@@ -1,0 +1,34 @@
+<div class="auth-wall-container animate-fade-in">
+  <div class="auth-wall-card">
+    <div class="locked-icon-wrapper">🔑</div>
+    <h2 class="locked-title">Authentication Required</h2>
+    <p class="locked-desc">
+      To view your active positions, record new transactions, or access your trade ledger history, please sign in using Google.
+    </p>
+    
+    <div class="auth-features-list">
+      <div class="auth-feature-item">
+        <span class="auth-feature-checkmark">✓</span>
+        <span><strong>LIFO Cost Basis Matching</strong>: Automatic tax-lot allocation of shares.</span>
+      </div>
+      <div class="auth-feature-item">
+        <span class="auth-feature-checkmark">✓</span>
+        <span><strong>Position Breakdown</strong>: Average remaining cost basis per share.</span>
+      </div>
+      <div class="auth-feature-item">
+        <span class="auth-feature-checkmark">✓</span>
+        <span><strong>Real-time Synchronization</strong>: Shared backend with Telegram Bot.</span>
+      </div>
+    </div>
+
+    <!-- Google GSI Button container for auth wall -->
+    <div id="googleBtnWall" style="min-height: 40px; margin: 15px auto; display: flex; justify-content: center;"></div>
+
+    <!-- Subtle Test backdoor option -->
+    <div class="demo-backdoor-wrapper">
+      <button class="demo-backdoor-link" (click)="loginAsDemoUser('u001')">
+        Or, continue as Guest using Demo Account (Sabay)
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+<div class="view-container animate-fade-in">
+  <!-- Premium Hero Banner (Public) -->
+  <section class="hero-banner">
+    <div class="hero-badge">🔐 Google Authenticated & Secure</div>
+    <h1 class="hero-title">Cambodia Securities Exchange (CSX) Portfolio Tracker</h1>
+    <p class="hero-subtitle">
+      A real-world professional ledger for CSX traders. Log transactions, track real-time market prices, and automatically analyze matching lots using the LIFO cost basis logic.
+    </p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <div>
+          <div class="feature-title">Real-Time Prices</div>
+          <div class="feature-desc">Public cached feed directly from the Cambodia Securities Exchange.</div>
+        </div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📦</span>
+        <div>
+          <div class="feature-title">LIFO Lot Allocation</div>
+          <div class="feature-desc">Taxes and cost-basis matched against your most recent purchases first.</div>
+        </div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📜</span>
+        <div>
+          <div class="feature-title">Trade Ledger</div>
+          <div class="feature-desc">Permanent transaction history, with detailed commissions calculations.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Authenticated Dashboard State -->
+  <ng-container *ngIf="!apiService.isGuest()">
+    <!-- Metric Highlights -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <span class="metric-title">Realised P/L</span>
+        <span class="metric-value" [ngClass]="totalRealisedPnl >= 0 ? 'text-profit' : 'text-loss'">
+          {{ totalRealisedPnl >= 0 ? '+' : '' }}{{ totalRealisedPnl | number }} <span class="currency">riel</span>
+        </span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Unrealised P/L</span>
+        <span class="metric-value" [ngClass]="totalUnrealisedPnl >= 0 ? 'text-profit' : 'text-loss'">
+          {{ totalUnrealisedPnl >= 0 ? '+' : '' }}{{ totalUnrealisedPnl | number }} <span class="currency">riel</span>
+        </span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Total P/L</span>
+        <span class="metric-value" [ngClass]="totalPnl >= 0 ? 'text-profit' : 'text-loss'">
+          {{ totalPnl >= 0 ? '+' : '' }}{{ totalPnl | number }} <span class="currency">riel</span>
+        </span>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Dashboard Columns (Public market prices + Lock/Authenticated side column) -->
+  <div class="dashboard-columns">
+    <!-- Live Market Prices (Public) -->
+    <div class="dashboard-panel">
+      <h2 class="panel-title">📈 CSX Market Prices</h2>
+      <div *ngIf="loadingPrices()" class="panel-loader">Loading prices...</div>
+      <div *ngIf="!loadingPrices()" class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Price (riel)</th>
+              <th>Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of prices()">
+              <td class="font-bold">{{ p.ticker }}</td>
+              <td>{{ p.price | number }}</td>
+              <td [ngClass]="p.change_direction === 'up' ? 'text-profit' : (p.change_direction === 'down' ? 'text-loss' : 'text-neutral')">
+                <span *ngIf="p.change_direction === 'up'">▲</span>
+                <span *ngIf="p.change_direction === 'down'">▼</span>
+                {{ p.change | number }}
+              </td>
+            </tr>
+            <tr *ngIf="prices().length === 0">
+              <td colspan="3" class="text-center">No market prices available.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right Side: User stats when logged in, or Lock preview when guest -->
+    <div class="dashboard-panel-group">
+      <!-- Logged-in: Top Rankings -->
+      <ng-container *ngIf="!apiService.isGuest()">
+        <!-- Top Tickers -->
+        <div class="dashboard-panel panel-sm">
+          <h2 class="panel-title">🏆 Top Tickers (Realised P/L)</h2>
+          <div class="ranking-list">
+            <div *ngFor="let t of topTickers(); let i = index" class="ranking-item">
+              <span class="ranking-rank">#{{ i + 1 }}</span>
+              <span class="ranking-name">{{ t.ticker }}</span>
+              <span class="ranking-val text-profit">+{{ t.realisedPnl | number }} riel</span>
+            </div>
+            <div *ngIf="topTickers().length === 0" class="ranking-empty">No trading history yet.</div>
+          </div>
+        </div>
+
+        <!-- Top Orders -->
+        <div class="dashboard-panel panel-sm">
+          <h2 class="panel-title">🥇 Top Orders (Realised P/L)</h2>
+          <div class="ranking-list">
+            <div *ngFor="let o of topOrders(); let i = index" class="ranking-item">
+              <span class="ranking-rank">#{{ i + 1 }}</span>
+              <span class="ranking-name">{{ o.ticker }} (Lot #{{ o.seq }})</span>
+              <span class="ranking-val text-profit">+{{ o.realisedPnl | number }} riel</span>
+            </div>
+            <div *ngIf="topOrders().length === 0" class="ranking-empty">No trading history yet.</div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Guest: Lock Preview -->
+      <div *ngIf="apiService.isGuest()" class="locked-analytics-overlay">
+        <div class="locked-icon-wrapper">🔒</div>
+        <h3 class="locked-title">Personalized Analytics</h3>
+        <p class="locked-desc">
+          Sign in with your Google account to record trades, track your realized and unrealized profits, and see matching lots.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

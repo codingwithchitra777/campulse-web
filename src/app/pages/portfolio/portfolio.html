@@ -1,0 +1,175 @@
+<div class="view-container animate-fade-in">
+  <div class="portfolio-layout">
+    <!-- Holdings Grid -->
+    <div class="portfolio-list-panel">
+      <h2 class="panel-title">💼 Active Positions</h2>
+      <div *ngIf="loadingPortfolio()" class="panel-loader">Loading portfolio...</div>
+      <div *ngIf="!loadingPortfolio()" class="table-container">
+        <table class="data-table selectable-rows">
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Last Price</th>
+              <th>Remaining Qty</th>
+              <th>Sold %</th>
+              <th>Avg Cost</th>
+              <th>Total P/L</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let h of portfolio()" (click)="selectHolding(h)" [class.selected]="selectedHolding()?.ticker === h.ticker">
+              <td class="font-bold">{{ h.ticker }}</td>
+              <td>{{ h.lastPrice | number }}</td>
+              <td>{{ h.remainingQty | number }}</td>
+              <td>{{ h.soldPercent | number:'1.1-1' }}%</td>
+              <td>{{ h.avgCostRemaining | number:'1.0-0' }}</td>
+              <td [ngClass]="h.totalPnl >= 0 ? 'text-profit' : 'text-loss'">
+                {{ h.totalPnl >= 0 ? '+' : '' }}{{ h.totalPnl | number }}
+              </td>
+            </tr>
+            <tr *ngIf="portfolio().length === 0">
+              <td colspan="6" class="text-center">No active positions. Buy some stocks to get started!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  <!-- Backdrop for Right Drawer -->
+  <div *ngIf="selectedHolding()" class="drawer-backdrop" (click)="selectedHolding.set(null)"></div>
+
+  <!-- Position Lots Breakdown (Right Drawer) -->
+  <div class="portfolio-drawer" [class.open]="selectedHolding() !== null">
+    <div class="drawer-header" *ngIf="selectedHolding()">
+      <h2 class="panel-title" style="margin: 0; font-size: 16px;">🔍 Position Detail: {{ selectedHolding()?.ticker }}</h2>
+      <button class="drawer-close-btn" (click)="selectedHolding.set(null)" title="Close Details">✕</button>
+    </div>
+    
+    <div *ngIf="selectedHolding() && loadingDetails()" class="panel-loader" style="margin-top: 40px;">Loading details...</div>
+
+    <div *ngIf="selectedHolding() && !loadingDetails() && holdingDetails()" class="drawer-content-scroll">
+      <!-- Dynamic HTML & CSS Stock Details component replacing backend image rendering -->
+      <div class="stock-details-card-html">
+        <div class="card-header-html">
+          <h3 class="card-title-html">{{ selectedHolding()?.ticker }} - STOCK DETAILS (LIFO Allocation Basis)</h3>
+          <div class="card-divider-html"></div>
+        </div>
+        
+        <!-- Stats Row -->
+        <div class="card-stats-row-html">
+          <div class="stat-box-html">
+            <span class="stat-label-html">Total Bought</span>
+            <span class="stat-value-html">{{ holdingDetails().totalBoughtQty | number }}</span>
+          </div>
+          <div class="stat-box-html">
+            <span class="stat-label-html">Total Sold</span>
+            <span class="stat-value-html">{{ holdingDetails().totalSoldQty | number }}</span>
+          </div>
+          <div class="stat-box-html">
+            <span class="stat-label-html">Remaining</span>
+            <span class="stat-value-html">{{ holdingDetails().remainingQty | number }}</span>
+          </div>
+          <div class="stat-box-html">
+            <span class="stat-label-html">Realised P/L</span>
+            <span class="stat-value-html" [ngClass]="holdingDetails().realisedPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
+              {{ holdingDetails().realisedPnl >= 0 ? '+' : '' }}{{ holdingDetails().realisedPnl | number }} KHR
+            </span>
+          </div>
+        </div>
+        
+        <!-- Columns for Buys and Sells lists -->
+        <div class="card-lists-columns-html">
+          <!-- Buy Orders List -->
+          <div class="list-col-html buy-col-html">
+            <h4 class="list-col-title-html title-buy">BUY ORDERS (LIFO Queue Basis)</h4>
+            <div class="list-table-container-html">
+              <table class="list-table-html">
+                <thead>
+                  <tr>
+                    <th>Seq</th>
+                    <th>Qty@Price</th>
+                    <th>Remaining</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let buy of holdingDetails().buys" [ngClass]="buy.qtyOpen > 0 ? 'row-active-buy' : 'row-sold-buy'">
+                    <td class="col-status-seq">
+                      <span class="status-indicator-dot" [ngClass]="buy.qtyOpen > 0 ? 'dot-active' : 'dot-sold'"></span>
+                      {{ buy.qtyOpen > 0 ? 'OPEN' : 'SOLD' }} #{{ buy.seq }}
+                    </td>
+                    <td>{{ buy.qtyOriginal | number }}@{{ buy.price | number }}</td>
+                    <td class="font-bold text-align-right" [ngClass]="buy.qtyOpen > 0 ? 'text-profit-bright' : 'text-muted'">
+                      {{ buy.qtyOpen | number }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="!holdingDetails().buys || holdingDetails().buys.length === 0">
+                    <td colspan="3" class="text-center-html">No buy orders.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Sell Orders List -->
+          <div class="list-col-html sell-col-html">
+            <h4 class="list-col-title-html title-sell">SELL ORDERS</h4>
+            <div class="list-table-container-html">
+              <table class="list-table-html">
+                <thead>
+                  <tr>
+                    <th>Seq</th>
+                    <th>Qty@Price</th>
+                    <th>P/L</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let sell of holdingDetails().sells" class="row-sell-header-html">
+                    <td colspan="3">
+                      <div class="sell-main-row-html">
+                        <span class="font-bold">#{{ sell.seq }}</span>
+                        <span>{{ sell.qty | number }}@{{ sell.price | number }}</span>
+                        <span class="font-bold" [ngClass]="sell.pnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
+                          {{ sell.pnl >= 0 ? '+' : '' }}{{ sell.pnl | number }}
+                        </span>
+                      </div>
+                      <!-- Matched Details Subrows -->
+                      <div class="sell-matches-container-html" *ngIf="sell.matched && sell.matched.length > 0">
+                        <div *ngFor="let match of sell.matched" class="sell-match-subrow-html">
+                          ↳ Matched #{{ match.buySeq }}: {{ match.qty | number }}@{{ match.price | number }}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!holdingDetails().sells || holdingDetails().sells.length === 0">
+                    <td colspan="3" class="text-center-html">No sell orders.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUY LOTS PANEL (Details) -->
+      <div class="lots-section" style="margin-top: 20px;">
+        <h3 class="section-subtitle">📥 Buy Lots (LIFO Allocation Remaining Details)</h3>
+        <div class="lots-list">
+          <div *ngFor="let lot of holdingDetails().remainingLots" class="lot-card">
+            <div class="lot-header">
+              <span class="lot-seq">Seq #{{ lot.seq }}</span>
+              <span class="lot-status" [ngClass]="lot.qtyOpen > 0 ? 'status-open' : 'status-sold'">
+                {{ lot.qtyOpen > 0 ? '🟢 Open' : '⚪ Sold' }}
+              </span>
+            </div>
+            <div class="lot-body">
+              <div>Remaining: <strong>{{ lot.qtyOpen }} / {{ lot.qtyOriginal }}</strong> shares</div>
+              <div>Price: <strong>{{ lot.price | number }} riel</strong></div>
+              <div>Date: <span class="date-text">{{ lot.orderDate | date:'mediumDate' }}</span></div>
+            </div>
+          </div>
+          <div *ngIf="holdingDetails().remainingLots.length === 0" class="empty-lots">No open lots remaining.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

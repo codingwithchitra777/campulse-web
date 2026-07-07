@@ -1,0 +1,13 @@
+.chart-section {
+  margin: 16px 0 20px 0;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.chart-section img {
+  width: 100%;
+  height: auto;
+  display: block;
+}

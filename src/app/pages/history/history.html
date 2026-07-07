@@ -1,0 +1,41 @@
+<div class="view-container animate-fade-in">
+  <div class="history-panel">
+    <h2 class="panel-title">📜 Complete Transaction History</h2>
+    <div *ngIf="loadingTrades()" class="panel-loader">Loading transaction history...</div>
+    <div *ngIf="!loadingTrades()" class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Seq</th>
+            <th>Ticker</th>
+            <th>Side</th>
+            <th>Quantity</th>
+            <th>Execution Price</th>
+            <th>Total Amount</th>
+            <th>Brokerage Commission</th>
+            <th>Execution Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of trades()">
+            <td class="font-bold">#{{ t.seq }}</td>
+            <td class="font-bold">{{ t.ticker }}</td>
+            <td>
+              <span class="trade-side-badge" [ngClass]="t.side === 'BUY' ? 'badge-buy' : 'badge-sell'">
+                {{ t.side }}
+              </span>
+            </td>
+            <td>{{ t.qty | number }}</td>
+            <td>{{ t.price | number }} riel</td>
+            <td class="font-bold">{{ (t.qty * t.price) | number }} riel</td>
+            <td class="text-muted">{{ t.commission | number }} riel</td>
+            <td class="date-text">{{ t.orderDate | date:'medium' }}</td>
+          </tr>
+          <tr *ngIf="trades().length === 0">
+            <td colspan="8" class="text-center">No trades found. Log a transaction on the "Record Trade" page to start tracking!</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
