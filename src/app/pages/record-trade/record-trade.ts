@@ -15,11 +15,12 @@ export class RecordTradeComponent implements OnInit {
   readonly tickersList = signal<any[]>([]);
   readonly loadingTickers = signal<boolean>(false);
 
-  // New trade form models
   tradeTicker = '';
   tradeSide = 'BUY';
   tradePrice = 0;
   tradeQty = 0;
+  tradeCommission = 0;
+  isCommissionManual = false;
 
   // Confirmation screen models
   readonly showConfirm = signal(false);
@@ -65,6 +66,7 @@ export class RecordTradeComponent implements OnInit {
         if (data && data.length > 0) {
           this.tradeTicker = data[0].ticker;
           this.tradePrice = data[0].price;
+          this.onPriceQtyChange();
           this.loadPositionDetails(this.tradeTicker);
         }
       },
@@ -105,7 +107,24 @@ export class RecordTradeComponent implements OnInit {
     if (selected) {
       this.tradePrice = selected.price;
     }
+    this.onPriceQtyChange();
     this.loadPositionDetails(this.tradeTicker);
+  }
+
+  onPriceQtyChange() {
+    if (!this.isCommissionManual) {
+      this.tradeCommission = Math.round(Number(this.tradePrice) * Number(this.tradeQty) * 0.0047);
+    }
+  }
+
+  onCommissionInput() {
+    this.isCommissionManual = true;
+  }
+
+  get totalTradeAmount(): number {
+    const subtotal = Number(this.tradePrice) * Number(this.tradeQty);
+    const commission = Number(this.tradeCommission) || 0;
+    return this.tradeSide === 'BUY' ? (subtotal + commission) : (subtotal - commission);
   }
 
   startTradeSubmit(event: Event) {
@@ -127,7 +146,8 @@ export class RecordTradeComponent implements OnInit {
       ticker: this.tradeTicker.toUpperCase(),
       side: this.tradeSide,
       price: Number(this.tradePrice),
-      qty: Number(this.tradeQty)
+      qty: Number(this.tradeQty),
+      commission: Number(this.tradeCommission)
     };
 
     this.apiService.initTrade(tradeData).subscribe({
@@ -154,13 +174,16 @@ export class RecordTradeComponent implements OnInit {
       ticker: this.tradeTicker.toUpperCase(),
       side: this.tradeSide,
       price: Number(this.tradePrice),
-      qty: Number(this.tradeQty)
+      qty: Number(this.tradeQty),
+      commission: Number(this.tradeCommission)
     };
 
     this.apiService.confirmTrade(tradeData).subscribe({
       next: (res) => {
         this.tradeSuccess.set(res);
         this.tradeQty = 0;
+        this.tradeCommission = 0;
+        this.isCommissionManual = false;
         this.loadPositionDetails(this.tradeTicker);
       },
       error: (err) => {

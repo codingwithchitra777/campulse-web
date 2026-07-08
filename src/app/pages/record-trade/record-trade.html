@@ -66,12 +66,35 @@
 
         <div class="form-group">
           <label for="price">Price per Share (riel):</label>
-          <input type="number" id="price" name="price" [(ngModel)]="tradePrice" placeholder="e.g. 7300" required min="1">
+          <input type="number" id="price" name="price" [(ngModel)]="tradePrice" (ngModelChange)="onPriceQtyChange()" placeholder="e.g. 7300" required min="1">
         </div>
 
         <div class="form-group">
           <label for="qty">Quantity (shares):</label>
-          <input type="number" id="qty" name="qty" [(ngModel)]="tradeQty" placeholder="e.g. 100" required min="1">
+          <input type="number" id="qty" name="qty" [(ngModel)]="tradeQty" (ngModelChange)="onPriceQtyChange()" placeholder="e.g. 100" required min="1">
+        </div>
+
+        <div class="form-group">
+          <label for="commission">Commission Fee (riel):</label>
+          <input type="number" id="commission" name="commission" [(ngModel)]="tradeCommission" (input)="onCommissionInput()" placeholder="e.g. 47" required min="0">
+        </div>
+
+        <!-- Total Price Immediate Preview -->
+        <div class="total-preview-box" *ngIf="tradePrice > 0 && tradeQty > 0" style="background: rgba(30, 41, 59, 0.5); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1e293b;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af; margin-bottom: 4px;">
+            <span>Subtotal:</span>
+            <span style="color: #f8fafc; font-weight: 500;">{{ (tradePrice * tradeQty) | number }} riel</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af; margin-bottom: 6px;">
+            <span>Commission:</span>
+            <span style="color: #f8fafc; font-weight: 500;">{{ tradeCommission | number }} riel</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 15px; border-top: 1px solid #334155; padding-top: 8px; margin-top: 4px;">
+            <span>Estimated Total:</span>
+            <span [style.color]="tradeSide === 'BUY' ? '#ef4444' : '#10b981'">
+              {{ totalTradeAmount | number }} riel
+            </span>
+          </div>
         </div>
 
         <button type="submit" class="submit-btn" [ngClass]="tradeSide === 'BUY' ? 'btn-buy' : 'btn-sell'" [disabled]="loadingTickers() || tickersList().length === 0 || loadingValidation()">
