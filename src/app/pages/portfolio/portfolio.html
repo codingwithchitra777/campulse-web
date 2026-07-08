@@ -14,6 +14,7 @@
               <th>Sold %</th>
               <th>Avg Cost</th>
               <th>Total P/L</th>
+              <th>P/L %</th>
             </tr>
           </thead>
           <tbody>
@@ -26,9 +27,12 @@
               <td [ngClass]="h.totalPnl >= 0 ? 'text-profit' : 'text-loss'">
                 {{ h.totalPnl >= 0 ? '+' : '' }}{{ h.totalPnl | number }}
               </td>
+              <td [ngClass]="h.totalPnlPercent >= 0 ? 'text-profit' : 'text-loss'">
+                {{ h.totalPnlPercent >= 0 ? '+' : '' }}{{ h.totalPnlPercent | number:'1.2-2' }}%
+              </td>
             </tr>
             <tr *ngIf="portfolio().length === 0">
-              <td colspan="6" class="text-center">No active positions. Buy some stocks to get started!</td>
+              <td colspan="7" class="text-center">No active positions. Buy some stocks to get started!</td>
             </tr>
           </tbody>
         </table>
@@ -73,6 +77,15 @@
             <span class="stat-label-html">Realised P/L</span>
             <span class="stat-value-html" [ngClass]="holdingDetails().realisedPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
               {{ holdingDetails().realisedPnl >= 0 ? '+' : '' }}{{ holdingDetails().realisedPnl | number }} KHR
+            </span>
+          </div>
+          <div class="stat-box-html" *ngIf="selectedHolding()">
+            <span class="stat-label-html">Total P/L</span>
+            <span class="stat-value-html" [ngClass]="selectedHolding().totalPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
+              {{ selectedHolding().totalPnl >= 0 ? '+' : '' }}{{ selectedHolding().totalPnl | number }} KHR
+              <span style="font-size: 11px; font-weight: normal; margin-left: 2px; opacity: 0.9;">
+                ({{ selectedHolding().totalPnlPercent >= 0 ? '+' : '' }}{{ selectedHolding().totalPnlPercent | number:'1.2-2' }}%)
+              </span>
             </span>
           </div>
         </div>
