@@ -1253,3 +1253,349 @@ body {
 .animate-pulse-warning {
   animation: pulseWarning 2s infinite;
 }
+
+/* Gemini-Style Profile & Dropdown Aesthetics */
+.profile-avatar-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-avatar-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #334155;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+}
+
+.profile-avatar-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  border-color: #3b82f6;
+}
+
+.profile-dropdown-card {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: 290px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+  z-index: 1060;
+  display: flex;
+  flex-direction: column;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.profile-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.large-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  align-self: flex-start;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-dropdown-divider {
+  height: 1px;
+  background: #24304f;
+  margin: 16px 0;
+}
+
+.profile-dropdown-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.signout-btn-modern {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.signout-btn-modern:hover {
+  background: rgba(239, 68, 68, 0.08);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1030;
+  background: transparent;
+}
+
+
+/* --- Mobile Media Queries & Responsive Layouts --- */
+
+@media (max-width: 768px) {
+  /* Global Layout Spacing */
+  .app-container {
+    padding: 12px;
+  }
+  
+  .app-body {
+    padding: 8px 0;
+  }
+
+  /* Responsive App Header (Stacked Layout) */
+  .app-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 16px;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .app-header > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Reposition elements for clean alignment */
+  .header-logo {
+    order: 1;
+  }
+  
+  .header-user {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .header-nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding: 2px 0 6px 0;
+    gap: 6px;
+    border-top: 1px solid #1e293b;
+    margin-top: 2px;
+    /* Hide scrollbar for clean tab-bar look */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .header-nav::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+
+  .header-nav a, .header-nav button {
+    padding: 8px 14px;
+    font-size: 13px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Hero Banner & Dashboard elements */
+  .hero-banner {
+    padding: 24px 16px;
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  .hero-subtitle {
+    font-size: 13px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .feature-card {
+    padding: 12px;
+  }
+
+  /* Metrics elements */
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .metric-card {
+    padding: 16px;
+  }
+
+  .metric-value {
+    font-size: 22px;
+  }
+
+  /* Grid splits stack vertically */
+  .dashboard-columns {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Compact details component inside Portfolio Page drawer */
+  .portfolio-drawer {
+    width: 100%;
+    max-width: 100%;
+    border-left: none;
+  }
+
+  .drawer-header {
+    padding: 16px;
+  }
+
+  .drawer-content-scroll {
+    padding: 12px;
+  }
+
+  .stock-details-card-html {
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  .card-stats-row-html {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stat-box-html {
+    align-items: flex-start;
+  }
+
+  .card-lists-columns-html {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .list-col-html {
+    padding: 10px;
+  }
+
+  /* Data Table Responsiveness */
+  .data-table th,
+  .data-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  /* Record Trade Form Card adjustment */
+  .centered-view {
+    padding-top: 0;
+  }
+  
+  .form-card {
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Smaller devices adjustments */
+  .app-header {
+    padding: 10px 12px;
+  }
+
+  .logo-text {
+    font-size: 18px;
+  }
+
+  .logo-emoji {
+    font-size: 22px;
+  }
+  
+  .header-nav a, .header-nav button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .card-stats-row-html {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}

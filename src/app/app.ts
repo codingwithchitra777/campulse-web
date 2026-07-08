@@ -12,6 +12,26 @@ import { ApiService } from './services/api.service';
 export class App implements OnInit {
   protected readonly apiService = inject(ApiService);
   private router = inject(Router);
+  showProfileDropdown = false;
+
+  toggleProfileDropdown(event: Event) {
+    event.stopPropagation();
+    this.showProfileDropdown = !this.showProfileDropdown;
+  }
+
+  closeProfileDropdown() {
+    this.showProfileDropdown = false;
+  }
+
+  getUserInitials(): string {
+    const profile = this.apiService.googleProfile();
+    if (!profile || !profile.name) return 'GP';
+    const parts = profile.name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return parts[0].substring(0, Math.min(2, parts[0].length)).toUpperCase();
+  }
 
   constructor() {
     // Automatically initialize Google button in the header whenever auth state changes

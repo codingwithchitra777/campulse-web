@@ -22,14 +22,36 @@
 
       <!-- Google Profile & Sign Out (shown when logged in) -->
       <ng-container *ngIf="!apiService.isGuest() && apiService.googleProfile()">
-        <div class="google-profile-info" style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 13px; font-weight: 600; color: #10b981;">👤 {{ apiService.googleProfile().name }}</span>
-          <button (click)="logoutGoogle()" style="background: #ef4444; border: none; color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600;">Sign Out</button>
+        <div class="profile-avatar-container">
+          <button class="profile-avatar-btn" (click)="toggleProfileDropdown($event)">
+            {{ getUserInitials() }}
+          </button>
+          
+          <!-- Floating Profile Dropdown Card (Gemini style) -->
+          <div class="profile-dropdown-card" *ngIf="showProfileDropdown" (click)="$event.stopPropagation()">
+            <div class="profile-dropdown-header">
+              <div class="large-avatar">{{ getUserInitials() }}</div>
+              <div class="user-details">
+                <span class="user-name">{{ apiService.googleProfile().name }}</span>
+                <span class="user-email" *ngIf="apiService.googleProfile().email">{{ apiService.googleProfile().email }}</span>
+                <span class="user-role-badge">Premium Trader</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <div class="profile-dropdown-actions">
+              <button class="signout-btn-modern" (click)="logoutGoogle(); closeProfileDropdown()">
+                <span>🚪</span> Sign Out
+              </button>
+            </div>
+          </div>
         </div>
       </ng-container>
 
       <button class="refresh-btn" (click)="refreshActivePage()" title="Refresh Data">🔄</button>
     </div>
+
+    <!-- Dropdown Backdrop to close on click outside -->
+    <div class="dropdown-backdrop" *ngIf="showProfileDropdown" (click)="closeProfileDropdown()"></div>
   </header>
 
   <!-- Body Content: Handles the router-outlet -->
