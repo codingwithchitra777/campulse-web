@@ -1,106 +1,75 @@
-import { Injectable, signal } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import {
+  GoogleAuthResponse,
+  Holding,
+  Position,
+  Price,
+  TopOrder,
+  TopTicker,
+  Trade,
+  TradeInitResult,
+  TradePayload,
+  TradeResult
+} from '../models';
+import { API_BASE_URL } from '../app.constants';
 
+/**
+ * Pure HTTP client for the campulse-backend API.
+ * Auth/session state lives in SessionService; the X-User-Id header is
+ * attached by userIdInterceptor (see app.config.ts).
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'https://campulse-backend.fastapicloud.dev';
-  
-  // Active User ID signal - allows mock switcher in header to trigger reactive reloading
-  // Active User ID signal - allows mock switcher in header to trigger reactive reloading
-  readonly activeUserId = signal<string>('u001');
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = API_BASE_URL;
 
-  // Google authentication profile signal
-  readonly googleProfile = signal<any | null>(null);
-
-  constructor(private http: HttpClient) {
-    // Automatically restore cached session on instantiation
-    const cachedProfile = localStorage.getItem('google_profile');
-    if (cachedProfile) {
-      try {
-        const profile = JSON.parse(cachedProfile);
-        this.googleProfile.set(profile);
-        this.activeUserId.set(profile.userId);
-      } catch (e) {
-        localStorage.removeItem('google_profile');
-        this.activeUserId.set('guest');
-      }
-    } else {
-      this.activeUserId.set('guest');
-    }
+  getPrices(): Observable<Price[]> {
+    return this.http.get<Price[]>(`${this.baseUrl}/api/prices`);
   }
 
-  isGuest(): boolean {
-    return this.googleProfile() === null;
+  getPrice(symbol: string): Observable<Price> {
+    return this.http.get<Price>(`${this.baseUrl}/api/price/${symbol}`);
   }
 
-  logout() {
-    localStorage.removeItem('google_profile');
-    this.googleProfile.set(null);
-    this.activeUserId.set('guest');
-  }
-
-  loginAsDemo(userId: string, name: string) {
-    const profile = { userId, name, email: `${userId}@demo.com` };
-    localStorage.setItem('google_profile', JSON.stringify(profile));
-    this.googleProfile.set(profile);
-    this.activeUserId.set(userId);
-  }
-
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'X-User-Id': this.activeUserId()
+  getTrades(ticker?: string): Observable<Trade[]> {
+    return this.http.get<Trade[]>(`${this.baseUrl}/api/trades`, {
+      params: ticker ? { ticker } : {}
     });
   }
 
-  getPrices(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/api/prices`);
+  addTrade(trade: TradePayload): Observable<TradeResult> {
+    return this.http.post<TradeResult>(`${this.baseUrl}/api/trades`, trade);
   }
 
-  getPrice(symbol: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/api/price/${symbol}`);
+  initTrade(trade: TradePayload): Observable<TradeInitResult> {
+    return this.http.post<TradeInitResult>(`${this.baseUrl}/api/trades/init`, trade);
   }
 
-  getTrades(ticker?: string): Observable<any[]> {
-    const url = ticker ? `${this.baseUrl}/api/trades?ticker=${ticker}` : `${this.baseUrl}/api/trades`;
-    return this.http.get<any[]>(url, { headers: this.getHeaders() });
+  confirmTrade(trade: TradePayload): Observable<TradeResult> {
+    return this.http.post<TradeResult>(`${this.baseUrl}/api/trades/confirm`, trade);
   }
 
-  addTrade(trade: { ticker: string; side: string; price: number; qty: number }): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/api/trades`, trade, { headers: this.getHeaders() });
+  getPosition(symbol: string): Observable<Position> {
+    return this.http.get<Position>(`${this.baseUrl}/api/position/${symbol}`);
   }
 
-  initTrade(trade: { ticker: string; side: string; price: number; qty: number }): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/api/trades/init`, trade, { headers: this.getHeaders() });
+  getPortfolio(): Observable<Holding[]> {
+    return this.http.get<Holding[]>(`${this.baseUrl}/api/portfolio`);
   }
 
-  confirmTrade(trade: { ticker: string; side: string; price: number; qty: number }): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/api/trades/confirm`, trade, { headers: this.getHeaders() });
+  getTopOrders(): Observable<TopOrder[]> {
+    return this.http.get<TopOrder[]>(`${this.baseUrl}/api/top-orders`);
   }
 
-  getPosition(symbol: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/api/position/${symbol}`, { headers: this.getHeaders() });
+  getTopTickers(): Observable<TopTicker[]> {
+    return this.http.get<TopTicker[]>(`${this.baseUrl}/api/top-tickers`);
   }
 
-  getPortfolio(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/api/portfolio`, { headers: this.getHeaders() });
-  }
-
-  getTopOrders(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/api/top-orders`, { headers: this.getHeaders() });
-  }
-
-  getTopTickers(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/api/top-tickers`, { headers: this.getHeaders() });
-  }
-
-  getChartUrl(symbol: string): string {
-    return `${this.baseUrl}/api/chart/${symbol}?userId=${this.activeUserId()}`;
-  }
-
-  googleLogin(credential: string): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/api/auth/google`, { credential });
+  googleLogin(credential: string): Observable<GoogleAuthResponse> {
+    return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/google`, { credential });
   }
 }

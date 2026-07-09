@@ -1,12 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { ApiService } from '../services/api.service';
+import { SessionService } from '../services/session.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const apiService = inject(ApiService);
+  const session = inject(SessionService);
   const router = inject(Router);
 
-  if (apiService.isGuest()) {
+  if (session.isGuest()) {
     // Redirect to login page and keep target path as returnUrl
     router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
     return false;

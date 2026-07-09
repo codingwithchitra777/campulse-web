@@ -1,6 +1,9 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../services/api.service';
+import { SessionService } from '../../services/session.service';
+import { Trade } from '../../models';
 
 @Component({
   selector: 'app-history',
@@ -8,24 +11,13 @@ import { ApiService } from '../../services/api.service';
   imports: [CommonModule],
   templateUrl: './history.html'
 })
-export class HistoryComponent implements OnInit {
-  readonly apiService = inject(ApiService);
+export class HistoryComponent {
+  private readonly api = inject(ApiService);
+  private readonly session = inject(SessionService);
 
-  readonly trades = signal<any[]>([]);
-  readonly loadingTrades = signal<boolean>(false);
-
-  ngOnInit() {
-    this.loadTrades();
-  }
-
-  loadTrades() {
-    this.loadingTrades.set(true);
-    this.apiService.getTrades().subscribe({
-      next: (data) => {
-        this.trades.set(data);
-        this.loadingTrades.set(false);
-      },
-      error: () => this.loadingTrades.set(false)
-    });
-  }
+  readonly trades = rxResource({
+    params: () => this.session.activeUserId(),
+    stream: () => this.api.getTrades(),
+    defaultValue: [] as Trade[]
+  });
 }

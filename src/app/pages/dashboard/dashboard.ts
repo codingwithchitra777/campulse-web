@@ -1,6 +1,9 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../services/api.service';
+import { SessionService } from '../../services/session.service';
+import { Holding, Price, TopOrder, TopTicker } from '../../models';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,55 +11,46 @@ import { ApiService } from '../../services/api.service';
   imports: [CommonModule],
   templateUrl: './dashboard.html'
 })
-export class DashboardComponent implements OnInit {
-  readonly apiService = inject(ApiService);
+export class DashboardComponent {
+  protected readonly session = inject(SessionService);
+  private readonly api = inject(ApiService);
 
-  readonly loadingPrices = signal<boolean>(false);
-  readonly prices = signal<any[]>([]);
-  
-  readonly portfolio = signal<any[]>([]);
-  readonly topTickers = signal<any[]>([]);
-  readonly topOrders = signal<any[]>([]);
+  // Personal data is keyed on the active user: it refetches automatically on
+  // login/logout/user switch, and idles (empty) while browsing as guest.
+  private readonly userId = computed(() =>
+    this.session.isGuest() ? undefined : this.session.activeUserId()
+  );
 
-  ngOnInit() {
-    this.loadPrices();
-    if (!this.apiService.isGuest()) {
-      this.loadPersonalDashboardData();
-    }
-  }
+  readonly prices = rxResource({
+    stream: () => this.api.getPrices(),
+    defaultValue: [] as Price[]
+  });
 
-  loadPrices() {
-    this.loadingPrices.set(true);
-    this.apiService.getPrices().subscribe({
-      next: (data) => {
-        this.prices.set(data);
-        this.loadingPrices.set(false);
-      },
-      error: () => this.loadingPrices.set(false)
-    });
-  }
+  readonly portfolio = rxResource({
+    params: () => this.userId(),
+    stream: () => this.api.getPortfolio(),
+    defaultValue: [] as Holding[]
+  });
 
-  loadPersonalDashboardData() {
-    this.apiService.getPortfolio().subscribe({
-      next: (data) => this.portfolio.set(data)
-    });
-    this.apiService.getTopTickers().subscribe({
-      next: (data) => this.topTickers.set(data)
-    });
-    this.apiService.getTopOrders().subscribe({
-      next: (data) => this.topOrders.set(data)
-    });
-  }
+  readonly topTickers = rxResource({
+    params: () => this.userId(),
+    stream: () => this.api.getTopTickers(),
+    defaultValue: [] as TopTicker[]
+  });
 
-  get totalRealisedPnl(): number {
-    return this.portfolio().reduce((sum, h) => sum + (h.realisedPnl || 0), 0);
-  }
+  readonly topOrders = rxResource({
+    params: () => this.userId(),
+    stream: () => this.api.getTopOrders(),
+    defaultValue: [] as TopOrder[]
+  });
 
-  get totalUnrealisedPnl(): number {
-    return this.portfolio().reduce((sum, h) => sum + (h.unrealisedPnl || 0), 0);
-  }
+  readonly totalRealisedPnl = computed(() =>
+    this.portfolio.value().reduce((sum, h) => sum + (h.realisedPnl || 0), 0)
+  );
 
-  get totalPnl(): number {
-    return this.totalRealisedPnl + this.totalUnrealisedPnl;
-  }
+  readonly totalUnrealisedPnl = computed(() =>
+    this.portfolio.value().reduce((sum, h) => sum + (h.unrealisedPnl || 0), 0)
+  );
+
+  readonly totalPnl = computed(() => this.totalRealisedPnl() + this.totalUnrealisedPnl());
 }

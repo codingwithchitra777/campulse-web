@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { Position, Price, TradePayload, TradeResult, TradeSide } from '../../models';
 
 @Component({
   selector: 'app-record-trade',
@@ -10,13 +11,13 @@ import { ApiService } from '../../services/api.service';
   templateUrl: './record-trade.html'
 })
 export class RecordTradeComponent implements OnInit {
-  readonly apiService = inject(ApiService);
+  private readonly api = inject(ApiService);
 
-  readonly tickersList = signal<any[]>([]);
+  readonly tickersList = signal<Price[]>([]);
   readonly loadingTickers = signal<boolean>(false);
 
   tradeTicker = '';
-  tradeSide = 'BUY';
+  tradeSide: TradeSide = 'BUY';
   tradePrice = 0;
   tradeQty = 0;
   tradeCommission = 0;
@@ -32,18 +33,18 @@ export class RecordTradeComponent implements OnInit {
   readonly existingQty = signal(0);
 
   // Feedback signals
-  readonly tradeSuccess = signal<any | null>(null);
+  readonly tradeSuccess = signal<TradeResult | null>(null);
   readonly tradeError = signal<string | null>(null);
 
   // Position details for selected stock
-  readonly activePosition = signal<any | null>(null);
+  readonly activePosition = signal<Position | null>(null);
   readonly loadingPosition = signal<boolean>(false);
 
   // Computed average buy cost from the remaining lots
   readonly averageCost = computed(() => {
     const pos = this.activePosition();
     if (!pos || !pos.remainingLots || pos.remainingLots.length === 0) return 0;
-    
+
     let totalCost = 0;
     let totalQty = 0;
     for (const lot of pos.remainingLots) {
@@ -59,7 +60,7 @@ export class RecordTradeComponent implements OnInit {
 
   loadTickers() {
     this.loadingTickers.set(true);
-    this.apiService.getPrices().subscribe({
+    this.api.getPrices().subscribe({
       next: (data) => {
         this.tickersList.set(data);
         this.loadingTickers.set(false);
@@ -80,7 +81,7 @@ export class RecordTradeComponent implements OnInit {
       return;
     }
     this.loadingPosition.set(true);
-    this.apiService.getPosition(ticker).subscribe({
+    this.api.getPosition(ticker).subscribe({
       next: (pos) => {
         this.activePosition.set(pos);
         this.loadingPosition.set(false);
@@ -95,6 +96,8 @@ export class RecordTradeComponent implements OnInit {
           remainingQty: 0,
           soldPercent: 0,
           realisedPnl: 0,
+          buys: [],
+          sells: [],
           remainingLots: []
         });
         this.loadingPosition.set(false);
@@ -103,7 +106,7 @@ export class RecordTradeComponent implements OnInit {
   }
 
   onTickerChange() {
-    const selected = this.tickersList().find(t => t.ticker === this.tradeTicker);
+    const selected = this.tickersList().find((t) => t.ticker === this.tradeTicker);
     if (selected) {
       this.tradePrice = selected.price;
     }
@@ -127,6 +130,16 @@ export class RecordTradeComponent implements OnInit {
     return this.tradeSide === 'BUY' ? (subtotal + commission) : (subtotal - commission);
   }
 
+  private buildTradePayload(): TradePayload {
+    return {
+      ticker: this.tradeTicker.toUpperCase(),
+      side: this.tradeSide,
+      price: Number(this.tradePrice),
+      qty: Number(this.tradeQty),
+      commission: Number(this.tradeCommission)
+    };
+  }
+
   startTradeSubmit(event: Event) {
     event.preventDefault();
     this.tradeSuccess.set(null);
@@ -142,15 +155,7 @@ export class RecordTradeComponent implements OnInit {
     }
 
     this.loadingValidation.set(true);
-    const tradeData = {
-      ticker: this.tradeTicker.toUpperCase(),
-      side: this.tradeSide,
-      price: Number(this.tradePrice),
-      qty: Number(this.tradeQty),
-      commission: Number(this.tradeCommission)
-    };
-
-    this.apiService.initTrade(tradeData).subscribe({
+    this.api.initTrade(this.buildTradePayload()).subscribe({
       next: (res) => {
         this.loadingValidation.set(false);
         this.existingQty.set(res.existingQty);
@@ -170,15 +175,7 @@ export class RecordTradeComponent implements OnInit {
 
   confirmAndSubmitTrade() {
     this.showConfirm.set(false);
-    const tradeData = {
-      ticker: this.tradeTicker.toUpperCase(),
-      side: this.tradeSide,
-      price: Number(this.tradePrice),
-      qty: Number(this.tradeQty),
-      commission: Number(this.tradeCommission)
-    };
-
-    this.apiService.confirmTrade(tradeData).subscribe({
+    this.api.confirmTrade(this.buildTradePayload()).subscribe({
       next: (res) => {
         this.tradeSuccess.set(res);
         this.tradeQty = 0;
