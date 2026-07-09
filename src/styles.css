@@ -474,6 +474,38 @@ body {
   border-left: 3px solid #3b82f6;
 }
 
+/* Small inline action button used in table rows (e.g. View position) */
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.view-btn:hover {
+  background: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+  border-color: #3b82f6;
+}
+
+/* Percentage shown inline next to an order's P/L, e.g. "+2,000 (+10%)" */
+.pnl-pct {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.85;
+  margin-left: 3px;
+}
+
 /* Rankings */
 .ranking-list {
   display: flex;
@@ -2036,6 +2068,17 @@ body.light .data-table td {
 
 body.light .data-table.selectable-rows tbody tr:hover {
   background-color: #f1f5f9;
+}
+
+body.light .view-btn {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+body.light .view-btn:hover {
+  background: #dbeafe;
+  border-color: #3b82f6;
 }
 
 /* Position detail card (portfolio drawer) */

@@ -4,7 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
-import { Holding, HoldingView } from '../../models';
+import { Holding, HoldingView, PositionSell } from '../../models';
 
 @Component({
   selector: 'app-portfolio',
@@ -33,6 +33,31 @@ export class PortfolioComponent {
 
   selectHolding(holding: HoldingView) {
     this.selectedHolding.set(holding);
+  }
+
+  /**
+   * Unrealised P/L of a single buy lot: what the still-open quantity gains or
+   * loses at the current market price vs its buy price. Null when the lot is
+   * fully sold or no market price is available.
+   */
+  lotPnl(lot: { qtyOpen: number; price: number }): number | null {
+    const lastPrice = this.selectedHolding()?.lastPrice ?? null;
+    if (lastPrice === null || lot.qtyOpen <= 0) return null;
+    return lot.qtyOpen * (lastPrice - lot.price);
+  }
+
+  /** Price move of an open buy lot vs the current market price, in percent. */
+  lotPnlPercent(lot: { qtyOpen: number; price: number }): number | null {
+    const lastPrice = this.selectedHolding()?.lastPrice ?? null;
+    if (lastPrice === null || lot.qtyOpen <= 0 || lot.price <= 0) return null;
+    return ((lastPrice - lot.price) / lot.price) * 100;
+  }
+
+  /** Realised P/L of a sell over the cost basis of its LIFO-matched buy lots, in percent. */
+  sellPnlPercent(sell: PositionSell): number | null {
+    const costBasis = sell.matched.reduce((sum, m) => sum + m.qty * m.price, 0);
+    if (costBasis <= 0) return null;
+    return (sell.pnl / costBasis) * 100;
   }
 }
 

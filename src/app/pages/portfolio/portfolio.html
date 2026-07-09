@@ -17,6 +17,7 @@
                 <th>Avg Cost</th>
                 <th>Total P/L</th>
                 <th>P/L %</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -33,10 +34,16 @@
                   <td [ngClass]="h.totalPnlPercent >= 0 ? 'text-profit' : 'text-loss'">
                     {{ h.totalPnlPercent >= 0 ? '+' : '' }}{{ h.totalPnlPercent | number:'1.2-2' }}%
                   </td>
+                  <td>
+                    <button class="view-btn" (click)="selectHolding(h); $event.stopPropagation()" title="View position details">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      View
+                    </button>
+                  </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="7" class="text-center">No active positions. Buy some stocks to get started!</td>
+                  <td colspan="8" class="text-center">No active positions. Buy some stocks to get started!</td>
                 </tr>
               }
             </tbody>
@@ -112,6 +119,7 @@
                         <th>Seq</th>
                         <th>Qty@Price</th>
                         <th>Remaining</th>
+                        <th class="text-align-right">P/L</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -125,10 +133,24 @@
                           <td class="font-bold text-align-right" [ngClass]="buy.qtyOpen > 0 ? 'text-profit-bright' : 'text-muted'">
                             {{ buy.qtyOpen | number }}
                           </td>
+                          <td class="font-bold text-align-right">
+                            @let pnl = lotPnl(buy);
+                            @if (pnl !== null) {
+                              <span [ngClass]="pnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
+                                {{ pnl >= 0 ? '+' : '' }}{{ pnl | number }}
+                                @let pnlPct = lotPnlPercent(buy);
+                                @if (pnlPct !== null) {
+                                  <span class="pnl-pct">({{ pnlPct >= 0 ? '+' : '' }}{{ pnlPct | number:'1.2-2' }}%)</span>
+                                }
+                              </span>
+                            } @else {
+                              <span class="text-muted">—</span>
+                            }
+                          </td>
                         </tr>
                       } @empty {
                         <tr>
-                          <td colspan="3" class="text-center-html">No buy orders.</td>
+                          <td colspan="4" class="text-center-html">No buy orders.</td>
                         </tr>
                       }
                     </tbody>
@@ -157,6 +179,10 @@
                               <span>{{ sell.qty | number }}@{{ sell.price | number }}</span>
                               <span class="font-bold" [ngClass]="sell.pnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
                                 {{ sell.pnl >= 0 ? '+' : '' }}{{ sell.pnl | number }}
+                                @let sellPct = sellPnlPercent(sell);
+                                @if (sellPct !== null) {
+                                  <span class="pnl-pct">({{ sellPct >= 0 ? '+' : '' }}{{ sellPct | number:'1.2-2' }}%)</span>
+                                }
                               </span>
                             </div>
                             <!-- Matched Details Subrows -->
@@ -198,6 +224,15 @@
                   <div class="lot-body">
                     <div>Remaining: <strong>{{ lot.qtyOpen }} / {{ lot.qtyOriginal }}</strong> shares</div>
                     <div>Price: <strong>{{ lot.price | number }} riel</strong></div>
+                    @let lotUnrealised = lotPnl(lot);
+                    @if (lotUnrealised !== null) {
+                      <div>
+                        Unrealised P/L:
+                        <strong [ngClass]="lotUnrealised >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
+                          {{ lotUnrealised >= 0 ? '+' : '' }}{{ lotUnrealised | number }} riel
+                        </strong>
+                      </div>
+                    }
                     <div>Date: <span class="date-text">{{ lot.orderDate | date:'mediumDate' }}</span></div>
                   </div>
                 </div>
