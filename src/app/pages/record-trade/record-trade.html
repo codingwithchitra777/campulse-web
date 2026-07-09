@@ -2,7 +2,7 @@
   <div class="record-trade-layout" *ngIf="!showConfirm()">
     <!-- Main Form Card -->
     <div class="form-card" style="margin: 0; max-width: 100%;">
-      <h2 class="panel-title">➕ Record New Trade</h2>
+      <h2 class="panel-title">➕ {{ 'TRADE.TITLE' | translate }}</h2>
       
       <!-- Feedback Messages -->
       <div *ngIf="tradeError()" class="alert alert-danger animate-slide-in">
@@ -11,8 +11,8 @@
 
       @if (tradeSuccess(); as success) {
         <div class="alert alert-success animate-slide-in">
-          <h3>✅ Trade Confirmed!</h3>
-          <p>Recorded <strong>{{ success.trade.qty }}</strong> shares of <strong>{{ success.trade.ticker }}</strong> @ <strong>{{ success.trade.price | number }} riel</strong>.</p>
+          <h3>✅ {{ 'TRADE.SUCCESS_TITLE' | translate }}</h3>
+          <p>{{ 'TRADE.RECORDED' | translate }} <strong>{{ success.trade.qty }}</strong> {{ 'TRADE.SHARES_OF' | translate }} <strong>{{ success.trade.ticker }}</strong> @ <strong>{{ success.trade.price | number }} riel</strong>.</p>
           @if (success.warning) {
             <div class="warning-box">
               ⚠️ {{ success.warning }}
@@ -21,16 +21,16 @@
           @if (success.trade.side === 'SELL' && success.allocations.length > 0) {
             <div class="matching-details">
               <hr>
-              <h4>📦 LIFO Matched Lots:</h4>
+              <h4>📦 {{ 'TRADE.LIFO_MATCHED' | translate }}</h4>
               <ul>
                 @for (a of success.allocations; track a.allocId) {
                   <li>
-                    Matched <strong>{{ a.qtyAllocated }}</strong> shares from Buy lot @ <strong>{{ a.buyPrice | number }} riel</strong>.
+                    {{ 'TRADE.MATCHED' | translate }} <strong>{{ a.qtyAllocated }}</strong> {{ 'TRADE.SHARES_FROM_LOT' | translate }} @ <strong>{{ a.buyPrice | number }} riel</strong>.
                   </li>
                 }
               </ul>
               <p class="realised-pnl-summary">
-                Realised Profit/Loss:
+                {{ 'TRADE.REAL_PNL' | translate }}:
                 <span [ngClass]="success.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
                   {{ success.realisedPnl >= 0 ? '+' : '' }}{{ success.realisedPnl | number }} riel
                 </span>
@@ -42,8 +42,8 @@
 
       <form (submit)="startTradeSubmit($event)" class="trade-form">
         <div class="form-group">
-          <label for="tickerSelect">Ticker Symbol (Select Stock):</label>
-          <div *ngIf="loadingTickers()" style="color: #9ca3af; font-size: 13px;">Loading symbols list...</div>
+          <label for="tickerSelect">{{ 'TRADE.SELECT_STOCK' | translate }}</label>
+          <div *ngIf="loadingTickers()" style="color: #9ca3af; font-size: 13px;">Loading...</div>
           <select 
             *ngIf="!loadingTickers()"
             id="tickerSelect" 
@@ -59,46 +59,46 @@
         </div>
 
         <div class="form-group">
-          <label>Trade Action:</label>
+          <label>{{ 'TRADE.ACTION' | translate }}</label>
           <div class="radio-group">
             <label class="radio-label">
               <input type="radio" name="side" [(ngModel)]="tradeSide" value="BUY">
-              <span class="radio-custom buy-selector">BUY</span>
+              <span class="radio-custom buy-selector">{{ 'TRADE.BUY' | translate }}</span>
             </label>
             <label class="radio-label">
               <input type="radio" name="side" [(ngModel)]="tradeSide" value="SELL">
-              <span class="radio-custom sell-selector">SELL</span>
+              <span class="radio-custom sell-selector">{{ 'TRADE.SELL' | translate }}</span>
             </label>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="price">Price per Share (riel):</label>
+          <label for="price">{{ 'TRADE.PRICE_SHARE' | translate }}</label>
           <input type="number" id="price" name="price" [(ngModel)]="tradePrice" (ngModelChange)="onPriceQtyChange()" placeholder="e.g. 7300" required min="1">
         </div>
 
         <div class="form-group">
-          <label for="qty">Quantity (shares):</label>
+          <label for="qty">{{ 'TRADE.QTY' | translate }}</label>
           <input type="number" id="qty" name="qty" [(ngModel)]="tradeQty" (ngModelChange)="onPriceQtyChange()" placeholder="e.g. 100" required min="1">
         </div>
 
         <div class="form-group">
-          <label for="commission">Commission Fee (riel):</label>
+          <label for="commission">{{ 'TRADE.COMMISSION' | translate }}</label>
           <input type="number" id="commission" name="commission" [(ngModel)]="tradeCommission" (input)="onCommissionInput()" placeholder="e.g. 47" required min="0">
         </div>
 
         <!-- Total Price Immediate Preview -->
         <div class="total-preview-box" *ngIf="tradePrice > 0 && tradeQty > 0" style="background: rgba(30, 41, 59, 0.5); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1e293b;">
           <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af; margin-bottom: 4px;">
-            <span>Subtotal:</span>
+            <span>{{ 'TRADE.SUBTOTAL' | translate }}:</span>
             <span style="color: #f8fafc; font-weight: 500;">{{ (tradePrice * tradeQty) | number }} riel</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af; margin-bottom: 6px;">
-            <span>Commission:</span>
+            <span>{{ 'PORTFOLIO.DRAWER.COMMISSION' | translate }}:</span>
             <span style="color: #f8fafc; font-weight: 500;">{{ tradeCommission | number }} riel</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 15px; border-top: 1px solid #334155; padding-top: 8px; margin-top: 4px;">
-            <span>Estimated Total:</span>
+            <span>{{ 'TRADE.EST_TOTAL' | translate }}:</span>
             <span [style.color]="tradeSide === 'BUY' ? '#ef4444' : '#10b981'">
               {{ totalTradeAmount | number }} riel
             </span>
@@ -106,14 +106,14 @@
         </div>
 
         <button type="submit" class="submit-btn" [ngClass]="tradeSide === 'BUY' ? 'btn-buy' : 'btn-sell'" [disabled]="loadingTickers() || tickersList().length === 0 || loadingValidation()">
-          {{ loadingValidation() ? 'Validating...' : 'Confirm ' + tradeSide }}
+          {{ loadingValidation() ? ('TRADE.VALIDATING' | translate) : (tradeSide === 'BUY' ? ('TRADE.CONFIRM_BUY' | translate) : ('TRADE.CONFIRM_SELL' | translate)) }}
         </button>
       </form>
     </div>
 
     <!-- Right side: Stock Balance details -->
     <div class="balance-card">
-      <h2 class="panel-title">📈 Stock Balance: {{ tradeTicker }}</h2>
+      <h2 class="panel-title">📈 {{ 'TRADE.BALANCE_TITLE' | translate }} {{ tradeTicker }}</h2>
       
       @if (loadingPosition()) {
         <div class="panel-loader" style="height: 150px;">
@@ -124,19 +124,19 @@
           <!-- Stats Row -->
           <div class="card-stats-row-html" style="margin-bottom: 20px;">
             <div class="stat-box-html">
-              <span class="stat-label-html">Available Shares</span>
+              <span class="stat-label-html">{{ 'TRADE.AVAILABLE_SHARES' | translate }}</span>
               <span class="stat-value-html" style="color: #60a5fa; font-size: 15px;">
                 {{ pos.remainingQty | number }}
               </span>
             </div>
             <div class="stat-box-html">
-              <span class="stat-label-html">Avg Buy Cost</span>
+              <span class="stat-label-html">{{ 'TRADE.AVG_BUY_COST' | translate }}</span>
               <span class="stat-value-html" style="font-size: 15px;">
                 {{ averageCost() | number }} riel
               </span>
             </div>
             <div class="stat-box-html">
-              <span class="stat-label-html">Realised P/L</span>
+              <span class="stat-label-html">{{ 'DASHBOARD.REALISED_PL' | translate }}</span>
               <span class="stat-value-html" [ngClass]="pos.realisedPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'" style="font-size: 15px;">
                 {{ pos.realisedPnl >= 0 ? '+' : '' }}{{ pos.realisedPnl | number }} riel
               </span>
@@ -146,21 +146,21 @@
           <!-- Total Bought vs Sold Ratio -->
           <div class="ratio-box" style="margin-bottom: 20px; font-size: 13px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #9ca3af;">
-              <span>Total Bought: <strong>{{ pos.totalBoughtQty | number }}</strong></span>
-              <span>Total Sold: <strong>{{ pos.totalSoldQty | number }}</strong></span>
+              <span>{{ 'TRADE.TOTAL_BOUGHT' | translate }}: <strong>{{ pos.totalBoughtQty | number }}</strong></span>
+              <span>{{ 'TRADE.TOTAL_SOLD' | translate }}: <strong>{{ pos.totalSoldQty | number }}</strong></span>
             </div>
             <!-- Progress bar -->
             <div class="progress-bar-container" style="background: #1e293b; height: 6px; border-radius: 3px; overflow: hidden; width: 100%;">
               <div class="progress-bar-fill" [style.width.%]="pos.soldPercent" style="background: linear-gradient(90deg, #3b82f6, #8b5cf6); height: 100%; transition: width 0.3s ease;"></div>
             </div>
             <div style="text-align: right; font-size: 11px; color: #64748b; margin-top: 4px;">
-              {{ pos.soldPercent | number:'1.1-1' }}% of holdings sold
+              {{ pos.soldPercent | number:'1.1-1' }}% {{ 'TRADE.HOLDINGS_SOLD' | translate }}
             </div>
           </div>
 
           <!-- LIFO open lots details -->
           <div class="lots-section" style="margin-top: 15px;">
-            <h3 class="section-subtitle" style="font-size: 12px; margin-bottom: 10px;">📥 Active Buy Lots (LIFO Queue)</h3>
+            <h3 class="lots-section-title" style="font-size: 12px; margin-bottom: 10px;">📥 {{ 'TRADE.LIFO_QUEUE' | translate }}</h3>
             <div class="lots-list" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
               @for (lot of pos.remainingLots; track lot.tradeId) {
                 <div class="lot-card" style="padding: 10px; background: #0f172a; border: 1px solid #1e293b; border-radius: 10px;">
@@ -171,16 +171,16 @@
                     </span>
                   </div>
                   <div class="lot-body" style="display: grid; grid-template-columns: 1fr 1.2fr; row-gap: 2px; font-size: 12px;">
-                    <div>Qty Open: <strong>{{ lot.qtyOpen | number }}</strong></div>
-                    <div>Cost: <strong>{{ lot.price | number }} riel</strong></div>
+                    <div>{{ 'PORTFOLIO.DRAWER.REMAINING' | translate }}: <strong>{{ lot.qtyOpen | number }}</strong></div>
+                    <div>{{ 'PORTFOLIO.DRAWER.PRICE' | translate }}: <strong>{{ lot.price | number }} riel</strong></div>
                     <div class="date-text" style="grid-column: 1 / -1; font-size: 10px; color: #8b949e; margin-top: 2px;">
-                      Date: {{ lot.orderDate | date:'mediumDate' }}
+                      {{ 'PORTFOLIO.DRAWER.DATE' | translate }}: {{ lot.orderDate | date:'mediumDate' }}
                     </div>
                   </div>
                 </div>
               } @empty {
                 <div class="empty-lots" style="text-align: center; color: #9ca3af; padding: 15px; font-size: 12px;">
-                  No open buy lots remaining.
+                  {{ 'TRADE.NO_BUY_LOTS' | translate }}
                 </div>
               }
             </div>
@@ -198,19 +198,19 @@
   <div class="form-card confirmation-card animate-scale-up" *ngIf="showConfirm()">
     <!-- Header -->
     <h2 class="panel-title text-center" style="border-bottom: 1px solid #1e293b; padding-bottom: 15px; margin-bottom: 20px;">
-      {{ validationError() ? '⚠️ Validation Error' : '🔔 Confirm Transaction' }}
+      {{ validationError() ? ('TRADE.CONFIRM_VAL_ERROR' | translate) : ('TRADE.CONFIRM_HEADER' | translate) }}
     </h2>
 
     <!-- Case A: Validation Quantity Error -->
     <div *ngIf="validationError()" class="validation-error-content">
       <div class="alert alert-danger" style="margin-bottom: 25px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 12px 16px; border-radius: 8px;">
-        <strong>Validation Failed:</strong> {{ validationError() }}
+        <strong>{{ 'TRADE.VAL_FAILED' | translate }}:</strong> {{ validationError() }}
       </div>
       <p style="font-size: 13px; color: #9ca3af; text-align: center; margin-bottom: 20px;">
         Please adjust your trade parameters.
       </p>
       <button type="button" class="submit-btn" style="background: #4b5563;" (click)="cancelConfirm()">
-        ✕ Return to Edit
+        ✕ {{ 'TRADE.BTN_RETURN' | translate }}
       </button>
     </div>
 
@@ -218,25 +218,25 @@
     <div *ngIf="!validationError()" class="confirmation-content">
       <div class="confirm-summary-box">
         <div class="confirm-item">
-          <span class="confirm-label">STOCK TICKER</span>
+          <span class="confirm-label">{{ 'DASHBOARD.COL_TICKER' | translate }}</span>
           <span class="confirm-value font-bold" style="color: #60a5fa;">{{ tradeTicker }}</span>
         </div>
         <div class="confirm-item">
-          <span class="confirm-label">ACTION</span>
+          <span class="confirm-label">{{ 'TRADE.ACTION' | translate }}</span>
           <span class="confirm-value font-bold" [ngClass]="tradeSide === 'BUY' ? 'text-profit' : 'text-loss'">
-            {{ tradeSide }}
+            {{ tradeSide === 'BUY' ? ('TRADE.BUY' | translate) : ('TRADE.SELL' | translate) }}
           </span>
         </div>
         <div class="confirm-item">
-          <span class="confirm-label">QUANTITY</span>
+          <span class="confirm-label">{{ 'TRADE.QTY' | translate }}</span>
           <span class="confirm-value">{{ tradeQty | number }} shares</span>
         </div>
         <div class="confirm-item">
-          <span class="confirm-label">PRICE PER SHARE</span>
+          <span class="confirm-label">{{ 'TRADE.PRICE_SHARE' | translate }}</span>
           <span class="confirm-value">{{ tradePrice | number }} riel</span>
         </div>
         <div class="confirm-item confirm-total-row">
-          <span class="confirm-label">ESTIMATED TOTAL</span>
+          <span class="confirm-label">{{ 'TRADE.EST_TOTAL' | translate }}</span>
           <span class="confirm-value font-bold" style="color: #f0f6fc;">
             {{ (tradeQty * tradePrice) | number }} riel
           </span>
@@ -246,7 +246,7 @@
       <!-- Sell-Specific LIFO matching simulation feedback (P/L and Warning) -->
       <div *ngIf="tradeSide === 'SELL'" class="simulated-matching-box" style="margin-top: 20px;">
         <div class="confirm-item">
-          <span class="confirm-label">Simulated P/L (Net of Fees)</span>
+          <span class="confirm-label">{{ 'TRADE.SIMULATED_PL' | translate }}</span>
           <span class="confirm-value font-bold" [ngClass]="simulatedPnl() >= 0 ? 'text-profit' : 'text-loss'">
             {{ simulatedPnl() >= 0 ? '+' : '' }}{{ simulatedPnl() | number }} riel
           </span>
@@ -254,18 +254,18 @@
 
         <!-- Loss Warning Card -->
         <div *ngIf="isLoss()" class="warning-loss-card animate-pulse-warning">
-          <strong>⚠️ Warning: Sell at a Loss!</strong>
-          <div>Executing this transaction will result in a realized loss of <strong>{{ simulatedLossAmount() | number }} riel</strong> on a LIFO matching basis.</div>
+          <strong>⚠️ {{ 'TRADE.WARN_LOSS_TITLE' | translate }}</strong>
+          <div>{{ 'TRADE.WARN_LOSS_DESC' | translate }}</div>
         </div>
       </div>
 
       <!-- Action Confirmation Buttons -->
       <div class="confirm-buttons-group" style="display: flex; gap: 15px; margin-top: 25px;">
         <button type="button" class="submit-btn" style="flex: 1; background: #374151; margin-top: 0;" (click)="cancelConfirm()">
-          Cancel
+          {{ 'TRADE.BTN_CANCEL' | translate }}
         </button>
         <button type="button" class="submit-btn" [ngClass]="tradeSide === 'BUY' ? 'btn-buy' : 'btn-sell'" style="flex: 1.5; margin-top: 0;" (click)="confirmAndSubmitTrade()">
-          Yes, Submit Trade
+          {{ 'TRADE.BTN_SUBMIT' | translate }}
         </button>
       </div>
     </div>

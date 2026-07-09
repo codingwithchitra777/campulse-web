@@ -1,31 +1,31 @@
 <div class="view-container animate-fade-in">
   <!-- Premium Hero Banner (Public) -->
   <section class="hero-banner">
-    <div class="hero-badge">🔐 Google Authenticated & Secure</div>
-    <h1 class="hero-title">CamPulse - Cambodia's Premium Investment & Portfolio Tracker</h1>
+    <div class="hero-badge">🔐 {{ 'DASHBOARD.SECURE_BADGE' | translate }}</div>
+    <h1 class="hero-title">{{ 'DASHBOARD.TITLE' | translate }}</h1>
     <p class="hero-subtitle">
-      A real-world professional ledger for active investors. Log transactions, track real-time asset prices, and automatically analyze matching lots using the LIFO cost basis logic.
+      {{ 'DASHBOARD.SUBTITLE' | translate }}
     </p>
     <div class="features-grid">
       <div class="feature-card">
         <span class="feature-icon">📊</span>
         <div>
-          <div class="feature-title">Real-Time Prices</div>
-          <div class="feature-desc">Public cached feed directly from the Cambodia Securities Exchange.</div>
+          <div class="feature-title">{{ 'DASHBOARD.FEATURE_PRICES_TITLE' | translate }}</div>
+          <div class="feature-desc">{{ 'DASHBOARD.FEATURE_PRICES_DESC' | translate }}</div>
         </div>
       </div>
       <div class="feature-card">
         <span class="feature-icon">📦</span>
         <div>
-          <div class="feature-title">LIFO Lot Allocation</div>
-          <div class="feature-desc">Taxes and cost-basis matched against your most recent purchases first.</div>
+          <div class="feature-title">{{ 'DASHBOARD.FEATURE_LIFO_TITLE' | translate }}</div>
+          <div class="feature-desc">{{ 'DASHBOARD.FEATURE_LIFO_DESC' | translate }}</div>
         </div>
       </div>
       <div class="feature-card">
         <span class="feature-icon">📜</span>
         <div>
-          <div class="feature-title">Trade Ledger</div>
-          <div class="feature-desc">Permanent transaction history, with detailed commissions calculations.</div>
+          <div class="feature-title">{{ 'DASHBOARD.FEATURE_LEDGER_TITLE' | translate }}</div>
+          <div class="feature-desc">{{ 'DASHBOARD.FEATURE_LEDGER_DESC' | translate }}</div>
         </div>
       </div>
     </div>
@@ -36,19 +36,19 @@
     <!-- Metric Highlights -->
     <section class="metrics-grid">
       <div class="metric-card">
-        <span class="metric-title">Realised P/L</span>
+        <span class="metric-title">{{ 'DASHBOARD.REALISED_PL' | translate }}</span>
         <span class="metric-value" [ngClass]="totalRealisedPnl() >= 0 ? 'text-profit' : 'text-loss'">
           {{ totalRealisedPnl() >= 0 ? '+' : '' }}{{ totalRealisedPnl() | number }} <span class="currency">riel</span>
         </span>
       </div>
       <div class="metric-card">
-        <span class="metric-title">Unrealised P/L</span>
+        <span class="metric-title">{{ 'DASHBOARD.UNREALISED_PL' | translate }}</span>
         <span class="metric-value" [ngClass]="totalUnrealisedPnl() >= 0 ? 'text-profit' : 'text-loss'">
           {{ totalUnrealisedPnl() >= 0 ? '+' : '' }}{{ totalUnrealisedPnl() | number }} <span class="currency">riel</span>
         </span>
       </div>
       <div class="metric-card">
-        <span class="metric-title">Total P/L</span>
+        <span class="metric-title">{{ 'DASHBOARD.TOTAL_PL' | translate }}</span>
         <span class="metric-value" [ngClass]="totalPnl() >= 0 ? 'text-profit' : 'text-loss'">
           {{ totalPnl() >= 0 ? '+' : '' }}{{ totalPnl() | number }} <span class="currency">riel</span>
         </span>
@@ -60,17 +60,17 @@
   <div class="dashboard-columns">
     <!-- Live Market Prices (Public) -->
     <div class="dashboard-panel">
-      <h2 class="panel-title">📈 CSX Market Prices</h2>
+      <h2 class="panel-title">📈 {{ 'DASHBOARD.MARKET_PRICES' | translate }}</h2>
       @if (prices.isLoading()) {
-        <div class="panel-loader">Loading prices...</div>
+        <div class="panel-loader">Loading...</div>
       } @else {
         <div class="table-container">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Ticker</th>
-                <th>Price (riel)</th>
-                <th>Change</th>
+                <th>{{ 'DASHBOARD.COL_TICKER' | translate }}</th>
+                <th>{{ 'DASHBOARD.COL_PRICE' | translate }}</th>
+                <th>{{ 'DASHBOARD.COL_CHANGE' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -105,7 +105,7 @@
       @if (!session.isGuest()) {
         <!-- Top Tickers -->
         <div class="dashboard-panel panel-sm">
-          <h2 class="panel-title">🏆 Top Tickers (Realised P/L)</h2>
+          <h2 class="panel-title">🏆 {{ 'DASHBOARD.TOP_TICKERS' | translate }}</h2>
           <div class="ranking-list">
             @for (t of topTickers.value(); track t.ticker) {
               <div class="ranking-item">
@@ -114,14 +114,14 @@
                 <span class="ranking-val text-profit">+{{ t.realisedPnl | number }} riel</span>
               </div>
             } @empty {
-              <div class="ranking-empty">No trading history yet.</div>
+              <div class="ranking-empty">{{ 'DASHBOARD.NO_HISTORY' | translate }}</div>
             }
           </div>
         </div>
 
         <!-- Top Orders -->
         <div class="dashboard-panel panel-sm">
-          <h2 class="panel-title">🥇 Top Orders (Realised P/L)</h2>
+          <h2 class="panel-title">🥇 {{ 'DASHBOARD.TOP_ORDERS' | translate }}</h2>
           <div class="ranking-list">
             @for (o of topOrders.value(); track o.buyTradeId) {
               <div class="ranking-item">
@@ -130,7 +130,7 @@
                 <span class="ranking-val text-profit">+{{ o.realisedPnl | number }} riel</span>
               </div>
             } @empty {
-              <div class="ranking-empty">No trading history yet.</div>
+              <div class="ranking-empty">{{ 'DASHBOARD.NO_HISTORY' | translate }}</div>
             }
           </div>
         </div>

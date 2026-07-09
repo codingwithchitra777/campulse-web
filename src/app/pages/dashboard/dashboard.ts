@@ -4,11 +4,12 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { Holding, Price, TopOrder, TopTicker } from '../../models';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './dashboard.html'
 })
 export class DashboardComponent {

@@ -2,20 +2,20 @@
   <div class="portfolio-layout">
     <!-- Holdings Grid -->
     <div class="portfolio-list-panel">
-      <h2 class="panel-title">💼 Active Positions</h2>
+      <h2 class="panel-title">💼 {{ 'PORTFOLIO.TITLE' | translate }}</h2>
       @if (portfolio.isLoading()) {
-        <div class="panel-loader">Loading portfolio...</div>
+        <div class="panel-loader">Loading...</div>
       } @else {
         <div class="table-container">
           <table class="data-table selectable-rows">
             <thead>
               <tr>
-                <th>Ticker</th>
-                <th>Last Price</th>
-                <th>Remaining Qty</th>
-                <th>Sold %</th>
-                <th>Avg Cost</th>
-                <th>Total P/L</th>
+                <th>{{ 'DASHBOARD.COL_TICKER' | translate }}</th>
+                <th>{{ 'PORTFOLIO.COL_MARKET_PRICE' | translate }}</th>
+                <th>{{ 'PORTFOLIO.COL_SHARES' | translate }}</th>
+                <th>{{ 'PORTFOLIO.COL_SOLD_PCT' | translate }}</th>
+                <th>{{ 'PORTFOLIO.COL_AVG_BUY' | translate }}</th>
+                <th>{{ 'PORTFOLIO.COL_PL' | translate }}</th>
                 <th>P/L %</th>
                 <th>Action</th>
               </tr>
@@ -37,13 +37,13 @@
                   <td>
                     <button class="view-btn" (click)="selectHolding(h); $event.stopPropagation()" title="View position details">
                       <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                      View
+                      {{ 'PORTFOLIO.BTN_VIEW' | translate }}
                     </button>
                   </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="8" class="text-center">No active positions. Buy some stocks to get started!</td>
+                  <td colspan="8" class="text-center">{{ 'PORTFOLIO.NO_POSITIONS' | translate }}</td>
                 </tr>
               }
             </tbody>
@@ -61,8 +61,8 @@
   <div class="portfolio-drawer" [class.open]="selectedHolding() !== null">
     @if (selectedHolding(); as sel) {
       <div class="drawer-header">
-        <h2 class="panel-title" style="margin: 0; font-size: 16px;">🔍 Position Detail: {{ sel.ticker }}</h2>
-        <button class="drawer-close-btn" (click)="selectedHolding.set(null)" title="Close Details">✕</button>
+        <h2 class="panel-title" style="margin: 0; font-size: 16px;">🔍 {{ 'PORTFOLIO.DRAWER.DETAILS' | translate }}: {{ sel.ticker }}</h2>
+        <button class="drawer-close-btn" (click)="selectedHolding.set(null)" title="Close">✕</button>
       </div>
 
       @if (holdingDetails.isLoading()) {
@@ -72,34 +72,34 @@
           <!-- Dynamic HTML & CSS Stock Details component replacing backend image rendering -->
           <div class="stock-details-card-html">
             <div class="card-header-html">
-              <h3 class="card-title-html">{{ sel.ticker }} - STOCK DETAILS (LIFO Allocation Basis)</h3>
+              <h3 class="card-title-html">{{ sel.ticker }} - {{ 'PORTFOLIO.DRAWER.DETAILS' | translate }}</h3>
               <div class="card-divider-html"></div>
             </div>
 
             <!-- Stats Row -->
             <div class="card-stats-row-html">
               <div class="stat-box-html">
-                <span class="stat-label-html">Total Bought</span>
+                <span class="stat-label-html">{{ 'PORTFOLIO.DRAWER.TOTAL_BOUGHT' | translate }}</span>
                 <span class="stat-value-html">{{ details.totalBoughtQty | number }}</span>
               </div>
               <div class="stat-box-html">
-                <span class="stat-label-html">Total Sold</span>
+                <span class="stat-label-html">{{ 'PORTFOLIO.DRAWER.TOTAL_SOLD' | translate }}</span>
                 <span class="stat-value-html">{{ details.totalSoldQty | number }}</span>
               </div>
               <div class="stat-box-html">
-                <span class="stat-label-html">Remaining</span>
+                <span class="stat-label-html">{{ 'PORTFOLIO.DRAWER.REMAINING' | translate }}</span>
                 <span class="stat-value-html">{{ details.remainingQty | number }}</span>
               </div>
               <div class="stat-box-html">
-                <span class="stat-label-html">Realised P/L</span>
+                <span class="stat-label-html">{{ 'DASHBOARD.REALISED_PL' | translate }}</span>
                 <span class="stat-value-html" [ngClass]="details.realisedPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-                  {{ details.realisedPnl >= 0 ? '+' : '' }}{{ details.realisedPnl | number }} KHR
+                  {{ details.realisedPnl >= 0 ? '+' : '' }}{{ details.realisedPnl | number }} riel
                 </span>
               </div>
               <div class="stat-box-html">
-                <span class="stat-label-html">Total P/L</span>
+                <span class="stat-label-html">{{ 'DASHBOARD.TOTAL_PL' | translate }}</span>
                 <span class="stat-value-html" [ngClass]="sel.totalPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-                  {{ sel.totalPnl >= 0 ? '+' : '' }}{{ sel.totalPnl | number }} KHR
+                  {{ sel.totalPnl >= 0 ? '+' : '' }}{{ sel.totalPnl | number }} riel
                   <span style="font-size: 11px; font-weight: normal; margin-left: 2px; opacity: 0.9;">
                     ({{ sel.totalPnlPercent >= 0 ? '+' : '' }}{{ sel.totalPnlPercent | number:'1.2-2' }}%)
                   </span>
@@ -111,7 +111,7 @@
             <div class="card-lists-columns-html">
               <!-- Buy Orders List -->
               <div class="list-col-html buy-col-html">
-                <h4 class="list-col-title-html title-buy">BUY ORDERS (LIFO Queue Basis)</h4>
+                <h4 class="list-col-title-html title-buy">{{ 'PORTFOLIO.BUY_ORDERS' | translate }}</h4>
                 <div class="list-table-container-html">
                   <table class="list-table-html">
                     <thead>
@@ -127,7 +127,7 @@
                         <tr [ngClass]="buy.qtyOpen > 0 ? 'row-active-buy' : 'row-sold-buy'">
                           <td class="col-status-seq">
                             <span class="status-indicator-dot" [ngClass]="buy.qtyOpen > 0 ? 'dot-active' : 'dot-sold'"></span>
-                            {{ buy.qtyOpen > 0 ? 'OPEN' : 'SOLD' }} #{{ buy.seq }}
+                            {{ buy.qtyOpen > 0 ? ('PORTFOLIO.OPEN' | translate) : ('PORTFOLIO.SOLD' | translate) }} #{{ buy.seq }}
                           </td>
                           <td>{{ buy.qtyOriginal | number }}@{{ buy.price | number }}</td>
                           <td class="font-bold text-align-right" [ngClass]="buy.qtyOpen > 0 ? 'text-profit-bright' : 'text-muted'">
@@ -160,7 +160,7 @@
 
               <!-- Sell Orders List -->
               <div class="list-col-html sell-col-html">
-                <h4 class="list-col-title-html title-sell">SELL ORDERS</h4>
+                <h4 class="list-col-title-html title-sell">{{ 'PORTFOLIO.SELL_ORDERS' | translate }}</h4>
                 <div class="list-table-container-html">
                   <table class="list-table-html">
                     <thead>
@@ -211,7 +211,7 @@
 
           <!-- BUY LOTS PANEL (Details) -->
           <div class="lots-section" style="margin-top: 20px;">
-            <h3 class="section-subtitle">📥 Buy Lots (LIFO Allocation Remaining Details)</h3>
+            <h3 class="section-subtitle">📥 {{ 'PORTFOLIO.DRAWER.UNSOLD_LOTS' | translate }}</h3>
             <div class="lots-list">
               @for (lot of details.remainingLots; track lot.tradeId) {
                 <div class="lot-card">
@@ -222,18 +222,18 @@
                     </span>
                   </div>
                   <div class="lot-body">
-                    <div>Remaining: <strong>{{ lot.qtyOpen }} / {{ lot.qtyOriginal }}</strong> shares</div>
-                    <div>Price: <strong>{{ lot.price | number }} riel</strong></div>
+                    <div>{{ 'PORTFOLIO.DRAWER.REMAINING' | translate }}: <strong>{{ lot.qtyOpen }} / {{ lot.qtyOriginal }}</strong></div>
+                    <div>{{ 'PORTFOLIO.DRAWER.PRICE' | translate }}: <strong>{{ lot.price | number }} riel</strong></div>
                     @let lotUnrealised = lotPnl(lot);
                     @if (lotUnrealised !== null) {
                       <div>
-                        Unrealised P/L:
+                        {{ 'DASHBOARD.UNREALISED_PL' | translate }}:
                         <strong [ngClass]="lotUnrealised >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
                           {{ lotUnrealised >= 0 ? '+' : '' }}{{ lotUnrealised | number }} riel
                         </strong>
                       </div>
                     }
-                    <div>Date: <span class="date-text">{{ lot.orderDate | date:'mediumDate' }}</span></div>
+                    <div>{{ 'PORTFOLIO.DRAWER.DATE' | translate }}: <span class="date-text">{{ lot.orderDate | date:'mediumDate' }}</span></div>
                   </div>
                 </div>
               } @empty {

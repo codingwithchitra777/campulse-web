@@ -4,10 +4,11 @@ import { RouterModule, Router } from '@angular/router';
 import { SessionService } from './services/session.service';
 import { GoogleAuthService } from './services/google-auth.service';
 import { ThemeService } from './services/theme.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -16,7 +17,10 @@ export class App {
   protected readonly theme = inject(ThemeService);
   private readonly googleAuth = inject(GoogleAuthService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
+  
   showProfileDropdown = false;
+  currentLang = 'en';
 
   readonly sidebarCollapsed = signal(localStorage.getItem('sidebar_collapsed') === '1');
 
@@ -25,7 +29,18 @@ export class App {
     localStorage.setItem('sidebar_collapsed', this.sidebarCollapsed() ? '1' : '0');
   }
 
+  switchLanguage(lang: string) {
+    this.translate.use(lang);
+    this.currentLang = lang;
+    localStorage.setItem('lang', lang);
+  }
+
   constructor() {
+    const savedLang = localStorage.getItem('lang') || 'en';
+    this.translate.setFallbackLang('en');
+    this.translate.use(savedLang);
+    this.currentLang = savedLang;
+
     // Re-render the header sign-in button whenever auth state changes
     // (the #googleBtn container only exists in the DOM while signed out).
     effect(() => {

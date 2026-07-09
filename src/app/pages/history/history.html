@@ -1,21 +1,21 @@
 <div class="view-container animate-fade-in">
   <div class="history-panel">
-    <h2 class="panel-title">📜 Complete Transaction History</h2>
+    <h2 class="panel-title">📜 {{ 'HISTORY.TITLE' | translate }}</h2>
     @if (trades.isLoading()) {
-      <div class="panel-loader">Loading transaction history...</div>
+      <div class="panel-loader">Loading...</div>
     } @else {
       <div class="table-container">
         <table class="data-table">
           <thead>
             <tr>
               <th>Seq</th>
-              <th>Ticker</th>
-              <th>Side</th>
-              <th>Quantity</th>
-              <th>Execution Price</th>
-              <th>Total Amount</th>
-              <th>Brokerage Commission</th>
-              <th>Execution Date</th>
+              <th>{{ 'DASHBOARD.COL_TICKER' | translate }}</th>
+              <th>{{ 'TRADE.ACTION' | translate }}</th>
+              <th>{{ 'TRADE.QTY' | translate }}</th>
+              <th>{{ 'TRADE.PRICE_SHARE' | translate }}</th>
+              <th>{{ 'TRADE.SUBTOTAL' | translate }}</th>
+              <th>{{ 'TRADE.COMMISSION' | translate }}</th>
+              <th>{{ 'PORTFOLIO.DRAWER.DATE' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -25,7 +25,7 @@
                 <td class="font-bold">{{ t.ticker }}</td>
                 <td>
                   <span class="trade-side-badge" [ngClass]="t.side === 'BUY' ? 'badge-buy' : 'badge-sell'">
-                    {{ t.side }}
+                    {{ t.side === 'BUY' ? ('TRADE.BUY' | translate) : ('TRADE.SELL' | translate) }}
                   </span>
                 </td>
                 <td>{{ t.qty | number }}</td>
@@ -36,7 +36,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="8" class="text-center">No trades found. Log a transaction on the "Record Trade" page to start tracking!</td>
+                <td colspan="8" class="text-center">{{ 'HISTORY.NO_TRADES' | translate }}</td>
               </tr>
             }
           </tbody>

@@ -5,11 +5,12 @@ import { map } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { Holding, HoldingView, PositionSell } from '../../models';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './portfolio.html'
 })
 export class PortfolioComponent {

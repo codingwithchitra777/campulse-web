@@ -5,13 +5,14 @@ import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { PagerComponent } from '../../components/pager/pager';
 import { Paginated, Trade } from '../../models';
+import { TranslatePipe } from '@ngx-translate/core';
 
 const PAGE_SIZE = 50;
 
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule, PagerComponent],
+  imports: [CommonModule, PagerComponent, TranslatePipe],
   templateUrl: './history.html'
 })
 export class HistoryComponent {

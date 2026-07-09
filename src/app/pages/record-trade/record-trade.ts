@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { Position, Price, TradePayload, TradeResult, TradeSide } from '../../models';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-record-trade',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './record-trade.html'
 })
 export class RecordTradeComponent implements OnInit {
