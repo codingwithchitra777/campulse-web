@@ -498,6 +498,36 @@ body {
   border-color: #3b82f6;
 }
 
+/* Realized P/L by Year — expandable year rows on the dashboard */
+.year-row {
+  cursor: pointer;
+}
+
+.year-toggle {
+  display: inline-block;
+  width: 14px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.year-ticker-row {
+  background: rgba(30, 41, 59, 0.35);
+  font-size: 12px;
+}
+
+.year-ticker-name {
+  padding-left: 34px !important;
+  color: #9ca3af;
+}
+
+body.light .year-ticker-row {
+  background: #f8fafc;
+}
+
+body.light .year-ticker-name {
+  color: #64748b;
+}
+
 /* Percentage shown inline next to an order's P/L, e.g. "+2,000 (+10%)" */
 .pnl-pct {
   font-size: 10px;
