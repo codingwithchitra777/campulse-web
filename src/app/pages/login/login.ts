@@ -36,7 +36,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   loginAsDemoUser(userId: string) {
-    this.session.loginAsDemo(userId, 'Sabay (Demo)');
-    this.router.navigate([this.returnUrl]);
+    this.googleAuth.demoLogin(userId, 'Sabay (Demo)', () => this.router.navigate([this.returnUrl]));
   }
 }

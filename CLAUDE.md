@@ -26,10 +26,10 @@ File naming follows the modern Angular style without the `.component` suffix: `p
 
 ### Service layer (`src/app/services/`)
 
-- **`SessionService`** — auth/session store. `googleProfile` (signal, null = guest) is the single source of truth; `activeUserId` and `isGuest` are `computed` from it. Session persists in localStorage (`google_profile`) and is restored on construction. `loginAsDemo()` provides a fake login path alongside real Google auth.
+- **`SessionService`** — auth/session store. `googleProfile` (signal, null = guest) is the single source of truth, now including the backend-issued JWT and role; `activeUserId` and `isGuest` are `computed` from it. Session persists in localStorage (`google_profile`) and is restored on construction.
 - **`ApiService`** — pure typed HTTP client for the backend endpoints. It does NOT attach auth headers.
-- **`GoogleAuthService`** — sole owner of the Google Identity Services (GSI) integration: script-readiness retries, `initialize`, button rendering, credential → backend verification → `SessionService.setProfile`.
-- **`userIdInterceptor`** (`src/app/interceptors/`) — attaches `X-User-Id` (from `SessionService.activeUserId()`) to every backend request. There is no token-based auth; this header is the entire identity mechanism.
+- **`GoogleAuthService`** — sole owner of both login paths: real Google Identity Services (GSI) integration (script-readiness retries, `initialize`, button rendering, credential → `/api/auth/google` → `SessionService.setProfile`) and `demoLogin()` (→ `/api/auth/demo`, same response shape, used by the login page's demo backdoor). Both mint a real JWT — there is no local-only fake session anymore.
+- **`authInterceptor`** (`src/app/interceptors/auth.interceptor.ts`) — attaches `Authorization: Bearer <token>` from `SessionService.googleProfile()?.token` to every backend request; guests (no profile) send no header. The backend verifies this JWT on every request (see `campulse-backend`'s `get_current_user`/`require_admin` deps) — it is no longer trust-on-header.
 
 ### Reactive data loading — no page reloads
 

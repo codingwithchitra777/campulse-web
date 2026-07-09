@@ -6,12 +6,14 @@
 
 export type TradeSide = 'BUY' | 'SELL';
 
-/** /api/auth/google response. */
+/** /api/auth/google and /api/auth/demo response. */
 export interface GoogleAuthResponse {
   success: boolean;
+  token: string;
   userId: string;
   userName: string;
   email: string | null;
+  role: string;
 }
 
 /** Profile persisted in localStorage and held in SessionService. */
@@ -19,6 +21,8 @@ export interface GoogleProfile {
   userId: string;
   name: string;
   email: string | null;
+  token: string;
+  role: string;
 }
 
 /** /api/prices item — note snake_case: comes straight from the CSX pricing service. */

@@ -25,10 +25,6 @@ export class SessionService {
     this.googleProfile.set(profile);
   }
 
-  loginAsDemo(userId: string, name: string) {
-    this.setProfile({ userId, name, email: `${userId}@demo.com` });
-  }
-
   logout() {
     localStorage.removeItem(PROFILE_STORAGE_KEY);
     this.googleProfile.set(null);

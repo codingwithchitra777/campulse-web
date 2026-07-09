@@ -58,11 +58,39 @@ export class GoogleAuthService {
     }, attempt === 0 ? 100 : 300);
   }
 
+  /** Demo login: mints a real backend-issued token for a caller-chosen user id, same as Google sign-in. */
+  demoLogin(userId: string, name: string, onSignedIn?: () => void): void {
+    this.api.demoLogin(userId, name).subscribe({
+      next: (res) => {
+        if (!res.success) return;
+        this.session.setProfile({
+          userId: res.userId,
+          name: res.userName,
+          email: res.email,
+          token: res.token,
+          role: res.role
+        });
+        onSignedIn?.();
+      },
+      error: (err) => {
+        console.error('Demo login failed', err);
+        const errMsg = err.error?.detail || err.error?.error || 'Demo login failed';
+        alert('Demo Login Failed: ' + errMsg);
+      }
+    });
+  }
+
   private handleCredential(credential: string, onSignedIn?: () => void): void {
     this.api.googleLogin(credential).subscribe({
       next: (res) => {
         if (!res.success) return;
-        this.session.setProfile({ userId: res.userId, name: res.userName, email: res.email });
+        this.session.setProfile({
+          userId: res.userId,
+          name: res.userName,
+          email: res.email,
+          token: res.token,
+          role: res.role
+        });
         onSignedIn?.();
       },
       error: (err) => {

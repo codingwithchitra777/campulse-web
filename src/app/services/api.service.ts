@@ -17,8 +17,8 @@ import { API_BASE_URL } from '../app.constants';
 
 /**
  * Pure HTTP client for the campulse-backend API.
- * Auth/session state lives in SessionService; the X-User-Id header is
- * attached by userIdInterceptor (see app.config.ts).
+ * Auth/session state lives in SessionService; the Authorization bearer
+ * token is attached by authInterceptor (see app.config.ts).
  */
 @Injectable({
   providedIn: 'root'
@@ -71,5 +71,9 @@ export class ApiService {
 
   googleLogin(credential: string): Observable<GoogleAuthResponse> {
     return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/google`, { credential });
+  }
+
+  demoLogin(userId: string, userName: string): Observable<GoogleAuthResponse> {
+    return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/demo`, { userId, userName });
   }
 }
