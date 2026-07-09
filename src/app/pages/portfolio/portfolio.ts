@@ -4,7 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
-import { Holding, HoldingView, Position, PositionSell } from '../../models';
+import { Holding, HoldingView, PositionSell } from '../../models';
 
 @Component({
   selector: 'app-portfolio',
@@ -28,7 +28,7 @@ export class PortfolioComponent {
   // Switching selection cancels the in-flight request automatically.
   readonly holdingDetails = rxResource({
     params: () => this.selectedHolding()?.ticker,
-    stream: ({ params: ticker }) => this.api.getPosition(ticker).pipe(map(sortLotsByPriceAsc))
+    stream: ({ params: ticker }) => this.api.getPosition(ticker)
   });
 
   selectHolding(holding: HoldingView) {
@@ -76,16 +76,3 @@ function toHoldingView(h: Holding): HoldingView {
   };
 }
 
-/**
- * Drawer display order: cheapest buy lots first — the same order the
- * best-profit matcher consumes them, so the list reads as the sell queue.
- */
-function sortLotsByPriceAsc(pos: Position): Position {
-  const byPriceAsc = (a: { price: number; seq: number }, b: { price: number; seq: number }) =>
-    a.price - b.price || a.seq - b.seq;
-  return {
-    ...pos,
-    buys: [...pos.buys].sort(byPriceAsc),
-    remainingLots: [...pos.remainingLots].sort(byPriceAsc)
-  };
-}
