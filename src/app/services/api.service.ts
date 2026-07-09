@@ -12,6 +12,7 @@ import {
   TopOrder,
   TopTicker,
   Trade,
+  TradeEditPayload,
   TradeInitResult,
   TradePayload,
   TradeResult
@@ -54,6 +55,14 @@ export class ApiService {
 
   confirmTrade(trade: TradePayload): Observable<TradeResult> {
     return this.http.post<TradeResult>(`${this.baseUrl}/api/trades/confirm`, trade);
+  }
+
+  updateTrade(tradeId: string, payload: TradeEditPayload): Observable<Trade> {
+    return this.http.patch<Trade>(`${this.baseUrl}/api/trades/${tradeId}`, payload);
+  }
+
+  deleteTrade(tradeId: string): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/trades/${tradeId}`);
   }
 
   getPosition(symbol: string): Observable<Position> {

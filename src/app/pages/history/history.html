@@ -16,6 +16,7 @@
               <th>{{ 'TRADE.SUBTOTAL' | translate }}</th>
               <th>{{ 'TRADE.COMMISSION' | translate }}</th>
               <th>{{ 'PORTFOLIO.DRAWER.DATE' | translate }}</th>
+              <th>{{ 'HISTORY.COL_ACTIONS' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -33,10 +34,20 @@
                 <td class="font-bold">{{ (t.qty * t.price) | number }} riel</td>
                 <td class="text-muted">{{ t.commission | number }} riel</td>
                 <td class="date-text">{{ t.orderDate | date:'medium' }}</td>
+                <td>
+                  @if (t.side === 'BUY') {
+                    <button class="view-btn" (click)="startEdit(t)" title="{{ 'HISTORY.BTN_EDIT' | translate }}">
+                      {{ 'HISTORY.BTN_EDIT' | translate }}
+                    </button>
+                  }
+                  <button class="view-btn" (click)="deleteTrade(t)" title="{{ 'HISTORY.BTN_DELETE' | translate }}">
+                    {{ 'HISTORY.BTN_DELETE' | translate }}
+                  </button>
+                </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="8" class="text-center">{{ 'HISTORY.NO_TRADES' | translate }}</td>
+                <td colspan="9" class="text-center">{{ 'HISTORY.NO_TRADES' | translate }}</td>
               </tr>
             }
           </tbody>
@@ -48,6 +59,57 @@
         [offset]="offset()"
         (offsetChange)="offset.set($event)"
       ></app-pager>
+    }
+  </div>
+
+  <!-- Backdrop for Edit Trade Drawer -->
+  @if (editingTrade()) {
+    <div class="drawer-backdrop" (click)="closeDrawer()"></div>
+  }
+
+  <!-- Edit Trade (Right Drawer) -->
+  <div class="side-drawer" [class.open]="editingTrade() !== null">
+    @if (editingTrade(); as t) {
+      <div class="drawer-header">
+        <h2 class="panel-title" style="margin: 0; font-size: 16px;">✏️ {{ 'HISTORY.BTN_EDIT' | translate }}: {{ t.ticker }}</h2>
+        <button class="drawer-close-btn" (click)="closeDrawer()" title="Close">✕</button>
+      </div>
+      <div class="drawer-content-scroll">
+        <form class="trade-form" (submit)="$event.preventDefault(); saveEdit()">
+          <div class="form-group">
+            <label for="editTicker">{{ 'TRADE.SELECT_STOCK' | translate }}</label>
+            <input type="text" id="editTicker" name="editTicker" [(ngModel)]="editTicker" required>
+          </div>
+          <div class="form-group">
+            <label for="editPrice">{{ 'TRADE.PRICE_SHARE' | translate }}</label>
+            <input type="number" id="editPrice" name="editPrice" [(ngModel)]="editPrice" required min="1">
+          </div>
+          <div class="form-group">
+            <label for="editQty">{{ 'TRADE.QTY' | translate }}</label>
+            <input type="number" id="editQty" name="editQty" [(ngModel)]="editQty" required min="1">
+          </div>
+          <div class="form-group">
+            <label for="editCommission">{{ 'TRADE.COMMISSION' | translate }}</label>
+            <input type="number" id="editCommission" name="editCommission" [(ngModel)]="editCommission" required min="0">
+          </div>
+
+          <div class="total-preview-box" style="background: rgba(30, 41, 59, 0.5); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1e293b;">
+            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af;">
+              <span>{{ 'TRADE.SUBTOTAL' | translate }}:</span>
+              <span style="color: #f8fafc; font-weight: 500;">{{ (editPrice * editQty) | number }} riel</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="submit-btn" style="flex: 1; background: #374151; margin-top: 0;" (click)="closeDrawer()">
+              {{ 'TRADE.BTN_CANCEL' | translate }}
+            </button>
+            <button type="submit" class="submit-btn btn-buy" style="flex: 1.5; margin-top: 0;">
+              {{ 'HISTORY.BTN_SAVE' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
     }
   </div>
 </div>

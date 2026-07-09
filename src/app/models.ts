@@ -60,6 +60,17 @@ export interface TradePayload {
   commission?: number;
 }
 
+/**
+ * PATCH body for /api/trades/{tradeId}. Only untouched BUY trades are
+ * editable (side is immutable — delete + re-add to flip it).
+ */
+export interface TradeEditPayload {
+  ticker: string;
+  price: number;
+  qty: number;
+  commission?: number;
+}
+
 /** LIFO allocation produced when a SELL is matched against BUY lots. */
 export interface Allocation {
   allocId: string;

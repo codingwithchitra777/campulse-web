@@ -58,7 +58,7 @@
   }
 
   <!-- Position Lots Breakdown (Right Drawer) -->
-  <div class="portfolio-drawer" [class.open]="selectedHolding() !== null">
+  <div class="side-drawer" [class.open]="selectedHolding() !== null">
     @if (selectedHolding(); as sel) {
       <div class="drawer-header">
         <h2 class="panel-title" style="margin: 0; font-size: 16px;">🔍 {{ 'PORTFOLIO.DRAWER.DETAILS' | translate }}: {{ sel.ticker }}</h2>

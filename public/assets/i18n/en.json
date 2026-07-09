@@ -100,7 +100,7 @@
   },
   "HISTORY": {
     "TITLE": "Transaction History",
-    "SUBTITLE": "A complete immutable ledger of all logged buy and sell transactions.",
+    "SUBTITLE": "A complete ledger of all logged buy and sell transactions.",
     "COL_ID": "Trade ID",
     "COL_DATE": "Date & Time",
     "COL_STOCK": "Stock",
@@ -109,7 +109,12 @@
     "COL_QTY": "Quantity",
     "COL_COMMISSION": "Commission",
     "COL_TOTAL": "Total Amount",
+    "COL_ACTIONS": "Actions",
     "NO_HISTORY": "You have not recorded any trades yet. Use the 'Record Trade' menu to log your first transaction!",
-    "NO_TRADES": "No trades found. Log a transaction on the 'Record Trade' page to start tracking!"
+    "NO_TRADES": "No trades found. Log a transaction on the 'Record Trade' page to start tracking!",
+    "BTN_EDIT": "Edit",
+    "BTN_SAVE": "Save",
+    "BTN_DELETE": "Delete",
+    "CONFIRM_DELETE": "Delete this trade? This cannot be undone."
   }
 }

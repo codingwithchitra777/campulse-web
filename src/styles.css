@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 /* Basic Resets & Styling System */
 * {
@@ -8,7 +8,7 @@
 }
 
 body {
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Outfit', 'Kantumruy Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: #080c14;
   color: #f3f4f6;
   min-height: 100vh;
@@ -560,7 +560,7 @@ body {
 
 /* Slide-in Right Drawer for Position Details */
 
-.portfolio-drawer {
+.side-drawer {
   position: fixed;
   top: 0;
   right: 0;
@@ -577,7 +577,7 @@ body {
   flex-direction: column;
 }
 
-.portfolio-drawer.open {
+.side-drawer.open {
   transform: translateX(0);
 }
 
@@ -1756,7 +1756,7 @@ body {
   }
 
   /* Compact details component inside Portfolio Page drawer */
-  .portfolio-drawer {
+  .side-drawer {
     width: 100%;
     max-width: 100%;
     border-left: none;
@@ -1958,7 +1958,7 @@ body.light .confirmation-card {
   box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
 }
 
-body.light .portfolio-drawer,
+body.light .side-drawer,
 body.light .profile-dropdown-card {
   background: #ffffff;
   border-color: #e2e8f0;
