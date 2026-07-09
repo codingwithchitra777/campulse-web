@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { SessionService } from './services/session.service';
@@ -17,6 +17,13 @@ export class App {
   private readonly googleAuth = inject(GoogleAuthService);
   private readonly router = inject(Router);
   showProfileDropdown = false;
+
+  readonly sidebarCollapsed = signal(localStorage.getItem('sidebar_collapsed') === '1');
+
+  toggleSidebar() {
+    this.sidebarCollapsed.update((collapsed) => !collapsed);
+    localStorage.setItem('sidebar_collapsed', this.sidebarCollapsed() ? '1' : '0');
+  }
 
   constructor() {
     // Re-render the header sign-in button whenever auth state changes

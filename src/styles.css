@@ -34,6 +34,38 @@ body {
   border-right: 1px solid #1e293b;
   padding: 20px 14px;
   z-index: 100;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: width 0.25s ease, padding 0.25s ease;
+}
+
+/* Collapsed: icon-only rail — labels hide, icons stay */
+.sidebar.collapsed {
+  width: 68px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .side-link span,
+.sidebar.collapsed .sidebar-user-info {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.sidebar.collapsed .side-link {
+  justify-content: center;
+  padding: 11px;
+}
+
+.sidebar.collapsed .sidebar-user {
+  justify-content: center;
+  padding: 2px 0;
 }
 
 .sidebar-logo {
@@ -146,9 +178,13 @@ body {
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 90;
+  /* Must sit ABOVE .dropdown-backdrop (1030): the topbar's backdrop-filter +
+     z-index create a stacking context that caps the profile dropdown card
+     inside it, so the transparent backdrop would otherwise swallow clicks on
+     Sign Out / theme toggle. Kept below the portfolio drawer stack (1040+). */
+  z-index: 1035;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 12px 24px;
   background: rgba(8, 12, 20, 0.75);
@@ -1790,6 +1826,11 @@ body {
     border-bottom: 1px solid #1e293b;
   }
 
+  /* On small screens the sidebar is a horizontal strip; collapsing hides it */
+  .sidebar.collapsed {
+    display: none;
+  }
+
   .sidebar-logo {
     padding: 0;
     margin: 0;
@@ -1936,11 +1977,6 @@ body.light .empty-lots {
   color: #64748b;
 }
 
-body.light .lot-card {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-}
-
 body.light .form-group label {
   color: #475569;
 }
@@ -1979,5 +2015,148 @@ body.light .drawer-close-btn {
 
 body.light .text-neutral,
 body.light .text-muted {
+  color: #64748b;
+}
+
+/* Tables: the dark container/header backgrounds must flip too, otherwise the
+   light text overrides above produce dark-on-dark rows. */
+body.light .table-container {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+body.light .data-table th {
+  background-color: #f1f5f9;
+}
+
+body.light .data-table th,
+body.light .data-table td {
+  border-color: #e2e8f0;
+}
+
+body.light .data-table.selectable-rows tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Position detail card (portfolio drawer) */
+body.light .stock-details-card-html {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+body.light .card-title-html {
+  color: #0f172a;
+}
+
+body.light .card-divider-html {
+  background: linear-gradient(90deg, transparent 10%, #cbd5e1 50%, transparent 90%);
+}
+
+body.light .card-stats-row-html {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+body.light .stat-label-html {
+  color: #64748b;
+}
+
+body.light .stat-value-html {
+  color: #0f172a;
+}
+
+body.light .list-col-html {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+body.light .list-col-title-html {
+  border-color: #e2e8f0;
+}
+
+body.light .list-table-html th {
+  color: #64748b;
+  border-color: #e2e8f0;
+}
+
+body.light .list-table-html td {
+  color: #1e293b;
+  border-color: #e2e8f0;
+}
+
+/* Bright P/L colors need darker variants for contrast on white */
+body.light .text-profit-bright {
+  color: #15803d !important;
+}
+
+body.light .text-loss-bright {
+  color: #dc2626 !important;
+}
+
+/* Trade confirmation screen */
+body.light .confirm-summary-box,
+body.light .simulated-matching-box {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+body.light .confirm-label {
+  color: #64748b;
+}
+
+body.light .confirm-value {
+  color: #0f172a;
+}
+
+/* !important: these cards carry inline dark backgrounds in record-trade.html,
+   which otherwise beat any stylesheet rule and leave dark-on-dark text. */
+body.light .lot-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Hero banner: its semi-transparent dark layers wash out to murky gray on a
+   light page, so it gets a proper light treatment. */
+body.light .hero-banner {
+  background: linear-gradient(135deg, #eef2ff 0%, #ffffff 100%);
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+}
+
+body.light .hero-banner::before {
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+}
+
+body.light .hero-badge {
+  background: rgba(59, 130, 246, 0.08);
+  color: #2563eb;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+body.light .hero-title {
+  background: linear-gradient(135deg, #0f172a 30%, #475569 100%);
+  -webkit-background-clip: text;
+}
+
+body.light .hero-subtitle {
+  color: #475569;
+}
+
+body.light .feature-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+body.light .feature-card:hover {
+  background: #f8fafc;
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+body.light .feature-title {
+  color: #0f172a;
+}
+
+body.light .feature-desc {
   color: #64748b;
 }
