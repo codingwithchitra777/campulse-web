@@ -178,3 +178,19 @@ export interface TopOrder {
   buyPrice: number | null;
   realisedPnl: number;
 }
+
+/** /api/admin/users item. */
+export interface AdminUser {
+  userId: string;
+  userName: string;
+  /** ISO datetime string. */
+  registerDate: string;
+  role: string;
+}
+
+/** /api/admin/stats response. */
+export interface AdminStats {
+  totalUsers: number;
+  totalTrades: number;
+  totalRealisedPnl: number;
+}

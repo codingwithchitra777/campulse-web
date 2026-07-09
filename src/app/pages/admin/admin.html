@@ -1,0 +1,110 @@
+<div class="view-container animate-fade-in">
+  <section class="metrics-grid">
+    <div class="metric-card">
+      <span class="metric-title">Total Users</span>
+      <span class="metric-value">{{ stats.value().totalUsers | number }}</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-title">Total Trades</span>
+      <span class="metric-value">{{ stats.value().totalTrades | number }}</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-title">Total Realised P/L</span>
+      <span class="metric-value" [ngClass]="stats.value().totalRealisedPnl >= 0 ? 'text-profit' : 'text-loss'">
+        {{ stats.value().totalRealisedPnl >= 0 ? '+' : '' }}{{ stats.value().totalRealisedPnl | number }} <span class="currency">riel</span>
+      </span>
+    </div>
+  </section>
+
+  <div class="history-panel">
+    <h2 class="panel-title">👥 Users</h2>
+    @if (users.isLoading()) {
+      <div class="panel-loader">Loading users...</div>
+    } @else {
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Joined</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of users.value(); track u.userId) {
+              <tr>
+                <td class="font-bold">{{ u.userId }}</td>
+                <td>{{ u.userName }}</td>
+                <td>
+                  <span class="trade-side-badge" [ngClass]="u.role === 'admin' ? 'badge-buy' : 'badge-sell'">
+                    {{ u.role }}
+                  </span>
+                </td>
+                <td class="date-text">{{ u.registerDate | date:'medium' }}</td>
+                <td>
+                  @if (u.userId !== session.activeUserId()) {
+                    <button class="topbar-icon-btn" (click)="toggleRole(u)">
+                      {{ u.role === 'admin' ? 'Demote' : 'Promote' }}
+                    </button>
+                  } @else {
+                    <span class="text-muted">You</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="text-center">No users found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  <div class="history-panel">
+    <h2 class="panel-title">📜 All Trades</h2>
+    @if (trades.isLoading()) {
+      <div class="panel-loader">Loading trades...</div>
+    } @else {
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Ticker</th>
+              <th>Side</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Commission</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of trades.value(); track t.tradeId) {
+              <tr>
+                <td class="font-bold">{{ t.userId }}</td>
+                <td class="font-bold">{{ t.ticker }}</td>
+                <td>
+                  <span class="trade-side-badge" [ngClass]="t.side === 'BUY' ? 'badge-buy' : 'badge-sell'">
+                    {{ t.side }}
+                  </span>
+                </td>
+                <td>{{ t.qty | number }}</td>
+                <td>{{ t.price | number }} riel</td>
+                <td class="text-muted">{{ t.commission | number }} riel</td>
+                <td class="date-text">{{ t.orderDate | date:'medium' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="text-center">No trades found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

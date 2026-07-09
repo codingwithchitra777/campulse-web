@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
+  AdminStats,
+  AdminUser,
   GoogleAuthResponse,
   Holding,
   Position,
@@ -75,5 +77,21 @@ export class ApiService {
 
   demoLogin(userId: string, userName: string): Observable<GoogleAuthResponse> {
     return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/demo`, { userId, userName });
+  }
+
+  getAllUsers(): Observable<AdminUser[]> {
+    return this.http.get<AdminUser[]>(`${this.baseUrl}/api/admin/users`);
+  }
+
+  updateUserRole(userId: string, role: string): Observable<AdminUser> {
+    return this.http.patch<AdminUser>(`${this.baseUrl}/api/admin/users/${userId}/role`, { role });
+  }
+
+  getAllTrades(): Observable<Trade[]> {
+    return this.http.get<Trade[]>(`${this.baseUrl}/api/admin/trades`);
+  }
+
+  getAdminStats(): Observable<AdminStats> {
+    return this.http.get<AdminStats>(`${this.baseUrl}/api/admin/stats`);
   }
 }

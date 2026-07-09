@@ -20,6 +20,8 @@ export class SessionService {
 
   readonly isGuest = computed(() => this.googleProfile() === null);
 
+  readonly isAdmin = computed(() => this.googleProfile()?.role === 'admin');
+
   setProfile(profile: GoogleProfile) {
     localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
     this.googleProfile.set(profile);
