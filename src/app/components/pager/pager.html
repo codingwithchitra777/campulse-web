@@ -1,0 +1,9 @@
+<div class="pager">
+  <button [disabled]="!hasPrev()" (click)="prev()" title="Previous page">
+    ← Prev
+  </button>
+  <span class="text-muted">Page {{ page() }} of {{ totalPages() }} ({{ total() }} total)</span>
+  <button [disabled]="!hasNext()" (click)="next()" title="Next page">
+    Next →
+  </button>
+</div>

@@ -33,7 +33,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (u of users.value(); track u.userId) {
+            @for (u of users.value().items; track u.userId) {
               <tr>
                 <td class="font-bold">{{ u.userId }}</td>
                 <td>{{ u.userName }}</td>
@@ -61,6 +61,12 @@
           </tbody>
         </table>
       </div>
+      <app-pager
+        [total]="users.value().total"
+        [limit]="users.value().limit"
+        [offset]="usersOffset()"
+        (offsetChange)="usersOffset.set($event)"
+      ></app-pager>
     }
   </div>
 
@@ -83,7 +89,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (t of trades.value(); track t.tradeId) {
+            @for (t of trades.value().items; track t.tradeId) {
               <tr>
                 <td class="font-bold">{{ t.userId }}</td>
                 <td class="font-bold">{{ t.ticker }}</td>
@@ -105,6 +111,12 @@
           </tbody>
         </table>
       </div>
+      <app-pager
+        [total]="trades.value().total"
+        [limit]="trades.value().limit"
+        [offset]="tradesOffset()"
+        (offsetChange)="tradesOffset.set($event)"
+      ></app-pager>
     }
   </div>
 </div>

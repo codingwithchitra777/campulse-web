@@ -6,6 +6,7 @@ import {
   AdminUser,
   GoogleAuthResponse,
   Holding,
+  Paginated,
   Position,
   Price,
   TopOrder,
@@ -37,9 +38,9 @@ export class ApiService {
     return this.http.get<Price>(`${this.baseUrl}/api/price/${symbol}`);
   }
 
-  getTrades(ticker?: string): Observable<Trade[]> {
-    return this.http.get<Trade[]>(`${this.baseUrl}/api/trades`, {
-      params: ticker ? { ticker } : {}
+  getTrades(ticker?: string, limit = 50, offset = 0): Observable<Paginated<Trade>> {
+    return this.http.get<Paginated<Trade>>(`${this.baseUrl}/api/trades`, {
+      params: { ...(ticker ? { ticker } : {}), limit, offset }
     });
   }
 
@@ -79,16 +80,20 @@ export class ApiService {
     return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/demo`, { userId, userName });
   }
 
-  getAllUsers(): Observable<AdminUser[]> {
-    return this.http.get<AdminUser[]>(`${this.baseUrl}/api/admin/users`);
+  getAllUsers(limit = 50, offset = 0): Observable<Paginated<AdminUser>> {
+    return this.http.get<Paginated<AdminUser>>(`${this.baseUrl}/api/admin/users`, {
+      params: { limit, offset }
+    });
   }
 
   updateUserRole(userId: string, role: string): Observable<AdminUser> {
     return this.http.patch<AdminUser>(`${this.baseUrl}/api/admin/users/${userId}/role`, { role });
   }
 
-  getAllTrades(): Observable<Trade[]> {
-    return this.http.get<Trade[]>(`${this.baseUrl}/api/admin/trades`);
+  getAllTrades(limit = 50, offset = 0): Observable<Paginated<Trade>> {
+    return this.http.get<Paginated<Trade>>(`${this.baseUrl}/api/admin/trades`, {
+      params: { limit, offset }
+    });
   }
 
   getAdminStats(): Observable<AdminStats> {

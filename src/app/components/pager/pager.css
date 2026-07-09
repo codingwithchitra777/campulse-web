@@ -1,0 +1,35 @@
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 14px 0 4px;
+}
+
+.pager button {
+  background: #151b2c;
+  border: 1px solid #1e293b;
+  color: #9ca3af;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pager button:hover:not(:disabled) {
+  color: #f3f4f6;
+  border-color: #3b82f6;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+}
+
+.pager button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+body.light .pager button {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #4b5563;
+}

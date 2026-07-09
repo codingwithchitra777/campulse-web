@@ -194,3 +194,11 @@ export interface AdminStats {
   totalTrades: number;
   totalRealisedPnl: number;
 }
+
+/** Wrapped shape returned by paginated list endpoints (/api/trades, /api/admin/users, /api/admin/trades). */
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+  limit: number;
+  offset: number;
+}
