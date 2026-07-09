@@ -4,7 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
-import { Holding, HoldingView, PositionSell } from '../../models';
+import { Holding, HoldingView, Position, PositionSell } from '../../models';
 
 @Component({
   selector: 'app-portfolio',
@@ -28,7 +28,7 @@ export class PortfolioComponent {
   // Switching selection cancels the in-flight request automatically.
   readonly holdingDetails = rxResource({
     params: () => this.selectedHolding()?.ticker,
-    stream: ({ params: ticker }) => this.api.getPosition(ticker)
+    stream: ({ params: ticker }) => this.api.getPosition(ticker).pipe(map(sortLotsByPriceAsc))
   });
 
   selectHolding(holding: HoldingView) {
@@ -62,13 +62,30 @@ export class PortfolioComponent {
 }
 
 /**
- * The backend doesn't send totalPnlPercent (the template used to render an
- * empty cell) — derive it from the P/L over the remaining cost basis.
+ * Guarantee a numeric totalPnlPercent: prefer the backend-provided value,
+ * falling back to a client-side derivation over the remaining cost basis.
  */
 function toHoldingView(h: Holding): HoldingView {
+  if (typeof h.totalPnlPercent === 'number') {
+    return { ...h, totalPnlPercent: h.totalPnlPercent };
+  }
   const costBasis = (h.avgCostRemaining ?? 0) * h.remainingQty;
   return {
     ...h,
     totalPnlPercent: costBasis > 0 ? (h.totalPnl / costBasis) * 100 : 0
+  };
+}
+
+/**
+ * Drawer display order: cheapest buy lots first — the same order the
+ * best-profit matcher consumes them, so the list reads as the sell queue.
+ */
+function sortLotsByPriceAsc(pos: Position): Position {
+  const byPriceAsc = (a: { price: number; seq: number }, b: { price: number; seq: number }) =>
+    a.price - b.price || a.seq - b.seq;
+  return {
+    ...pos,
+    buys: [...pos.buys].sort(byPriceAsc),
+    remainingLots: [...pos.remainingLots].sort(byPriceAsc)
   };
 }

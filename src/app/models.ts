@@ -45,8 +45,8 @@ export interface Trade {
 
 /**
  * POST body for /api/trades[/init|/confirm].
- * `commission` is display-only on the client: the backend recomputes it
- * server-side (price * qty * 0.0047) and ignores this field.
+ * `commission` is honored by the backend when provided; when omitted the
+ * backend computes it as price * qty * 0.0047.
  */
 export interface TradePayload {
   ticker: string;
@@ -105,9 +105,11 @@ export interface Holding {
   realisedPnl: number;
   unrealisedPnl: number;
   totalPnl: number;
+  unrealisedPnlPercent?: number | null;
+  totalPnlPercent?: number | null;
 }
 
-/** Holding enriched client-side with the P/L % over remaining cost basis. */
+/** Holding with a guaranteed P/L %: backend-provided, or derived client-side. */
 export interface HoldingView extends Holding {
   totalPnlPercent: number;
 }
