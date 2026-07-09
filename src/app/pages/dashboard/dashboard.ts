@@ -1,9 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
-import { Holding, Price, TopOrder, TopTicker } from '../../models';
+import { Holding, Price, TopOrder, TopTicker, YearlyPnl } from '../../models';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -44,6 +44,18 @@ export class DashboardComponent {
     stream: () => this.api.getTopOrders(),
     defaultValue: [] as TopOrder[]
   });
+
+  readonly yearlyPnl = rxResource({
+    params: () => this.userId(),
+    stream: () => this.api.getYearlyPnl(),
+    defaultValue: [] as YearlyPnl[]
+  });
+
+  readonly expandedYear = signal<number | null>(null);
+
+  toggleYear(year: number) {
+    this.expandedYear.set(this.expandedYear() === year ? null : year);
+  }
 
   readonly totalRealisedPnl = computed(() =>
     this.portfolio.value().reduce((sum, h) => sum + (h.realisedPnl || 0), 0)

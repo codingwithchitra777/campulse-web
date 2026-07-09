@@ -26,7 +26,10 @@
     "COL_CHANGE": "Change",
     "TOP_TICKERS": "Top Tickers (Realised P/L)",
     "TOP_ORDERS": "Top Orders (Realised P/L)",
-    "NO_HISTORY": "No trading history yet."
+    "NO_HISTORY": "No trading history yet.",
+    "PNL_BY_YEAR": "Realized P/L by Year",
+    "COL_YEAR": "Year",
+    "COL_SELLS": "Sells"
   },
   "PORTFOLIO": {
     "TITLE": "Active Positions",

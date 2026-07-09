@@ -190,6 +190,21 @@ export interface TopOrder {
   realisedPnl: number;
 }
 
+/** /api/pnl/yearly — per-ticker contribution inside a year row. */
+export interface YearlyPnlTicker {
+  ticker: string;
+  realisedPnl: number;
+  sellCount: number;
+}
+
+/** /api/pnl/yearly item — realized P/L grouped by the sell trade's year. */
+export interface YearlyPnl {
+  year: number;
+  realisedPnl: number;
+  sellCount: number;
+  tickers: YearlyPnlTicker[];
+}
+
 /** /api/admin/users item. */
 export interface AdminUser {
   userId: string;

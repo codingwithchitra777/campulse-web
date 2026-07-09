@@ -15,7 +15,8 @@ import {
   TradeEditPayload,
   TradeInitResult,
   TradePayload,
-  TradeResult
+  TradeResult,
+  YearlyPnl
 } from '../models';
 import { API_BASE_URL } from '../app.constants';
 
@@ -79,6 +80,10 @@ export class ApiService {
 
   getTopTickers(): Observable<TopTicker[]> {
     return this.http.get<TopTicker[]>(`${this.baseUrl}/api/top-tickers`);
+  }
+
+  getYearlyPnl(): Observable<YearlyPnl[]> {
+    return this.http.get<YearlyPnl[]>(`${this.baseUrl}/api/pnl/yearly`);
   }
 
   googleLogin(credential: string): Observable<GoogleAuthResponse> {
