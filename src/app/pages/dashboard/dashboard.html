@@ -85,7 +85,10 @@
                     @if (p.change_direction === 'down') {
                       <span>▼</span>
                     }
-                    {{ p.change | number }}
+                    {{ changeAbs(p) | number }}
+                    @if (changePercent(p); as pct) {
+                      <span class="pnl-pct">({{ pct | number:'1.1-1' }}%)</span>
+                    }
                   </td>
                 </tr>
               } @empty {
