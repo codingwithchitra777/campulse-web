@@ -831,7 +831,9 @@ body.light .year-ticker-name {
 
 .form-group select,
 .form-group input[type="text"],
-.form-group input[type="number"] {
+.form-group input[type="number"],
+.form-group input[type="date"] {
+  color-scheme: dark;
   background: #1e293b;
   border: 1px solid #334155;
   color: #f3f4f6;
@@ -2046,7 +2048,9 @@ body.light .form-group label {
 
 body.light .form-group select,
 body.light .form-group input[type="text"],
-body.light .form-group input[type="number"] {
+body.light .form-group input[type="number"],
+body.light .form-group input[type="date"] {
+  color-scheme: light;
   background: #f8fafc;
   border-color: #cbd5e1;
   color: #0f172a;

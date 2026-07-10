@@ -53,6 +53,8 @@ export interface Trade {
  * backend computes it as price * qty * 0.0047.
  */
 export interface TradePayload {
+  /** YYYY-MM-DD; omitted = today (server stamps utcnow). */
+  orderDate?: string;
   ticker: string;
   side: TradeSide;
   price: number;
@@ -65,6 +67,8 @@ export interface TradePayload {
  * editable (side is immutable — delete + re-add to flip it).
  */
 export interface TradeEditPayload {
+  /** YYYY-MM-DD; omitted = keep the trade's current date. */
+  orderDate?: string;
   ticker: string;
   price: number;
   qty: number;

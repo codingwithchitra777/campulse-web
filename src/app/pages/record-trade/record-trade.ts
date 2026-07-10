@@ -23,6 +23,8 @@ export class RecordTradeComponent implements OnInit {
   tradeQty = 0;
   tradeCommission = 0;
   isCommissionManual = false;
+  readonly today = new Date().toISOString().split('T')[0];
+  tradeDate = this.today;
 
   // Confirmation screen models
   readonly showConfirm = signal(false);
@@ -137,7 +139,8 @@ export class RecordTradeComponent implements OnInit {
       side: this.tradeSide,
       price: Number(this.tradePrice),
       qty: Number(this.tradeQty),
-      commission: Number(this.tradeCommission)
+      commission: Number(this.tradeCommission),
+      ...(this.tradeDate && this.tradeDate !== this.today ? { orderDate: this.tradeDate } : {})
     };
   }
 
@@ -182,6 +185,7 @@ export class RecordTradeComponent implements OnInit {
         this.tradeQty = 0;
         this.tradeCommission = 0;
         this.isCommissionManual = false;
+        this.tradeDate = this.today;
         this.loadPositionDetails(this.tradeTicker);
       },
       error: (err) => {

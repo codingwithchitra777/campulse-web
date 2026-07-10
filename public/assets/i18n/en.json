@@ -77,6 +77,7 @@
     "PRICE_SHARE": "Price per Share (riel):",
     "QTY": "Quantity (shares):",
     "COMMISSION": "Commission Fee (riel):",
+    "ORDER_DATE": "Trade Date",
     "EST_TOTAL": "Estimated Total:",
     "CONFIRM_BUY": "Confirm BUY",
     "CONFIRM_SELL": "Confirm SELL",

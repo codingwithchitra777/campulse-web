@@ -35,6 +35,8 @@ export class HistoryComponent {
   editPrice = 0;
   editQty = 0;
   editCommission = 0;
+  editDate = '';
+  readonly today = new Date().toISOString().split('T')[0];
 
   constructor() {
     // Switching users mid-browse could otherwise leave the page on an offset
@@ -50,6 +52,7 @@ export class HistoryComponent {
     this.editPrice = t.price;
     this.editQty = t.qty;
     this.editCommission = t.commission;
+    this.editDate = t.orderDate.slice(0, 10);
     this.editingTrade.set(t);
   }
 
@@ -65,7 +68,8 @@ export class HistoryComponent {
         ticker: this.editTicker,
         price: this.editPrice,
         qty: this.editQty,
-        commission: this.editCommission
+        commission: this.editCommission,
+        ...(this.editDate ? { orderDate: this.editDate } : {})
       })
       .subscribe({
         next: () => {

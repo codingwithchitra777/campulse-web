@@ -87,6 +87,11 @@
           <input type="number" id="commission" name="commission" [(ngModel)]="tradeCommission" (input)="onCommissionInput()" placeholder="e.g. 47" required min="0">
         </div>
 
+        <div class="form-group">
+          <label for="tradeDate">{{ 'TRADE.ORDER_DATE' | translate }}</label>
+          <input type="date" id="tradeDate" name="tradeDate" [(ngModel)]="tradeDate" [max]="today" required>
+        </div>
+
         <!-- Total Price Immediate Preview -->
         <div class="total-preview-box" *ngIf="tradePrice > 0 && tradeQty > 0" style="background: rgba(30, 41, 59, 0.5); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1e293b;">
           <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af; margin-bottom: 4px;">
@@ -234,6 +239,10 @@
         <div class="confirm-item">
           <span class="confirm-label">{{ 'TRADE.PRICE_SHARE' | translate }}</span>
           <span class="confirm-value">{{ tradePrice | number }} riel</span>
+        </div>
+        <div class="confirm-item">
+          <span class="confirm-label">{{ 'TRADE.ORDER_DATE' | translate }}</span>
+          <span class="confirm-value" [class.font-bold]="tradeDate !== today">{{ tradeDate | date:'mediumDate' }}</span>
         </div>
         <div class="confirm-item confirm-total-row">
           <span class="confirm-label">{{ 'TRADE.EST_TOTAL' | translate }}</span>
