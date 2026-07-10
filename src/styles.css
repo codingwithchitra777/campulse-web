@@ -2234,3 +2234,77 @@ body.light .feature-title {
 body.light .feature-desc {
   color: #64748b;
 }
+
+/* Portfolio Performance Chart */
+.chart-panel {
+  margin-bottom: 24px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.time-selector {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.time-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-family: 'Outfit', 'Kantumruy Pro', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.time-btn:hover {
+  color: #f3f4f6;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.time-btn.active {
+  color: #fff;
+  background: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.chart-container {
+  position: relative;
+  height: 380px;
+  width: 100%;
+}
+
+/* Light Mode Adaptations */
+body.light .time-selector {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+body.light .time-btn {
+  color: #475569;
+}
+
+body.light .time-btn:hover {
+  color: #0f172a;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+body.light .time-btn.active {
+  color: #fff;
+  background: #3b82f6;
+}
+

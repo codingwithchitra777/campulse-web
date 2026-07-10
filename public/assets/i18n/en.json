@@ -29,7 +29,14 @@
     "NO_HISTORY": "No trading history yet.",
     "PNL_BY_YEAR": "Realized P/L by Year",
     "COL_YEAR": "Year",
-    "COL_SELLS": "Sells"
+    "COL_SELLS": "Sells",
+    "CHART_TITLE": "Portfolio Growth vs. Capital Invested",
+    "CHART_LEGEND_EQUITY": "Portfolio Equity (Value)",
+    "CHART_LEGEND_PRINCIPAL": "Total Principal (Invested)",
+    "CHART_NET_PNL": "Net P/L",
+    "CHART_PRINCIPAL_DESC": "The blue line shows the cumulative cash capital you have tied up in stock purchases. It only goes up when you buy and down when you sell positions.",
+    "CHART_EQUITY_DESC": "The green/red gradient line represents the current market value of your portfolio. It updates dynamically using real-time CSX stock quotes.",
+    "CHART_GAP_DESC": "The gap between the lines is filled with a semi-transparent green highlight to show profit, giving you an instant visual of your investment efficiency since period start."
   },
   "PORTFOLIO": {
     "TITLE": "Active Positions",

@@ -2,7 +2,32 @@
   <div class="portfolio-layout">
     <!-- Holdings Grid -->
     <div class="portfolio-list-panel">
-      <h2 class="panel-title">💼 {{ 'PORTFOLIO.TITLE' | translate }}</h2>
+      <h2 class="panel-title" style="margin-bottom: 20px;">💼 {{ 'PORTFOLIO.TITLE' | translate }}</h2>
+
+      <!-- Portfolio Performance Chart (Authenticated) -->
+      @if (!session.isGuest()) {
+        <div class="dashboard-panel chart-panel" style="margin-bottom: 30px;">
+          <div class="chart-header">
+            <h2 class="panel-title" style="margin-bottom: 0;">📅 {{ 'DASHBOARD.CHART_TITLE' | translate }}</h2>
+            <div class="time-selector">
+              <button class="time-btn" [class.active]="activePeriod() === '1W'" (click)="setPeriod('1W')">1W</button>
+              <button class="time-btn" [class.active]="activePeriod() === '1M'" (click)="setPeriod('1M')">1M</button>
+              <button class="time-btn" [class.active]="activePeriod() === '3M'" (click)="setPeriod('3M')">3M</button>
+              <button class="time-btn" [class.active]="activePeriod() === '6M'" (click)="setPeriod('6M')">6M</button>
+              <button class="time-btn" [class.active]="activePeriod() === 'ALL'" (click)="setPeriod('ALL')">ALL</button>
+            </div>
+          </div>
+          
+          @if (timelineResource.isLoading()) {
+            <div class="panel-loader">Loading...</div>
+          } @else {
+            <div class="chart-container">
+              <canvas #performanceCanvas></canvas>
+            </div>
+          }
+        </div>
+      }
+
       @if (portfolio.isLoading()) {
         <div class="panel-loader">Loading...</div>
       } @else {

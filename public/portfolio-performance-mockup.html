@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CamPulse - Portfolio Performance Mockup</title>
+  <!-- Google Fonts: Outfit & Kantumruy Pro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    /* Styling System / CSS Variables */
+    :root {
+      --bg-dark: #080c14;
+      --bg-panel: #111827;
+      --border-color: #1e293b;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --profit-green: #10b981;
+      --loss-red: #ef4444;
+      --card-gradient: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', 'Kantumruy Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Header styling */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      background: rgba(21, 27, 44, 0.75);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-emoji {
+      font-size: 28px;
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .badge {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--profit-green);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    /* Recommendation Card */
+    .rec-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .rec-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rec-text {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .kpi-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .kpi-sub {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .text-profit {
+      color: var(--profit-green);
+    }
+
+    .text-loss {
+      color: var(--loss-red);
+    }
+
+    /* Chart Panel */
+    .chart-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .chart-title {
+      font-size: 16px;
+      font-weight: 700;
+      border-left: 4px solid var(--accent-blue);
+      padding-left: 10px;
+    }
+
+    .time-selector {
+      display: flex;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .time-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .time-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .time-btn.active {
+      color: var(--text-main);
+      background: var(--accent-blue);
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 380px;
+      width: 100%;
+    }
+
+    /* Explanation list */
+    .features-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-item {
+      background: #151b2c;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .feat-icon {
+      font-size: 20px;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 8px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .feat-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .feat-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-container">
+      <span class="logo-emoji">📈</span>
+      <span class="logo-text">CamPulse Analytics</span>
+    </div>
+    <div class="badge">PROPOSAL MOCKUP</div>
+  </header>
+
+  <!-- Recommendation Card -->
+  <section class="rec-card">
+    <h2 class="rec-title">💡 UX/UI Recommendation: Interactive Performance Timeline</h2>
+    <p class="rec-text">
+      Instead of simple static lists, we recommend a dual-axis timeline chart using **Chart.js** built-in gradients. 
+      The **Invested Capital (Principal)** line remains as a stable anchor representing money actually spent buying positions, while the **Portfolio Market Value (Equity)** line fluctuates in real-time based on active stock quotes. Shading the area between the lines creates an intuitive visual indicator of active/unrealized profit (green glow) and loss (red glow).
+    </p>
+  </section>
+
+  <!-- KPIs -->
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-title">Portfolio Equity</span>
+      <span class="kpi-value">12,450,000 ៛</span>
+      <span class="kpi-sub text-profit">▲ +2,450,000 ៛ (+24.5%)</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-title">Total Principal</span>
+      <span class="kpi-value">10,000,000 ៛</span>
+      <span class="kpi-sub" style="color: var(--text-muted);">Active Invested Capital</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-title">Unrealized P/L</span>
+      <span class="kpi-value text-profit">+650,000 ៛</span>
+      <span class="kpi-sub">Based on active CSX prices</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-title">Realized P/L</span>
+      <span class="kpi-value text-profit">+1,800,000 ៛</span>
+      <span class="kpi-sub">Locked matching lots (LIFO)</span>
+    </div>
+  </section>
+
+  <!-- Chart Panel -->
+  <section class="chart-panel">
+    <div class="chart-header">
+      <h2 class="chart-title">📅 Portfolio Growth vs. Capital Invested</h2>
+      <div class="time-selector">
+        <button class="time-btn" onclick="updateChartPeriod('1W')">1W</button>
+        <button class="time-btn" onclick="updateChartPeriod('1M')">1M</button>
+        <button class="time-btn active" onclick="updateChartPeriod('3M')">3M</button>
+        <button class="time-btn" onclick="updateChartPeriod('6M')">6M</button>
+        <button class="time-btn" onclick="updateChartPeriod('ALL')">ALL</button>
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <canvas id="performanceChart"></canvas>
+    </div>
+  </section>
+
+  <!-- Explanation Cards -->
+  <section class="features-list">
+    <div class="feature-item">
+      <span class="feat-icon">📉</span>
+      <div>
+        <h3 class="feat-title">Principal Line (Cost Basis)</h3>
+        <p class="feat-desc">The blue line shows the cumulative cash capital you have tied up in stock purchases. It only goes up when you buy and down when you sell positions.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feat-icon">✨</span>
+      <div>
+        <h3 class="feat-title">Equity Line (Current Value)</h3>
+        <p class="feat-desc">The green/red gradient line represents the current market value of your portfolio. It updates dynamically using real-time CSX stock quotes.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feat-icon">💡</span>
+      <div>
+        <h3 class="feat-title">Visual P/L Area Gap</h3>
+        <p class="feat-desc">The gap between the lines is filled with a semi-transparent green highlight to show profit, giving you an instant visual of your investment efficiency since period start.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Mock Data Generator
+  const generateMockData = (daysCount) => {
+    const dates = [];
+    const invested = [];
+    const equity = [];
+    
+    let currentInvested = 2000000;
+    let currentEquity = 2000000;
+    
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - daysCount);
+    
+    for (let i = 0; i < daysCount; i++) {
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + i);
+      dates.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      
+      // Simulating buy events on specific intervals
+      if (i === Math.floor(daysCount * 0.25)) {
+        currentInvested += 3000000;
+        currentEquity += 3000000;
+      }
+      if (i === Math.floor(daysCount * 0.6)) {
+        currentInvested += 5000000;
+        currentEquity += 5000000;
+      }
+      
+      // Stock price fluctuations (simulating PAS / ABC stock increases)
+      // Slightly trending upwards with minor pullbacks
+      let changePercent = (Math.random() - 0.38) * 0.05; // biased upwards
+      currentEquity = currentEquity * (1 + changePercent);
+      
+      invested.push(Math.round(currentInvested));
+      equity.push(Math.round(currentEquity));
+    }
+    
+    return { dates, invested, equity };
+  };
+
+  // Default to 3 months (90 days)
+  let activePeriodData = generateMockData(90);
+  
+  // Setup Chart.js
+  const ctx = document.getElementById('performanceChart').getContext('2d');
+  
+  // Create gradient backgrounds
+  const equityGradient = ctx.createLinearGradient(0, 0, 0, 350);
+  equityGradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+  equityGradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+  const performanceChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: activePeriodData.dates,
+      datasets: [
+        {
+          label: 'Portfolio Equity (Value)',
+          data: activePeriodData.equity,
+          borderColor: '#10b981',
+          borderWidth: 3,
+          backgroundColor: equityGradient,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          pointHoverBackgroundColor: '#10b981',
+          pointHoverBorderColor: '#ffffff',
+          pointHoverBorderWidth: 2,
+        },
+        {
+          label: 'Total Principal (Invested)',
+          data: activePeriodData.invested,
+          borderColor: '#3b82f6',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          backgroundColor: 'transparent',
+          fill: false,
+          tension: 0.1,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: '#3b82f6',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            color: '#f3f4f6',
+            font: {
+              family: 'Outfit',
+              size: 12
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: '#111827',
+          titleColor: '#f3f4f6',
+          bodyColor: '#9ca3af',
+          borderColor: '#1e293b',
+          borderWidth: 1,
+          titleFont: { family: 'Outfit', weight: 'bold' },
+          bodyFont: { family: 'Outfit' },
+          callbacks: {
+            label: function(context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += new Intl.NumberFormat('en-US').format(context.parsed.y) + ' ៛';
+              }
+              return label;
+            },
+            footer: function(tooltipItems) {
+              const equity = tooltipItems[0].parsed.y;
+              const principal = tooltipItems[1].parsed.y;
+              const netPnl = equity - principal;
+              const pnlPercent = ((netPnl / principal) * 100).toFixed(1);
+              const sign = netPnl >= 0 ? '+' : '';
+              return `Net P/L: ${sign}${new Intl.NumberFormat('en-US').format(netPnl)} ៛ (${sign}${pnlPercent}%)`;
+            }
+          },
+          footerFont: { family: 'Outfit', weight: 'bold' },
+          footerColor: function(tooltipItems) {
+            const equity = tooltipItems.tooltipItems[0].parsed.y;
+            const principal = tooltipItems.tooltipItems[1].parsed.y;
+            return equity >= principal ? '#10b981' : '#ef4444';
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            color: '#1e293b',
+            drawOnChartArea: true,
+            drawTicks: false
+          },
+          ticks: {
+            color: '#9ca3af',
+            maxTicksLimit: 8,
+            font: { family: 'Outfit' }
+          }
+        },
+        y: {
+          grid: {
+            color: '#1e293b',
+            drawOnChartArea: true,
+            drawTicks: false
+          },
+          ticks: {
+            color: '#9ca3af',
+            font: { family: 'Outfit' },
+            callback: function(value) {
+              if (value >= 1000000) {
+                return (value / 1000000).toFixed(1) + 'M ៛';
+              }
+              return new Intl.NumberFormat('en-US').format(value) + ' ៛';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Switch periods
+  function updateChartPeriod(period) {
+    // Update active button state
+    document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    let days = 90;
+    if (period === '1W') days = 7;
+    else if (period === '1M') days = 30;
+    else if (period === '3M') days = 90;
+    else if (period === '6M') days = 180;
+    else if (period === 'ALL') days = 365;
+    
+    const newData = generateMockData(days);
+    
+    performanceChart.data.labels = newData.dates;
+    performanceChart.data.datasets[0].data = newData.equity;
+    performanceChart.data.datasets[1].data = newData.invested;
+    
+    // Smooth transition
+    performanceChart.update();
+  }
+</script>
+
+</body>
+</html>

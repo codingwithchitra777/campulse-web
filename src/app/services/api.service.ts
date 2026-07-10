@@ -86,6 +86,10 @@ export class ApiService {
     return this.http.get<YearlyPnl[]>(`${this.baseUrl}/api/pnl/yearly`);
   }
 
+  getChartsTimeline(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/api/charts/timeline`);
+  }
+
   googleLogin(credential: string): Observable<GoogleAuthResponse> {
     return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/google`, { credential });
   }
