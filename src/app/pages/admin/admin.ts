@@ -6,8 +6,6 @@ import { SessionService } from '../../services/session.service';
 import { PagerComponent } from '../../components/pager/pager';
 import { AdminStats, AdminUser, Paginated, Trade } from '../../models';
 
-const PAGE_SIZE = 50;
-
 @Component({
   selector: 'app-admin',
   standalone: true,
@@ -20,18 +18,30 @@ export class AdminComponent {
 
   readonly usersOffset = signal(0);
   readonly tradesOffset = signal(0);
+  readonly usersLimit = signal(50);
+  readonly tradesLimit = signal(50);
 
   readonly users = rxResource({
-    params: () => ({ userId: this.session.activeUserId(), offset: this.usersOffset() }),
-    stream: ({ params }) => this.api.getAllUsers(PAGE_SIZE, params.offset),
-    defaultValue: { items: [], total: 0, limit: PAGE_SIZE, offset: 0 } as Paginated<AdminUser>
+    params: () => ({ userId: this.session.activeUserId(), offset: this.usersOffset(), limit: this.usersLimit() }),
+    stream: ({ params }) => this.api.getAllUsers(params.limit, params.offset),
+    defaultValue: { items: [], total: 0, limit: 50, offset: 0 } as Paginated<AdminUser>
   });
 
   readonly trades = rxResource({
-    params: () => ({ userId: this.session.activeUserId(), offset: this.tradesOffset() }),
-    stream: ({ params }) => this.api.getAllTrades(PAGE_SIZE, params.offset),
-    defaultValue: { items: [], total: 0, limit: PAGE_SIZE, offset: 0 } as Paginated<Trade>
+    params: () => ({ userId: this.session.activeUserId(), offset: this.tradesOffset(), limit: this.tradesLimit() }),
+    stream: ({ params }) => this.api.getAllTrades(params.limit, params.offset),
+    defaultValue: { items: [], total: 0, limit: 50, offset: 0 } as Paginated<Trade>
   });
+
+  setUsersLimit(limit: number) {
+    this.usersLimit.set(limit);
+    this.usersOffset.set(0);
+  }
+
+  setTradesLimit(limit: number) {
+    this.tradesLimit.set(limit);
+    this.tradesOffset.set(0);
+  }
 
   readonly stats = rxResource({
     params: () => this.session.activeUserId(),

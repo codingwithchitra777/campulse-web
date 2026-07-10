@@ -109,8 +109,14 @@
     "BTN_CANCEL": "Cancel",
     "BTN_SUBMIT": "Yes, Submit Trade"
   },
+  "PAGER": {
+    "ROWS": "Rows"
+  },
   "HISTORY": {
     "TITLE": "Transaction History",
+    "FILTER_TICKER": "Ticker",
+    "ALL_TICKERS": "All tickers",
+    "EXPORT_CSV": "Export CSV",
     "SUBTITLE": "A complete ledger of all logged buy and sell transactions.",
     "COL_ID": "Trade ID",
     "COL_DATE": "Date & Time",

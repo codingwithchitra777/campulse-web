@@ -63,9 +63,10 @@
       </div>
       <app-pager
         [total]="users.value().total"
-        [limit]="users.value().limit"
+        [limit]="usersLimit()"
         [offset]="usersOffset()"
         (offsetChange)="usersOffset.set($event)"
+        (limitChange)="setUsersLimit($event)"
       ></app-pager>
     }
   </div>
@@ -113,9 +114,10 @@
       </div>
       <app-pager
         [total]="trades.value().total"
-        [limit]="trades.value().limit"
+        [limit]="tradesLimit()"
         [offset]="tradesOffset()"
         (offsetChange)="tradesOffset.set($event)"
+        (limitChange)="setTradesLimit($event)"
       ></app-pager>
     }
   </div>

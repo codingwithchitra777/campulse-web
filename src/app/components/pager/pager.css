@@ -33,3 +33,32 @@ body.light .pager button {
   border-color: #e5e7eb;
   color: #4b5563;
 }
+
+.page-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.page-size select {
+  background: #151b2c;
+  border: 1px solid #1e293b;
+  color: #9ca3af;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.page-size select:hover {
+  color: #f3f4f6;
+  border-color: #3b82f6;
+}
+
+body.light .page-size select {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #4b5563;
+}

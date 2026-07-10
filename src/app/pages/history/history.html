@@ -1,6 +1,22 @@
 <div class="view-container animate-fade-in">
   <div class="history-panel">
     <h2 class="panel-title">📜 {{ 'HISTORY.TITLE' | translate }}</h2>
+
+    <div class="table-toolbar">
+      <label class="toolbar-filter">
+        <span class="text-muted">{{ 'HISTORY.FILTER_TICKER' | translate }}</span>
+        <select [ngModel]="tickerFilter()" (ngModelChange)="setFilter($event)" name="tickerFilter">
+          <option value="">{{ 'HISTORY.ALL_TICKERS' | translate }}</option>
+          @for (t of tickers.value(); track t.ticker) {
+            <option [value]="t.ticker">{{ t.ticker }}</option>
+          }
+        </select>
+      </label>
+      <button class="view-btn" (click)="exportCsv()" [disabled]="exporting() || trades.value().total === 0">
+        📄 {{ exporting() ? '…' : ('HISTORY.EXPORT_CSV' | translate) }}
+      </button>
+    </div>
+
     @if (trades.isLoading()) {
       <div class="panel-loader">Loading...</div>
     } @else {
@@ -55,9 +71,10 @@
       </div>
       <app-pager
         [total]="trades.value().total"
-        [limit]="trades.value().limit"
+        [limit]="limit()"
         [offset]="offset()"
         (offsetChange)="offset.set($event)"
+        (limitChange)="setLimit($event)"
       ></app-pager>
     }
   </div>

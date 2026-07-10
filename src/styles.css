@@ -529,6 +529,44 @@ body.light .year-ticker-name {
   color: #64748b;
 }
 
+/* Filter/action row above a data table (e.g. History ticker filter + CSV export) */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.toolbar-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.toolbar-filter select {
+  background: #151b2c;
+  border: 1px solid #1e293b;
+  color: #f3f4f6;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.toolbar-filter select:hover {
+  border-color: #3b82f6;
+}
+
+body.light .toolbar-filter select {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
 /* Percentage shown inline next to an order's P/L, e.g. "+2,000 (+10%)" */
 .pnl-pct {
   font-size: 10px;
@@ -1344,9 +1382,10 @@ body.light .year-ticker-name {
 .text-loss-bright {
   color: #f85149 !important;
 }
+/* Buy and Sell lists stacked full-width — side by side was too cramped. */
 .card-lists-columns-html {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 15px;
 }
 .list-col-html {
@@ -1370,7 +1409,7 @@ body.light .year-ticker-name {
   color: #f85149;
 }
 .list-table-container-html {
-  max-height: 250px;
+  max-height: 320px;
   overflow-y: auto;
 }
 .list-table-html {
@@ -1818,11 +1857,6 @@ body.light .year-ticker-name {
 
   .stat-box-html {
     align-items: flex-start;
-  }
-
-  .card-lists-columns-html {
-    grid-template-columns: 1fr;
-    gap: 16px;
   }
 
   .list-col-html {

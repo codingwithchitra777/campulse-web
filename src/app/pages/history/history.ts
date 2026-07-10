@@ -5,10 +5,11 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { PagerComponent } from '../../components/pager/pager';
-import { Paginated, Trade } from '../../models';
+import { Paginated, Price, Trade } from '../../models';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-const PAGE_SIZE = 50;
+/** Backend caps page size at 200; used when the CSV export walks all pages. */
+const EXPORT_PAGE_SIZE = 200;
 
 @Component({
   selector: 'app-history',
@@ -22,11 +23,25 @@ export class HistoryComponent {
   private readonly translate = inject(TranslateService);
 
   readonly offset = signal(0);
+  readonly limit = signal(50);
+  readonly tickerFilter = signal('');
+  readonly exporting = signal(false);
 
   readonly trades = rxResource({
-    params: () => ({ userId: this.session.activeUserId(), offset: this.offset() }),
-    stream: ({ params }) => this.api.getTrades(undefined, PAGE_SIZE, params.offset),
-    defaultValue: { items: [], total: 0, limit: PAGE_SIZE, offset: 0 } as Paginated<Trade>
+    params: () => ({
+      userId: this.session.activeUserId(),
+      offset: this.offset(),
+      limit: this.limit(),
+      ticker: this.tickerFilter()
+    }),
+    stream: ({ params }) => this.api.getTrades(params.ticker || undefined, params.limit, params.offset),
+    defaultValue: { items: [], total: 0, limit: 50, offset: 0 } as Paginated<Trade>
+  });
+
+  // Filter dropdown options — same source record-trade uses for its ticker select.
+  readonly tickers = rxResource({
+    stream: () => this.api.getPrices(),
+    defaultValue: [] as Price[]
   });
 
   // Slide-in drawer, same pattern as PortfolioComponent.selectedHolding.
@@ -44,7 +59,63 @@ export class HistoryComponent {
     effect(() => {
       this.session.activeUserId();
       this.offset.set(0);
+      this.tickerFilter.set('');
     });
+  }
+
+  setFilter(ticker: string) {
+    this.tickerFilter.set(ticker);
+    this.offset.set(0);
+  }
+
+  setLimit(limit: number) {
+    this.limit.set(limit);
+    this.offset.set(0);
+  }
+
+  exportCsv() {
+    if (this.exporting()) return;
+    this.exporting.set(true);
+    const ticker = this.tickerFilter() || undefined;
+    const rows: Trade[] = [];
+
+    const fetchPage = (offset: number) => {
+      this.api.getTrades(ticker, EXPORT_PAGE_SIZE, offset).subscribe({
+        next: (page) => {
+          rows.push(...page.items);
+          if (rows.length < page.total && page.items.length > 0) {
+            fetchPage(offset + EXPORT_PAGE_SIZE);
+          } else {
+            this.downloadCsv(rows);
+            this.exporting.set(false);
+          }
+        },
+        error: (err) => {
+          this.exporting.set(false);
+          alert('Failed to export trades: ' + (err.error?.detail || 'Unknown error'));
+        }
+      });
+    };
+    fetchPage(0);
+  }
+
+  private downloadCsv(rows: Trade[]) {
+    const esc = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
+    const header = ['Seq', 'Ticker', 'Side', 'Qty', 'Price', 'Subtotal', 'Commission', 'OrderDate'];
+    const lines = [
+      header.join(','),
+      ...rows.map((t) =>
+        [t.seq, esc(t.ticker), t.side, t.qty, t.price, t.qty * t.price, t.commission, esc(t.orderDate)].join(',')
+      )
+    ];
+    const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const suffix = this.tickerFilter() ? `_${this.tickerFilter()}` : '';
+    a.href = url;
+    a.download = `trades${suffix}_${this.today}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   startEdit(t: Trade) {

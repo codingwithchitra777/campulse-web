@@ -1,4 +1,12 @@
 <div class="pager">
+  <label class="page-size">
+    <span class="text-muted">{{ 'PAGER.ROWS' | translate }}</span>
+    <select [value]="limit()" (change)="onSizeChange($event)" title="Rows per page">
+      @for (size of pageSizes; track size) {
+        <option [value]="size" [selected]="size === limit()">{{ size }}</option>
+      }
+    </select>
+  </label>
   <button [disabled]="!hasPrev()" (click)="prev()" title="Previous page">
     ← Prev
   </button>
