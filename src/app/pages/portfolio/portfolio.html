@@ -75,6 +75,55 @@
           </table>
         </div>
       }
+
+      <!-- Realized P/L by Year (moved here from the dashboard) -->
+      <div class="dashboard-panel" style="margin-top: 30px;">
+        <h2 class="panel-title">📅 {{ 'DASHBOARD.PNL_BY_YEAR' | translate }}</h2>
+        @if (yearlyPnl.isLoading()) {
+          <div class="panel-loader">Loading...</div>
+        } @else {
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>{{ 'DASHBOARD.COL_YEAR' | translate }}</th>
+                  <th>{{ 'DASHBOARD.REALISED_PL' | translate }}</th>
+                  <th>{{ 'DASHBOARD.COL_SELLS' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (y of yearlyPnl.value(); track y.year) {
+                  <tr class="year-row" (click)="toggleYear(y.year)">
+                    <td class="font-bold">
+                      <span class="year-toggle">{{ expandedYear() === y.year ? '▾' : '▸' }}</span>
+                      {{ y.year }}
+                    </td>
+                    <td class="font-bold" [ngClass]="y.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
+                      {{ y.realisedPnl >= 0 ? '+' : '' }}{{ y.realisedPnl | number }} riel
+                    </td>
+                    <td>{{ y.sellCount | number }}</td>
+                  </tr>
+                  @if (expandedYear() === y.year) {
+                    @for (tk of y.tickers; track tk.ticker) {
+                      <tr class="year-ticker-row">
+                        <td class="year-ticker-name">{{ tk.ticker }}</td>
+                        <td [ngClass]="tk.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
+                          {{ tk.realisedPnl >= 0 ? '+' : '' }}{{ tk.realisedPnl | number }} riel
+                        </td>
+                        <td>{{ tk.sellCount | number }}</td>
+                      </tr>
+                    }
+                  }
+                } @empty {
+                  <tr>
+                    <td colspan="3" class="text-center">{{ 'DASHBOARD.NO_HISTORY' | translate }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
     </div>
 
   <!-- Backdrop for Right Drawer -->

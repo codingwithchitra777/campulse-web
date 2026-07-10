@@ -4,7 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
-import { Holding, HoldingView, PositionSell } from '../../models';
+import { Holding, HoldingView, PositionSell, YearlyPnl } from '../../models';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Chart } from 'chart.js/auto';
 
@@ -46,6 +46,19 @@ export class PortfolioComponent implements OnDestroy {
 
   readonly activePeriod = signal<'1W' | '1M' | '3M' | '6M' | 'ALL'>('3M');
   private chartInstance: any = null;
+
+  // Realized P/L by Year summary (moved here from the dashboard)
+  readonly yearlyPnl = rxResource({
+    params: () => this.session.activeUserId(),
+    stream: () => this.api.getYearlyPnl(),
+    defaultValue: [] as YearlyPnl[]
+  });
+
+  readonly expandedYear = signal<number | null>(null);
+
+  toggleYear(year: number) {
+    this.expandedYear.set(this.expandedYear() === year ? null : year);
+  }
 
   constructor() {
     // Setup reactive effect to automatically build/rebuild the chart
@@ -304,6 +317,7 @@ export class PortfolioComponent implements OnDestroy {
                 return label;
               },
               footer: (tooltipItems) => {
+                if (!tooltipItems || tooltipItems.length === 0) return '';
                 const equityVal = tooltipItems[0].parsed.y ?? 0;
                 const principalVal = tooltipItems[1] ? (tooltipItems[1].parsed.y ?? 0) : equityVal;
                 const netPnl = equityVal - principalVal;
@@ -314,9 +328,11 @@ export class PortfolioComponent implements OnDestroy {
               }
             },
             footerFont: { family: "'Outfit', 'Kantumruy Pro', sans-serif", weight: 'bold' },
-            footerColor: (tooltipItems) => {
-              const equityVal = tooltipItems.tooltipItems[0].parsed.y ?? 0;
-              const principalVal = tooltipItems.tooltipItems[1] ? (tooltipItems.tooltipItems[1].parsed.y ?? 0) : equityVal;
+            footerColor: (context) => {
+              const dataPoints = context.tooltip?.dataPoints;
+              if (!dataPoints || dataPoints.length === 0) return '#f3f4f6';
+              const equityVal = dataPoints[0].parsed.y ?? 0;
+              const principalVal = dataPoints[1] ? (dataPoints[1].parsed.y ?? 0) : equityVal;
               return equityVal >= principalVal ? '#10b981' : '#ef4444';
             }
           }
