@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { SessionService } from './services/session.service';
 import { GoogleAuthService } from './services/google-auth.service';
+import { TelegramAuthService } from './services/telegram-auth.service';
 import { ThemeService } from './services/theme.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -16,6 +17,7 @@ export class App {
   protected readonly session = inject(SessionService);
   protected readonly theme = inject(ThemeService);
   private readonly googleAuth = inject(GoogleAuthService);
+  private readonly telegramAuth = inject(TelegramAuthService);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   
@@ -40,6 +42,9 @@ export class App {
     this.translate.setFallbackLang('en');
     this.translate.use(savedLang);
     this.currentLang = savedLang;
+
+    // Inside the Telegram Mini App, sign the user in from initData silently.
+    this.telegramAuth.autoLoginFromWebApp();
 
     // Re-render the header sign-in button whenever auth state changes
     // (the #googleBtn container only exists in the DOM while signed out).

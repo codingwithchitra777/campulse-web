@@ -126,10 +126,12 @@ export class PortfolioComponent implements OnDestroy {
 
     const investment = data.investment || [];
     const pnl = data.pnl || [];
+    const realEquity = data.equity || [];
 
     const dateSet = new Set<string>();
     investment.forEach((item: any) => { if (item.date) dateSet.add(item.date); });
     pnl.forEach((item: any) => { if (item.date) dateSet.add(item.date); });
+    realEquity.forEach((item: any) => { if (item.date) dateSet.add(item.date); });
 
     const sortedDates = Array.from(dateSet).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
@@ -140,6 +142,9 @@ export class PortfolioComponent implements OnDestroy {
     let lastInvested = 0;
     let lastRecovered = 0;
     let lastPnl = 0;
+    // Market-valued equity from daily price snapshots (backend `equity` series).
+    // Forward-fills between snapshots and beats the synthetic estimate below.
+    let lastRealEquity: number | null = null;
 
     sortedDates.forEach((dateStr) => {
       const invItem = investment.find((x: any) => x.date === dateStr);
@@ -153,8 +158,13 @@ export class PortfolioComponent implements OnDestroy {
         lastPnl = pnlItem.cumulativePnl ?? lastPnl;
       }
 
+      const realItem = realEquity.find((x: any) => x.date === dateStr);
+      if (realItem) {
+        lastRealEquity = realItem.value ?? lastRealEquity;
+      }
+
       const activePrincipal = Math.max(0, lastInvested - lastRecovered);
-      const activeEquity = Math.max(0, activePrincipal + lastPnl);
+      const activeEquity = lastRealEquity ?? Math.max(0, activePrincipal + lastPnl);
 
       dates.push(dateStr);
       invested.push(activePrincipal);

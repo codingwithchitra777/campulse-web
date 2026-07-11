@@ -14,6 +14,7 @@ import {
   Trade,
   TradeEditPayload,
   TradeInitResult,
+  TelegramAuthPayload,
   TradePayload,
   TradeResult,
   YearlyPnl
@@ -96,6 +97,14 @@ export class ApiService {
 
   demoLogin(userId: string, userName: string): Observable<GoogleAuthResponse> {
     return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/demo`, { userId, userName });
+  }
+
+  telegramLogin(payload: TelegramAuthPayload): Observable<GoogleAuthResponse> {
+    return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/telegram`, payload);
+  }
+
+  telegramWebAppLogin(initData: string): Observable<GoogleAuthResponse> {
+    return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/telegram-webapp`, { initData });
   }
 
   getAllUsers(limit = 50, offset = 0): Observable<Paginated<AdminUser>> {

@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SessionService } from '../../services/session.service';
 import { GoogleAuthService } from '../../services/google-auth.service';
+import { TelegramAuthService } from '../../services/telegram-auth.service';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +14,7 @@ import { GoogleAuthService } from '../../services/google-auth.service';
 export class LoginComponent implements OnInit, AfterViewInit {
   private readonly session = inject(SessionService);
   private readonly googleAuth = inject(GoogleAuthService);
+  private readonly telegramAuth = inject(TelegramAuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -33,6 +35,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
       { theme: 'filled_blue', size: 'large', width: 280, shape: 'pill' },
       () => this.router.navigate([this.returnUrl])
     );
+    this.telegramAuth.renderButton('telegramBtnWall', () => this.router.navigate([this.returnUrl]));
   }
 
   loginAsDemoUser(userId: string) {

@@ -25,6 +25,17 @@ export interface GoogleProfile {
   role: string;
 }
 
+/** The Telegram Login Widget's signed user object, sent verbatim to /api/auth/telegram. */
+export interface TelegramAuthPayload {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+  photo_url?: string;
+  auth_date: number;
+  hash: string;
+}
+
 /** /api/prices item — note snake_case: comes straight from the CSX pricing service. */
 export interface Price {
   ticker: string;
