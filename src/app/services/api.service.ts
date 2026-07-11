@@ -6,6 +6,8 @@ import {
   AdminUser,
   GoogleAuthResponse,
   Holding,
+  LinkCodeResponse,
+  LinkedAccount,
   Paginated,
   Position,
   Price,
@@ -105,6 +107,18 @@ export class ApiService {
 
   telegramWebAppLogin(initData: string): Observable<GoogleAuthResponse> {
     return this.http.post<GoogleAuthResponse>(`${this.baseUrl}/api/auth/telegram-webapp`, { initData });
+  }
+
+  createLinkCode(): Observable<LinkCodeResponse> {
+    return this.http.post<LinkCodeResponse>(`${this.baseUrl}/api/auth/link/code`, {});
+  }
+
+  getLinks(): Observable<{ success: boolean; links: LinkedAccount[] }> {
+    return this.http.get<{ success: boolean; links: LinkedAccount[] }>(`${this.baseUrl}/api/auth/links`);
+  }
+
+  removeLink(aliasUserId: string): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/auth/links/${aliasUserId}`);
   }
 
   getAllUsers(limit = 50, offset = 0): Observable<Paginated<AdminUser>> {

@@ -36,6 +36,23 @@ export interface TelegramAuthPayload {
   hash: string;
 }
 
+/** POST /api/auth/link/code response — a one-time code + the bot deep link to redeem it. */
+export interface LinkCodeResponse {
+  success: boolean;
+  code: string;
+  deepLink: string;
+  botUsername: string;
+}
+
+/** /api/auth/links item — a Telegram account linked into this (primary) account. */
+export interface LinkedAccount {
+  aliasUserId: string;
+  userName: string | null;
+  chatId: number | null;
+  /** ISO datetime string. */
+  linkedAt: string;
+}
+
 /** /api/prices item — note snake_case: comes straight from the CSX pricing service. */
 export interface Price {
   ticker: string;

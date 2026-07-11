@@ -104,6 +104,9 @@
               </div>
               <div class="profile-dropdown-divider"></div>
               <div class="profile-dropdown-actions">
+                <a class="signout-btn-modern" routerLink="/settings" (click)="closeProfileDropdown()">
+                  <span>🔗</span> Connected accounts
+                </a>
                 <button class="signout-btn-modern" (click)="logoutGoogle(); closeProfileDropdown()">
                   <span>🚪</span> {{ 'NAV.SIGN_OUT' | translate }}
                 </button>

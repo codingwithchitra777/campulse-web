@@ -1,0 +1,62 @@
+<div class="settings-page">
+  <header class="settings-header">
+    <h1>Settings</h1>
+    <p class="muted">Manage your account and connected services.</p>
+  </header>
+
+  @if (session.isGuest()) {
+    <div class="settings-card">
+      <p>Please sign in to manage connected accounts.</p>
+    </div>
+  } @else {
+    <section class="settings-card">
+      <div class="card-head">
+        <div>
+          <h2>🔗 Connected accounts</h2>
+          <p class="muted">
+            Link your Telegram account so the bot's trades and your web portfolio share one account.
+          </p>
+        </div>
+        <button class="btn-primary" (click)="connectTelegram()" [disabled]="connecting()">
+          {{ connecting() ? 'Generating…' : '➕ Connect Telegram' }}
+        </button>
+      </div>
+
+      @if (error(); as e) {
+        <div class="alert error">{{ e }}</div>
+      }
+
+      @if (linkCode(); as lc) {
+        <div class="alert info">
+          <p><strong>Almost there.</strong> We opened <code>{{ lc.botUsername }}</code> in a new tab —
+          press <strong>Start</strong> in Telegram to finish linking.</p>
+          <p class="muted small">
+            Didn't open? Tap this link on the device with Telegram:
+            <a [href]="lc.deepLink" target="_blank" rel="noopener">{{ lc.deepLink }}</a>
+            <br />The code expires in ~15 minutes and can be used once.
+          </p>
+          <button class="btn-ghost" (click)="links.reload()">↻ I've linked it — refresh</button>
+        </div>
+      }
+
+      <div class="links-list">
+        @if (links.isLoading()) {
+          <p class="muted">Loading…</p>
+        } @else if (links.value().links.length === 0) {
+          <p class="muted empty">No Telegram accounts linked yet.</p>
+        } @else {
+          @for (link of links.value().links; track link.aliasUserId) {
+            <div class="link-row">
+              <div class="link-info">
+                <span class="tg-badge">Telegram</span>
+                <span class="link-name">{{ link.userName || link.aliasUserId }}</span>
+                <span class="muted small">id {{ link.aliasUserId }} · linked {{ link.linkedAt | date: 'mediumDate' }}</span>
+              </div>
+              <button class="btn-danger" (click)="disconnect(link)">Disconnect</button>
+            </div>
+          }
+        }
+      </div>
+    </section>
+  }
+</div>

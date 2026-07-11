@@ -1,0 +1,146 @@
+.settings-page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 8px 4px 32px;
+}
+
+.settings-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--text-muted, #8a94a6);
+}
+.small {
+  font-size: 0.82rem;
+}
+
+.settings-card {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e5e8ee);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-top: 18px;
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.card-head h2 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.card-head p {
+  margin: 0;
+  max-width: 46ch;
+}
+
+button {
+  cursor: pointer;
+  border-radius: 9px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  padding: 9px 15px;
+  font-size: 0.9rem;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-primary {
+  background: var(--accent, #2f6bff);
+  color: #fff;
+  white-space: nowrap;
+}
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border-color, #d7dce6);
+  color: var(--text, #2b3242);
+  margin-top: 8px;
+}
+.btn-danger {
+  background: transparent;
+  border-color: #e5484d;
+  color: #e5484d;
+}
+.btn-danger:hover {
+  background: #e5484d;
+  color: #fff;
+}
+
+.alert {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+.alert p {
+  margin: 0 0 6px;
+}
+.alert p:last-child {
+  margin-bottom: 0;
+}
+.alert.info {
+  background: rgba(47, 107, 255, 0.08);
+  border: 1px solid rgba(47, 107, 255, 0.25);
+}
+.alert.error {
+  background: rgba(229, 72, 77, 0.08);
+  border: 1px solid rgba(229, 72, 77, 0.3);
+  color: #e5484d;
+}
+.alert code,
+.link-info code {
+  font-family: ui-monospace, monospace;
+}
+.alert a {
+  color: var(--accent, #2f6bff);
+  word-break: break-all;
+}
+
+.links-list {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.empty {
+  padding: 10px 0;
+}
+
+.link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color, #e5e8ee);
+  border-radius: 11px;
+}
+.link-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.link-name {
+  font-weight: 600;
+}
+.tg-badge {
+  display: inline-block;
+  width: fit-content;
+  background: #229ed9;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 1px 7px;
+  border-radius: 6px;
+}
