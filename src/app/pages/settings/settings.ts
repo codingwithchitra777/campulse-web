@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
+import { ThemeService } from '../../services/theme.service';
 import { LinkCodeResponse, LinkedAccount } from '../../models';
 
 /**
@@ -20,6 +21,7 @@ import { LinkCodeResponse, LinkedAccount } from '../../models';
 })
 export class SettingsComponent {
   protected readonly session = inject(SessionService);
+  protected readonly theme = inject(ThemeService);
   private readonly api = inject(ApiService);
 
   readonly connecting = signal(false);

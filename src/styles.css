@@ -1596,9 +1596,9 @@ body.light .toolbar-filter select {
 
 .profile-dropdown-card {
   position: absolute;
-  top: 48px;
-  right: 0;
-  width: 290px;
+  bottom: calc(100% + 12px);
+  left: 10px;
+  width: calc(100% - 20px);
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(16px);
   border: 1px solid #334155;
@@ -2382,6 +2382,25 @@ body.light .time-btn.active {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+/* Default Dark Mode Variables */
+:root {
+  --bg-color: #080c14;
+  --surface-color: rgba(30, 41, 59, 0.5);
+  --card-bg: #151d2f;
+  --text-color: #f3f4f6;
+  --text-muted: #8a94a6;
+  --border-color: #1e293b;
+}
+
+body.light {
+  --bg-color: #ffffff;
+  --surface-color: #f8fafc;
+  --card-bg: #ffffff;
+  --text-color: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
 }
 
 .topbar-search {
@@ -3229,6 +3248,7 @@ body.light .topbar-search input {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    overflow: visible !important; /* Ensure popups aren't clipped */
   }
 
   /* Hide desktop-only elements in sidebar */
@@ -3251,6 +3271,16 @@ body.light .topbar-search input {
   /* Hide the spacer so the items are centered/spaced evenly */
   .nav-spacer {
     display: none !important;
+  }
+
+  .mobile-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 999; /* Below the bottom nav which is 1000 */
   }
 
   /* Popups for submenus and more menu */
@@ -3394,4 +3424,43 @@ body.light .ai-insight-card {
 body.light .premium-upgrade-card {
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+/* --- Portfolio Redesign Styles --- */
+
+.segmented-control {
+  display: flex;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.seg-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.seg-btn:hover {
+  color: var(--text-color);
+}
+
+.seg-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+}
+
+.modern-table th {
+  text-transform: uppercase;
+}
+
+.modern-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
 }

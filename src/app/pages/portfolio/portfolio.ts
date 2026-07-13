@@ -19,8 +19,13 @@ export class PortfolioComponent implements OnDestroy {
   protected readonly session = inject(SessionService);
   private readonly translateService = inject(TranslateService);
 
-  // View query for the Chart canvas
+  showComingSoon() {
+    alert('Coming soon');
+  }
+
+  // View queries for canvases
   readonly performanceCanvas = viewChild<ElementRef<HTMLCanvasElement>>('performanceCanvas');
+  readonly allocationCanvas = viewChild<ElementRef<HTMLCanvasElement>>('allocationCanvas');
 
   readonly portfolio = rxResource({
     params: () => this.session.activeUserId(),
@@ -29,6 +34,36 @@ export class PortfolioComponent implements OnDestroy {
   });
 
   readonly selectedHolding = signal<HoldingView | null>(null);
+  
+  // Layout state
+  readonly activeTab = signal<'holdings' | 'performance'>('holdings');
+
+  // Computed Portfolio Metrics
+  readonly totalValue = computed(() => {
+    return this.portfolio.value()?.reduce((sum, h) => sum + ((h.lastPrice || 0) * h.remainingQty), 0) || 0;
+  });
+
+  readonly investedCapital = computed(() => {
+    return this.portfolio.value()?.reduce((sum, h) => sum + ((h.avgCostRemaining || 0) * h.remainingQty), 0) || 0;
+  });
+
+  readonly totalUnrealizedPnl = computed(() => {
+    return this.portfolio.value()?.reduce((sum, h) => sum + h.unrealisedPnl, 0) || 0;
+  });
+
+  readonly activeHoldings = computed(() => {
+    const active = (this.portfolio.value() || []).filter(h => h.remainingQty > 0);
+    return active.sort((a, b) => ((b.lastPrice || 0) * b.remainingQty) - ((a.lastPrice || 0) * a.remainingQty));
+  });
+
+  readonly totalUnrealizedPnlPercent = computed(() => {
+    const invested = this.investedCapital();
+    return invested > 0 ? (this.totalUnrealizedPnl() / invested) * 100 : 0;
+  });
+
+  readonly totalRealizedPnl = computed(() => {
+    return this.portfolio.value()?.reduce((sum, h) => sum + h.realisedPnl, 0) || 0;
+  });
 
   // Loads whenever a holding is selected; idle while nothing is selected.
   // Switching selection cancels the in-flight request automatically.
@@ -45,7 +80,8 @@ export class PortfolioComponent implements OnDestroy {
   });
 
   readonly activePeriod = signal<'1W' | '1M' | '3M' | '6M' | 'ALL'>('3M');
-  private chartInstance: any = null;
+  private performanceChartInstance: any = null;
+  private allocationChartInstance: any = null;
 
   // Realized P/L by Year summary (moved here from the dashboard)
   readonly yearlyPnl = rxResource({
@@ -60,8 +96,15 @@ export class PortfolioComponent implements OnDestroy {
     this.expandedYear.set(this.expandedYear() === year ? null : year);
   }
 
+  getLegendColor(index: number): string {
+    const backgroundColors = [
+      '#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899',
+    ];
+    return backgroundColors[index % backgroundColors.length];
+  }
+
   constructor() {
-    // Setup reactive effect to automatically build/rebuild the chart
+    // Setup reactive effect to automatically build/rebuild the performance chart
     effect(() => {
       const canvasRef = this.performanceCanvas();
       const rawData = this.timelineResource.value();
@@ -70,14 +113,29 @@ export class PortfolioComponent implements OnDestroy {
       const lang = this.translateService.currentLang;
       
       if (canvasRef && rawData) {
-        this.buildChart(canvasRef.nativeElement, rawData, period);
+        this.buildPerformanceChart(canvasRef.nativeElement, rawData, period);
+      }
+    });
+
+    // Setup reactive effect for the allocation donut chart
+    effect(() => {
+      const canvasRef = this.allocationCanvas();
+      const activeData = this.activeHoldings();
+      // Re-trigger on language change
+      const lang = this.translateService.currentLang;
+      
+      if (canvasRef && activeData) {
+        this.buildAllocationChart(canvasRef.nativeElement, activeData);
       }
     });
   }
 
   ngOnDestroy() {
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
+    if (this.performanceChartInstance) {
+      this.performanceChartInstance.destroy();
+    }
+    if (this.allocationChartInstance) {
+      this.allocationChartInstance.destroy();
     }
   }
 
@@ -227,10 +285,10 @@ export class PortfolioComponent implements OnDestroy {
     };
   }
 
-  private buildChart(canvas: HTMLCanvasElement, rawData: any, period: string) {
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
-      this.chartInstance = null;
+  private buildPerformanceChart(canvas: HTMLCanvasElement, rawData: any, period: string) {
+    if (this.performanceChartInstance) {
+      this.performanceChartInstance.destroy();
+      this.performanceChartInstance = null;
     }
 
     const { dates: fullDates, invested: fullInvested, equity: fullEquity } = this.mergeTimeline(rawData);
@@ -250,7 +308,7 @@ export class PortfolioComponent implements OnDestroy {
       return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     });
 
-    this.chartInstance = new Chart(ctx, {
+    this.performanceChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
         labels: formattedLabels,
@@ -382,11 +440,90 @@ export class PortfolioComponent implements OnDestroy {
       }
     });
   }
+
+  private buildAllocationChart(canvas: HTMLCanvasElement, activeHoldings: HoldingView[]) {
+    if (this.allocationChartInstance) {
+      this.allocationChartInstance.destroy();
+      this.allocationChartInstance = null;
+    }
+
+    if (!activeHoldings || activeHoldings.length === 0) return;
+
+    const labels = activeHoldings.map(h => h.ticker);
+    const data = activeHoldings.map(h => (h.lastPrice || 0) * h.remainingQty);
+    
+    const backgroundColors = [
+      '#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899',
+    ];
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    this.allocationChartInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: backgroundColors.slice(0, data.length),
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '75%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#111827',
+            titleColor: '#f3f4f6',
+            bodyColor: '#9ca3af',
+            borderColor: '#1e293b',
+            borderWidth: 1,
+            titleFont: { family: "'Outfit', 'Kantumruy Pro', sans-serif", weight: 'bold' },
+            bodyFont: { family: "'Outfit', 'Kantumruy Pro', sans-serif" },
+            callbacks: {
+              label: (context) => {
+                const value = context.raw as number;
+                const total = context.dataset.data.reduce((a: any, b: any) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(2) + '%';
+                return ` ៛ ${value.toLocaleString()} (${percentage})`;
+              }
+            }
+          }
+        }
+      },
+      plugins: [{
+        id: 'centerText',
+        beforeDraw: (chart) => {
+          const width = chart.width;
+          const height = chart.height;
+          const ctx = chart.ctx;
+          ctx.save();
+          
+          const totalHoldings = activeHoldings.length;
+          
+          ctx.textBaseline = 'middle';
+          ctx.textAlign = 'center';
+          
+          ctx.font = 'bold 24px "Outfit", sans-serif';
+          ctx.fillStyle = '#f8fafc';
+          ctx.fillText(totalHoldings.toString(), width / 2, (height / 2) - 10);
+          
+          ctx.font = '14px "Outfit", sans-serif';
+          ctx.fillStyle = '#94a3b8';
+          ctx.fillText('Holdings', width / 2, (height / 2) + 15);
+          ctx.restore();
+        }
+      }]
+    });
+  }
 }
 
 /**
- * Guarantee a numeric totalPnlPercent: prefer the backend-provided value,
- * falling back to a client-side derivation over the remaining cost basis.
+ * Derived holding view with guaranteed totalPnlPercent.
  */
 function toHoldingView(h: Holding): HoldingView {
   if (typeof h.totalPnlPercent === 'number') {

@@ -9,6 +9,18 @@
       <p>Please sign in to manage connected accounts.</p>
     </div>
   } @else {
+    <section class="settings-card" style="margin-bottom: 16px;">
+      <div class="card-head" style="align-items: center; cursor: pointer;" (click)="theme.toggle()">
+        <div>
+          <h2>🌙 Appearance</h2>
+          <p class="muted">Toggle dark mode for a better nighttime viewing experience.</p>
+        </div>
+        <div style="font-size: 24px;">
+          {{ theme.theme() === 'dark' ? '✅' : '⬛' }}
+        </div>
+      </div>
+    </section>
+
     <section class="settings-card">
       <div class="card-head">
         <div>
@@ -17,9 +29,11 @@
             Link your Telegram account so the bot's trades and your web portfolio share one account.
           </p>
         </div>
-        <button class="btn-primary" (click)="connectTelegram()" [disabled]="connecting()">
-          {{ connecting() ? 'Generating…' : '➕ Connect Telegram' }}
-        </button>
+        @if (!links.value().links.length) {
+          <button class="btn-primary" (click)="connectTelegram()" [disabled]="connecting()">
+            {{ connecting() ? 'Generating…' : '➕ Connect Telegram' }}
+          </button>
+        }
       </div>
 
       @if (error(); as e) {
@@ -42,7 +56,7 @@
       <div class="links-list">
         @if (links.isLoading()) {
           <p class="muted">Loading…</p>
-        } @else if (links.value().links.length === 0) {
+        } @else if (!links.value().links.length) {
           <p class="muted empty">No Telegram accounts linked yet.</p>
         } @else {
           @for (link of links.value().links; track link.aliasUserId) {

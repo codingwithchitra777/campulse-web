@@ -41,6 +41,10 @@ export class App {
   mobileMoreMenuOpen = false;
 
   toggleTradesMenu() {
+    if (this.sidebarCollapsed()) {
+      this.sidebarCollapsed.set(false);
+      localStorage.setItem('sidebar_collapsed', '0');
+    }
     this.tradesMenuOpen = !this.tradesMenuOpen;
     if (this.tradesMenuOpen) this.mobileMoreMenuOpen = false;
   }
@@ -146,8 +150,13 @@ export class App {
   // --- Profile Methods ---
 
   toggleProfileDropdown(event: Event) {
-    event.stopPropagation();
+    if (this.sidebarCollapsed()) {
+      this.sidebarCollapsed.set(false);
+      localStorage.setItem('sidebar_collapsed', '0');
+    }
     this.showProfileDropdown = !this.showProfileDropdown;
+    this.showNotifications = false;
+    event.stopPropagation();
   }
 
   closeProfileDropdown() {
@@ -166,7 +175,8 @@ export class App {
 
   logoutGoogle() {
     this.session.logout();
-    this.router.navigate(['/dashboard']);
+    this.closeProfileDropdown();
+    this.router.navigate(['/login']);
   }
 
   refreshActivePage() {

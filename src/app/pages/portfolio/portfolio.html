@@ -2,11 +2,62 @@
   <div class="portfolio-layout">
     <!-- Holdings Grid -->
     <div class="portfolio-list-panel">
-      <h2 class="panel-title" style="margin-bottom: 20px;">💼 {{ 'PORTFOLIO.TITLE' | translate }}</h2>
+      <!-- Header & Tabs -->
+      <div class="portfolio-header-area" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">Portfolio</h2>
+          <p class="muted" style="margin: 0; font-size: 14px;">Manage your holdings and track performance across the Cambodian market.</p>
+        </div>
+      </div>
+
+      <!-- Top Metrics Grid -->
+      <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="dashboard-panel metric-card" style="padding: 16px;">
+          <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">TOTAL VALUE</div>
+          <div class="font-bold" style="font-size: 24px; line-height: 1.2;">៛ {{ totalValue() | number }}</div>
+          <div class="muted" style="font-size: 12px; margin-top: 4px;">≈ ${{ totalValue() / 4100 | number:'1.0-0' }} USD</div>
+        </div>
+        
+        <div class="dashboard-panel metric-card" style="padding: 16px;">
+          <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">INVESTED CAPITAL</div>
+          <div class="font-bold" style="font-size: 24px; line-height: 1.2;">៛ {{ investedCapital() | number }}</div>
+        </div>
+
+        <div class="dashboard-panel metric-card" style="padding: 16px;">
+          <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">UNREALIZED P/L</div>
+          <div class="font-bold" style="font-size: 24px; line-height: 1.2; display: flex; align-items: center; justify-content: space-between;">
+            <span [ngClass]="totalUnrealizedPnl() >= 0 ? 'text-profit' : 'text-loss'">
+              {{ totalUnrealizedPnl() >= 0 ? '+' : '' }}៛ <br/> {{ (totalUnrealizedPnl() >= 0 ? totalUnrealizedPnl() : -totalUnrealizedPnl()) | number }}
+            </span>
+            <span class="badge" [ngClass]="totalUnrealizedPnlPercent() >= 0 ? 'badge-profit' : 'badge-loss'" style="font-size: 12px; padding: 4px 8px; border-radius: 12px; background: rgba(16, 185, 129, 0.1);">
+              {{ totalUnrealizedPnlPercent() >= 0 ? '↑' : '↓' }} {{ (totalUnrealizedPnlPercent() >= 0 ? totalUnrealizedPnlPercent() : -totalUnrealizedPnlPercent()) | number:'1.2-2' }}%
+            </span>
+          </div>
+        </div>
+
+        <div class="dashboard-panel metric-card" style="padding: 16px;">
+          <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">REALIZED P/L</div>
+          <div class="font-bold" [ngClass]="totalRealizedPnl() >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 24px; line-height: 1.2;">
+            {{ totalRealizedPnl() >= 0 ? '+' : '' }}៛ <br/> {{ (totalRealizedPnl() >= 0 ? totalRealizedPnl() : -totalRealizedPnl()) | number }}
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Insight Card (Premium) -->
+      @if (!session.isGuest()) {
+        <div class="dashboard-panel ai-insight-card" style="margin-bottom: 24px; background: linear-gradient(145deg, #1e1b4b, #0f172a); border: 1px solid #312e81;">
+          <div class="insight-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <span class="insight-icon">✨</span>
+            <span class="insight-title" style="font-size: 12px; font-weight: bold; letter-spacing: 0.5px; color: #a5b4fc; text-transform: uppercase;">AI Insight (Premium)</span>
+          </div>
+          <p class="insight-text" style="font-size: 16px; font-style: italic; line-height: 1.5; color: #e0e7ff; margin-bottom: 0;">"You have achieved a 68% win rate this month. Consider taking profits on your PWSA position which has hit your historical target zones."</p>
+          <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid #4f46e5; color: #a5b4fc; border-radius: 20px; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 16px; transition: background 0.2s;">View Full AI Report</button>
+        </div>
+      }
 
       <!-- Portfolio Performance Chart (Authenticated) -->
       @if (!session.isGuest()) {
-        <div class="dashboard-panel chart-panel" style="margin-bottom: 30px;">
+        <div class="dashboard-panel chart-panel" style="margin-bottom: 24px;">
           <div class="chart-header">
             <h2 class="panel-title" style="margin-bottom: 0;">📅 {{ 'DASHBOARD.CHART_TITLE' | translate }}</h2>
             <div class="time-selector">
@@ -28,102 +79,145 @@
         </div>
       }
 
-      @if (portfolio.isLoading()) {
-        <div class="panel-loader">Loading...</div>
-      } @else {
-        <div class="table-container">
-          <table class="data-table selectable-rows">
-            <thead>
-              <tr>
-                <th>{{ 'DASHBOARD.COL_TICKER' | translate }}</th>
-                <th>{{ 'PORTFOLIO.COL_MARKET_PRICE' | translate }}</th>
-                <th>{{ 'PORTFOLIO.COL_SHARES' | translate }}</th>
-                <th>{{ 'PORTFOLIO.COL_SOLD_PCT' | translate }}</th>
-                <th>{{ 'PORTFOLIO.COL_AVG_BUY' | translate }}</th>
-                <th>{{ 'PORTFOLIO.COL_PL' | translate }}</th>
-                <th>P/L %</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (h of portfolio.value(); track h.ticker) {
-                <tr (click)="selectHolding(h)" [class.selected]="selectedHolding()?.ticker === h.ticker">
-                  <td class="font-bold">{{ h.ticker }}</td>
-                  <td>{{ h.lastPrice | number }}</td>
-                  <td>{{ h.remainingQty | number }}</td>
-                  <td>{{ h.soldPercent | number:'1.1-1' }}%</td>
-                  <td>{{ h.avgCostRemaining | number:'1.0-0' }}</td>
-                  <td [ngClass]="h.totalPnl >= 0 ? 'text-profit' : 'text-loss'">
-                    {{ h.totalPnl >= 0 ? '+' : '' }}{{ h.totalPnl | number }}
-                  </td>
-                  <td [ngClass]="h.totalPnlPercent >= 0 ? 'text-profit' : 'text-loss'">
-                    {{ h.totalPnlPercent >= 0 ? '+' : '' }}{{ h.totalPnlPercent | number:'1.2-2' }}%
-                  </td>
-                  <td>
-                    <button class="view-btn" (click)="selectHolding(h); $event.stopPropagation()" title="View position details">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                      {{ 'PORTFOLIO.BTN_VIEW' | translate }}
-                    </button>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="8" class="text-center">{{ 'PORTFOLIO.NO_POSITIONS' | translate }}</td>
-                </tr>
+      <div class="holdings-layout" style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+          <!-- Using inline CSS for layout if larger than mobile -->
+          <style>
+            @media (min-width: 900px) {
+              .holdings-layout { grid-template-columns: 320px 1fr !important; }
+            }
+          </style>
+          
+          <!-- Left: Allocation Donut -->
+          <div class="dashboard-panel allocation-panel" style="display: flex; flex-direction: column;">
+            <h3 class="panel-title" style="font-size: 18px;">Allocation</h3>
+            <div class="chart-container" style="height: 240px; position: relative; margin: 20px 0;">
+              <canvas #allocationCanvas></canvas>
+            </div>
+            <!-- Custom Legend -->
+            <div class="allocation-legend" style="margin-top: auto;">
+              @for (h of activeHoldings(); track h.ticker) {
+                <div class="legend-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="legend-color-box" [style.background-color]="getLegendColor($index)" style="width: 10px; height: 10px; border-radius: 2px;"></div>
+                    <span class="legend-ticker muted">{{ h.ticker }}</span>
+                  </div>
+                  <span class="legend-pct font-bold">{{ (totalValue() > 0 ? (((h.lastPrice || 0) * h.remainingQty / totalValue()) * 100) : 0) | number:'1.2-2' }}%</span>
+                </div>
               }
-            </tbody>
-          </table>
-        </div>
-      }
+            </div>
+          </div>
 
-      <!-- Realized P/L by Year (moved here from the dashboard) -->
-      <div class="dashboard-panel" style="margin-top: 30px;">
-        <h2 class="panel-title">📅 {{ 'DASHBOARD.PNL_BY_YEAR' | translate }}</h2>
-        @if (yearlyPnl.isLoading()) {
-          <div class="panel-loader">Loading...</div>
-        } @else {
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>{{ 'DASHBOARD.COL_YEAR' | translate }}</th>
-                  <th>{{ 'DASHBOARD.REALISED_PL' | translate }}</th>
-                  <th>{{ 'DASHBOARD.COL_SELLS' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (y of yearlyPnl.value(); track y.year) {
-                  <tr class="year-row" (click)="toggleYear(y.year)">
-                    <td class="font-bold">
-                      <span class="year-toggle">{{ expandedYear() === y.year ? '▾' : '▸' }}</span>
-                      {{ y.year }}
-                    </td>
-                    <td class="font-bold" [ngClass]="y.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
-                      {{ y.realisedPnl >= 0 ? '+' : '' }}{{ y.realisedPnl | number }} riel
-                    </td>
-                    <td>{{ y.sellCount | number }}</td>
+          <!-- Right: Holdings List -->
+          <div class="dashboard-panel holdings-panel" style="padding: 0;">
+            <div class="chart-header" style="padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center;">
+              <h3 class="panel-title" style="margin-bottom: 0; font-size: 18px;">Current Holdings</h3>
+              <button class="view-btn" style="background: transparent; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer;">Download CSV 📥</button>
+            </div>
+            
+            <div class="table-container" style="margin-top: 16px;">
+              <table class="data-table selectable-rows modern-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border-color);">
+                    <th style="padding: 12px 20px; text-align: left; font-size: 11px; letter-spacing: 0.5px; color: var(--text-muted);">TICKER</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: 11px; letter-spacing: 0.5px; color: var(--text-muted);">SHARES</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: 11px; letter-spacing: 0.5px; color: var(--text-muted);">AVG COST</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: 11px; letter-spacing: 0.5px; color: var(--text-muted);">MKT PRICE</th>
+                    <th style="padding: 12px 20px; text-align: right; font-size: 11px; letter-spacing: 0.5px; color: var(--text-muted);">TOTAL P/L</th>
+                    <th style="padding: 12px 20px; text-align: right; font-size: 11px; letter-spacing: 0.5px; color: var(--text-muted);">ACTION</th>
                   </tr>
-                  @if (expandedYear() === y.year) {
-                    @for (tk of y.tickers; track tk.ticker) {
-                      <tr class="year-ticker-row">
-                        <td class="year-ticker-name">{{ tk.ticker }}</td>
-                        <td [ngClass]="tk.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
-                          {{ tk.realisedPnl >= 0 ? '+' : '' }}{{ tk.realisedPnl | number }} riel
+                </thead>
+                <tbody>
+                  @for (h of portfolio.value(); track h.ticker) {
+                    @if (h.remainingQty > 0) {
+                      <tr (click)="selectHolding(h)" style="border-bottom: 1px solid var(--border-color); cursor: pointer;" [class.selected]="selectedHolding()?.ticker === h.ticker">
+                        <td style="padding: 16px 20px;">
+                          <div class="ticker-cell" style="display: flex; align-items: center; gap: 12px;">
+                            <div class="ticker-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: var(--text-muted);">
+                              {{ h.ticker.substring(0, 2) }}
+                            </div>
+                            <div class="ticker-info" style="display: flex; flex-direction: column;">
+                              <span class="font-bold" style="font-size: 14px;">{{ h.ticker }}</span>
+                              <span class="muted" style="font-size: 11px; line-height: 1.2;">
+                                {{ h.ticker === 'PWSA' ? 'Phnom Penh Water' : (h.ticker === 'GTI' ? 'Grand Twins Int.' : (h.ticker === 'PPAP' ? 'Phnom Penh Port' : h.ticker)) }}
+                              </span>
+                            </div>
+                          </div>
                         </td>
-                        <td>{{ tk.sellCount | number }}</td>
+                        <td style="padding: 16px 20px; font-size: 14px; color: var(--text-muted);">{{ h.remainingQty | number }}</td>
+                        <td style="padding: 16px 20px; font-size: 14px; color: var(--text-muted);">៛ {{ h.avgCostRemaining | number:'1.0-0' }}</td>
+                        <td style="padding: 16px 20px; font-size: 14px; color: var(--text-muted);">៛ {{ h.lastPrice | number }}</td>
+                        <td style="padding: 16px 20px; text-align: right;">
+                          <div class="font-bold" [ngClass]="h.totalPnl >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 14px;">
+                            {{ h.totalPnl >= 0 ? '+' : '' }}៛ {{ (h.totalPnl >= 0 ? h.totalPnl : -h.totalPnl) | number }}
+                          </div>
+                          <div [ngClass]="h.totalPnlPercent >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 11px; opacity: 0.9;">
+                            {{ h.totalPnlPercent >= 0 ? '+' : '' }}{{ h.totalPnlPercent | number:'1.2-2' }}%
+                          </div>
+                        </td>
+                        <td style="padding: 16px 20px; text-align: right;">
+                          <button class="view-btn" (click)="selectHolding(h); $event.stopPropagation()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 6px 16px; font-size: 12px; font-family: inherit; font-weight: 500; cursor: pointer; transition: background 0.2s;">View</button>
+                        </td>
                       </tr>
                     }
+                  } @empty {
+                    <tr>
+                      <td colspan="6" class="text-center" style="padding: 30px;">{{ 'PORTFOLIO.NO_POSITIONS' | translate }}</td>
+                    </tr>
                   }
-                } @empty {
-                  <tr>
-                    <td colspan="3" class="text-center">{{ 'DASHBOARD.NO_HISTORY' | translate }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
-        }
-      </div>
+        </div>
+
+        <!-- Realized P/L by Year -->
+        <div class="dashboard-panel" style="margin-top: 30px;">
+          <h2 class="panel-title">📅 {{ 'DASHBOARD.PNL_BY_YEAR' | translate }}</h2>
+          @if (yearlyPnl.isLoading()) {
+            <div class="panel-loader">Loading...</div>
+          } @else {
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>{{ 'DASHBOARD.COL_YEAR' | translate }}</th>
+                    <th>{{ 'DASHBOARD.REALISED_PL' | translate }}</th>
+                    <th>{{ 'DASHBOARD.COL_SELLS' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (y of yearlyPnl.value(); track y.year) {
+                    <tr class="year-row" (click)="toggleYear(y.year)">
+                      <td class="font-bold">
+                        <span class="year-toggle">{{ expandedYear() === y.year ? '▾' : '▸' }}</span>
+                        {{ y.year }}
+                      </td>
+                      <td class="font-bold" [ngClass]="y.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
+                        {{ y.realisedPnl >= 0 ? '+' : '' }}{{ (y.realisedPnl >= 0 ? y.realisedPnl : -y.realisedPnl) | number }} riel
+                      </td>
+                      <td>{{ y.sellCount | number }}</td>
+                    </tr>
+                    @if (expandedYear() === y.year) {
+                      @for (tk of y.tickers; track tk.ticker) {
+                        <tr class="year-ticker-row">
+                          <td class="year-ticker-name">{{ tk.ticker }}</td>
+                          <td [ngClass]="tk.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
+                            {{ tk.realisedPnl >= 0 ? '+' : '' }}{{ (tk.realisedPnl >= 0 ? tk.realisedPnl : -tk.realisedPnl) | number }} riel
+                          </td>
+                          <td>{{ tk.sellCount | number }}</td>
+                        </tr>
+                      }
+                    }
+                  } @empty {
+                    <tr>
+                      <td colspan="3" class="text-center">{{ 'DASHBOARD.NO_HISTORY' | translate }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
     </div>
 
   <!-- Backdrop for Right Drawer -->

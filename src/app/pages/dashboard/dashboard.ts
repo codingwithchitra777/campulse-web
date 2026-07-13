@@ -19,6 +19,10 @@ export class DashboardComponent implements OnDestroy {
   private readonly api = inject(ApiService);
   private readonly translateService = inject(TranslateService);
 
+  showComingSoon() {
+    alert('Coming soon');
+  }
+
   // Personal data is keyed on the active user: it refetches automatically on
   // login/logout/user switch, and idles (empty) while browsing as guest.
   private readonly userId = computed(() =>
