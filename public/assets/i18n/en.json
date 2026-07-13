@@ -2,8 +2,14 @@
   "NAV": {
     "DASHBOARD": "Dashboard",
     "PORTFOLIO": "Portfolio",
+    "TRADES": "Trades",
     "RECORD_TRADE": "Record Trade",
     "HISTORY": "History",
+    "ANALYTICS": "Analytics",
+    "AI_COACH": "AI Coach",
+    "JOURNAL": "Journal",
+    "WATCHLIST": "Watchlist",
+    "SETTINGS": "Settings",
     "SIGN_OUT": "Sign Out",
     "PREMIUM_TRADER": "Premium Trader"
   },

@@ -2,8 +2,14 @@
   "NAV": {
     "DASHBOARD": "ផ្ទាំងព័ត៌មាន",
     "PORTFOLIO": "ផលប័ត្រ",
+    "TRADES": "ការជួញដូរ",
     "RECORD_TRADE": "កត់ត្រាការជួញដូរ",
     "HISTORY": "ប្រវត្តិជួញដូរ",
+    "ANALYTICS": "វិភាគទិន្នន័យ",
+    "AI_COACH": "គ្រូបង្វឹក AI",
+    "JOURNAL": "កំណត់ត្រាវិនិយោគ",
+    "WATCHLIST": "បញ្ជីតាមដាន",
+    "SETTINGS": "ការកំណត់",
     "SIGN_OUT": "ចាកចេញ",
     "PREMIUM_TRADER": "អ្នកជួញដូរពិសេស"
   },

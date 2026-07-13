@@ -25,6 +25,30 @@ export class App {
   currentLang = 'en';
 
   readonly sidebarCollapsed = signal(localStorage.getItem('sidebar_collapsed') === '1');
+  
+  // New State Signals for Layout Redesign
+  premiumModalFeature = signal<string | null>(null);
+  showNotifications = false;
+  notifications = signal<any[]>([
+    { title: 'Welcome to CamPulse Premium', time: 'Just now', read: false },
+    { title: 'CSX Market is now open', time: '2 hours ago', read: false },
+    { title: 'LIFO calculation complete', time: '1 day ago', read: true }
+  ]);
+  
+  marketStatus = signal<{ open: boolean, text: string }>({ open: false, text: 'CSX Closed' });
+
+  tradesMenuOpen = false;
+  mobileMoreMenuOpen = false;
+
+  toggleTradesMenu() {
+    this.tradesMenuOpen = !this.tradesMenuOpen;
+    if (this.tradesMenuOpen) this.mobileMoreMenuOpen = false;
+  }
+
+  toggleMobileMoreMenu() {
+    this.mobileMoreMenuOpen = !this.mobileMoreMenuOpen;
+    if (this.mobileMoreMenuOpen) this.tradesMenuOpen = false;
+  }
 
   toggleSidebar() {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
@@ -36,12 +60,37 @@ export class App {
     this.currentLang = lang;
     localStorage.setItem('lang', lang);
   }
+  
+  updateMarketStatus() {
+    const now = new Date();
+    // Convert to Cambodia time (UTC+7)
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const cambodiaTime = new Date(utc + 3600000 * 7);
+    
+    const day = cambodiaTime.getDay(); // 0 = Sun, 6 = Sat
+    const hour = cambodiaTime.getHours();
+    
+    const isWeekend = day === 0 || day === 6;
+    const isWorkingHours = hour >= 8 && hour < 15; // 8:00 AM - 3:00 PM
+    
+    if (isWeekend) {
+      this.marketStatus.set({ open: false, text: 'CSX Closed (Weekend)' });
+    } else if (!isWorkingHours) {
+      this.marketStatus.set({ open: false, text: 'CSX Closed' });
+    } else {
+      this.marketStatus.set({ open: true, text: 'CSX Open' });
+    }
+  }
 
   constructor() {
     const savedLang = localStorage.getItem('lang') || 'en';
     this.translate.setFallbackLang('en');
     this.translate.use(savedLang);
     this.currentLang = savedLang;
+    
+    this.updateMarketStatus();
+    // Check status every minute
+    setInterval(() => this.updateMarketStatus(), 60000);
 
     // Inside the Telegram Mini App, sign the user in from initData silently.
     this.telegramAuth.autoLoginFromWebApp();
@@ -63,6 +112,38 @@ export class App {
       }
     });
   }
+
+  // --- New Nav Methods ---
+
+  get unreadNotificationsCount(): number {
+    return this.notifications().filter(n => !n.read).length;
+  }
+
+  toggleNotifications(event: Event) {
+    event.stopPropagation();
+    this.showNotifications = !this.showNotifications;
+    this.showProfileDropdown = false;
+  }
+
+  markNotificationsRead() {
+    this.notifications.update(list => list.map(n => ({ ...n, read: true })));
+  }
+
+  openPremiumModal(feature: string, event: Event) {
+    event.preventDefault();
+    this.premiumModalFeature.set(feature);
+  }
+
+  closePremiumModal() {
+    this.premiumModalFeature.set(null);
+  }
+  
+  onSearch(event: Event) {
+    const target = event.target as HTMLInputElement;
+    console.log('Searching for:', target.value);
+  }
+
+  // --- Profile Methods ---
 
   toggleProfileDropdown(event: Event) {
     event.stopPropagation();

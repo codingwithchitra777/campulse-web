@@ -1,152 +1,209 @@
-<div class="view-container animate-fade-in">
-  <!-- Premium Hero Banner (Public) -->
-  <section class="hero-banner">
-    <div class="hero-badge">🔐 {{ 'DASHBOARD.SECURE_BADGE' | translate }}</div>
-    <h1 class="hero-title">{{ 'DASHBOARD.TITLE' | translate }}</h1>
-    <p class="hero-subtitle">
-      {{ 'DASHBOARD.SUBTITLE' | translate }}
-    </p>
-    <div class="features-grid">
-      <div class="feature-card">
-        <span class="feature-icon">📊</span>
-        <div>
-          <div class="feature-title">{{ 'DASHBOARD.FEATURE_PRICES_TITLE' | translate }}</div>
-          <div class="feature-desc">{{ 'DASHBOARD.FEATURE_PRICES_DESC' | translate }}</div>
-        </div>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">📦</span>
-        <div>
-          <div class="feature-title">{{ 'DASHBOARD.FEATURE_LIFO_TITLE' | translate }}</div>
-          <div class="feature-desc">{{ 'DASHBOARD.FEATURE_LIFO_DESC' | translate }}</div>
-        </div>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">📜</span>
-        <div>
-          <div class="feature-title">{{ 'DASHBOARD.FEATURE_LEDGER_TITLE' | translate }}</div>
-          <div class="feature-desc">{{ 'DASHBOARD.FEATURE_LEDGER_DESC' | translate }}</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
+<div class="view-container animate-fade-in dashboard-screen-1">
   <!-- Authenticated Dashboard State -->
   @if (!session.isGuest()) {
-    <!-- Metric Highlights -->
-    <section class="metrics-grid">
-      <div class="metric-card">
-        <span class="metric-title">{{ 'DASHBOARD.REALISED_PL' | translate }}</span>
-        <span class="metric-value" [ngClass]="totalRealisedPnl() >= 0 ? 'text-profit' : 'text-loss'">
-          {{ totalRealisedPnl() >= 0 ? '+' : '' }}{{ totalRealisedPnl() | number }} <span class="currency">riel</span>
-        </span>
+    
+    <!-- Hero Section -->
+    <section class="dashboard-hero">
+      <h1 class="greeting">Good Morning, {{ userName() }} 👋</h1>
+      
+      <div class="portfolio-summary-cards">
+        
+        <!-- Portfolio Value -->
+        <div class="summary-card">
+          <div class="card-label">
+            <span class="label-icon">📄</span>
+            PORTFOLIO VALUE
+          </div>
+          <div class="card-value">{{ totalPortfolioValue() | number }} <span class="currency">riel</span></div>
+          <div class="card-subtitle">
+            <span class="badge profit-badge">↗ +1.2%</span>
+            <span class="subtitle-text">vs yesterday</span>
+          </div>
+        </div>
+        
+        <!-- Today's Gain -->
+        <div class="summary-card">
+          <div class="card-label">
+            <span class="label-icon">📅</span>
+            TODAY'S GAIN
+          </div>
+          <div class="card-value" [ngClass]="totalUnrealisedPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
+            {{ totalUnrealisedPnl() >= 0 ? '+' : '' }}{{ totalUnrealisedPnl() | number }} <span class="currency">riel</span>
+          </div>
+          <div class="card-subtitle progress-subtitle">
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" style="width: 65%;"></div>
+            </div>
+            <span class="subtitle-text">Target 65%</span>
+          </div>
+        </div>
+
+        <!-- Total Return -->
+        <div class="summary-card">
+          <div class="card-label">
+            <span class="label-icon">📈</span>
+            TOTAL RETURN
+          </div>
+          <div class="card-value" [ngClass]="totalPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
+            {{ totalPnl() >= 0 ? '+' : '' }}{{ totalPnl() | number }} <span class="currency">riel</span>
+          </div>
+          <div class="card-subtitle">
+            <span class="badge profit-badge" [ngClass]="totalPnl() >= 0 ? 'profit-badge' : 'loss-badge'">
+              {{ totalPnl() >= 0 ? '↗' : '↘' }} 
+              @if (totalPortfolioValue() > 0) {
+                {{ (totalPnl() / totalPortfolioValue()) * 100 | number:'1.1-1' }}%
+              } @else {
+                0.0%
+              }
+            </span>
+            <span class="subtitle-text">All time</span>
+          </div>
+        </div>
+
       </div>
-      <div class="metric-card">
-        <span class="metric-title">{{ 'DASHBOARD.UNREALISED_PL' | translate }}</span>
-        <span class="metric-value" [ngClass]="totalUnrealisedPnl() >= 0 ? 'text-profit' : 'text-loss'">
-          {{ totalUnrealisedPnl() >= 0 ? '+' : '' }}{{ totalUnrealisedPnl() | number }} <span class="currency">riel</span>
-        </span>
+    </section>
+
+
+    <div class="dashboard-main-grid">
+      <!-- Left Column: Chart & Insights & Trades -->
+      <div class="dashboard-main-col">
+        <!-- Portfolio Performance Chart -->
+        <div class="dashboard-panel chart-panel">
+          <div class="chart-header">
+            <h2 class="panel-title" style="margin-bottom: 0;">📅 {{ 'DASHBOARD.CHART_TITLE' | translate }}</h2>
+            <div class="time-selector">
+              <button class="time-btn" [class.active]="activePeriod() === '1W'" (click)="setPeriod('1W')">1W</button>
+              <button class="time-btn" [class.active]="activePeriod() === '1M'" (click)="setPeriod('1M')">1M</button>
+              <button class="time-btn" [class.active]="activePeriod() === '3M'" (click)="setPeriod('3M')">3M</button>
+              <button class="time-btn" [class.active]="activePeriod() === '6M'" (click)="setPeriod('6M')">6M</button>
+              <button class="time-btn" [class.active]="activePeriod() === 'ALL'" (click)="setPeriod('ALL')">ALL</button>
+            </div>
+          </div>
+          
+          @if (timelineResource.isLoading()) {
+            <div class="panel-loader">Loading...</div>
+          } @else {
+            <div class="chart-container" style="height: 300px; margin-top: 20px;">
+              <canvas #performanceCanvas></canvas>
+            </div>
+          }
+        </div>
+
+        <!-- AI Insight Card -->
+        <div class="ai-insight-card">
+          <div class="insight-header">
+            <span class="insight-icon">✨</span>
+            <span class="insight-title">AI Insight (Premium)</span>
+          </div>
+          <p class="insight-text">"You have achieved a 68% win rate this month. Consider taking profits on your PWSA position which has hit your historical target zones."</p>
+        </div>
+
+        <!-- Recent Trades -->
+        <div class="dashboard-panel">
+          <h2 class="panel-title">Recent Trades</h2>
+          <div class="recent-trades-list">
+            @for (t of recentTrades.value().items; track t.tradeId) {
+              <div class="trade-item">
+                <div class="trade-icon" [ngClass]="t.side === 'BUY' ? 'icon-buy' : 'icon-sell'">
+                  {{ t.side === 'BUY' ? 'B' : 'S' }}
+                </div>
+                <div class="trade-details">
+                  <div class="trade-ticker-row">
+                    <span class="trade-ticker">{{ t.ticker }}</span>
+                    <span class="trade-amount">{{ t.qty }} shares</span>
+                  </div>
+                  <div class="trade-date-row">
+                    <span class="trade-date">{{ t.orderDate | date:'mediumDate' }}</span>
+                    <span class="trade-price">{{ t.price | number }} riel</span>
+                  </div>
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center" style="color: #64748b; font-size: 13px;">No recent trades.</div>
+            }
+          </div>
+        </div>
       </div>
-      <div class="metric-card">
-        <span class="metric-title">{{ 'DASHBOARD.TOTAL_PL' | translate }}</span>
-        <span class="metric-value" [ngClass]="totalPnl() >= 0 ? 'text-profit' : 'text-loss'">
-          {{ totalPnl() >= 0 ? '+' : '' }}{{ totalPnl() | number }} <span class="currency">riel</span>
-        </span>
+
+      <!-- Right Column: Market Movers & Promos -->
+      <div class="dashboard-side-col">
+        
+        <!-- Market Movers -->
+        <div class="dashboard-panel">
+          <h2 class="panel-title">Market Movers</h2>
+          
+          <div class="movers-section">
+            <h3 class="movers-subtitle text-profit">🔥 Top Winners</h3>
+            <div class="movers-list">
+              @for (winner of marketWinners(); track winner.ticker) {
+                <div class="mover-item">
+                  <span class="mover-ticker">{{ winner.ticker }}</span>
+                  <span class="mover-change text-profit">{{ formatChange(winner) }}</span>
+                </div>
+              } @empty {
+                <div class="text-center" style="color: #64748b; font-size: 13px;">No data</div>
+              }
+            </div>
+          </div>
+
+          <div class="movers-section mt-15">
+            <h3 class="movers-subtitle text-loss">❄️ Top Losers</h3>
+            <div class="movers-list">
+              @for (loser of marketLosers(); track loser.ticker) {
+                <div class="mover-item">
+                  <span class="mover-ticker">{{ loser.ticker }}</span>
+                  <span class="mover-change text-loss">{{ formatChange(loser) }}</span>
+                </div>
+              } @empty {
+                <div class="text-center" style="color: #64748b; font-size: 13px;">No data</div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Premium Upgrade Card -->
+        <div class="premium-upgrade-card">
+          <div class="crown-icon">👑</div>
+          <h3>Upgrade to Premium</h3>
+          <p>Get full access to AI insights, LIFO simulations, and custom real-time alerts.</p>
+          <button class="upgrade-btn">View Plans</button>
+        </div>
+
+      </div>
+    </div>
+
+  } @else {
+    <!-- Guest State -->
+    <section class="hero-banner">
+      <div class="hero-badge">🔐 {{ 'DASHBOARD.SECURE_BADGE' | translate }}</div>
+      <h1 class="hero-title">{{ 'DASHBOARD.TITLE' | translate }}</h1>
+      <p class="hero-subtitle">
+        {{ 'DASHBOARD.SUBTITLE' | translate }}
+      </p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">📊</span>
+          <div>
+            <div class="feature-title">{{ 'DASHBOARD.FEATURE_PRICES_TITLE' | translate }}</div>
+            <div class="feature-desc">{{ 'DASHBOARD.FEATURE_PRICES_DESC' | translate }}</div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📦</span>
+          <div>
+            <div class="feature-title">{{ 'DASHBOARD.FEATURE_LIFO_TITLE' | translate }}</div>
+            <div class="feature-desc">{{ 'DASHBOARD.FEATURE_LIFO_DESC' | translate }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="locked-analytics-overlay" style="margin-top: 40px; border-radius: 12px; background: rgba(30, 41, 59, 0.5);">
+        <div class="locked-icon-wrapper">🔒</div>
+        <h3 class="locked-title">Sign in to view your dashboard</h3>
+        <p class="locked-desc">
+          Sign in with your Google account to record trades, track your realized and unrealized profits, and see matching lots.
+        </p>
       </div>
     </section>
   }
-
-  <!-- Dashboard Columns (Public market prices + Lock/Authenticated side column) -->
-  <div class="dashboard-columns">
-    <!-- Live Market Prices (Public) -->
-    <div class="dashboard-panel">
-      <h2 class="panel-title">📈 {{ 'DASHBOARD.MARKET_PRICES' | translate }}</h2>
-      @if (prices.isLoading()) {
-        <div class="panel-loader">Loading...</div>
-      } @else {
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>{{ 'DASHBOARD.COL_TICKER' | translate }}</th>
-                <th>{{ 'DASHBOARD.COL_PRICE' | translate }}</th>
-                <th>{{ 'DASHBOARD.COL_CHANGE' | translate }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (p of prices.value(); track p.ticker) {
-                <tr>
-                  <td class="font-bold">{{ p.ticker }}</td>
-                  <td>{{ p.price | number }}</td>
-                  <td [ngClass]="p.change_direction === 'up' ? 'text-profit' : (p.change_direction === 'down' ? 'text-loss' : 'text-neutral')">
-                    @if (p.change_direction === 'up') {
-                      <span>▲</span>
-                    }
-                    @if (p.change_direction === 'down') {
-                      <span>▼</span>
-                    }
-                    {{ changeAbs(p) | number }}
-                    @if (changePercent(p); as pct) {
-                      <span class="pnl-pct">({{ pct | number:'1.1-1' }}%)</span>
-                    }
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="3" class="text-center">No market prices available.</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-    </div>
-
-    <!-- Right Side: User stats when logged in, or Lock preview when guest -->
-    <div class="dashboard-panel-group">
-      <!-- Logged-in: Top Rankings -->
-      @if (!session.isGuest()) {
-        <!-- Top Tickers -->
-        <div class="dashboard-panel panel-sm">
-          <h2 class="panel-title">🏆 {{ 'DASHBOARD.TOP_TICKERS' | translate }}</h2>
-          <div class="ranking-list">
-            @for (t of topTickers.value(); track t.ticker) {
-              <div class="ranking-item">
-                <span class="ranking-rank">#{{ $index + 1 }}</span>
-                <span class="ranking-name">{{ t.ticker }}</span>
-                <span class="ranking-val text-profit">+{{ t.realisedPnl | number }} riel</span>
-              </div>
-            } @empty {
-              <div class="ranking-empty">{{ 'DASHBOARD.NO_HISTORY' | translate }}</div>
-            }
-          </div>
-        </div>
-
-        <!-- Top Orders -->
-        <div class="dashboard-panel panel-sm">
-          <h2 class="panel-title">🥇 {{ 'DASHBOARD.TOP_ORDERS' | translate }}</h2>
-          <div class="ranking-list">
-            @for (o of topOrders.value(); track o.buyTradeId) {
-              <div class="ranking-item">
-                <span class="ranking-rank">#{{ $index + 1 }}</span>
-                <span class="ranking-name">{{ o.ticker }} (Lot #{{ o.seq }})</span>
-                <span class="ranking-val text-profit">+{{ o.realisedPnl | number }} riel</span>
-              </div>
-            } @empty {
-              <div class="ranking-empty">{{ 'DASHBOARD.NO_HISTORY' | translate }}</div>
-            }
-          </div>
-        </div>
-      } @else {
-        <!-- Guest: Lock Preview -->
-        <div class="locked-analytics-overlay">
-          <div class="locked-icon-wrapper">🔒</div>
-          <h3 class="locked-title">Personalized Analytics</h3>
-          <p class="locked-desc">
-            Sign in with your Google account to record trades, track your realized and unrealized profits, and see matching lots.
-          </p>
-        </div>
-      }
-    </div>
-  </div>
 </div>
