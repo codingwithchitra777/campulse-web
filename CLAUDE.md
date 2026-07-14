@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Campulse is an Angular 21 frontend for a trading journal / portfolio tracker (LIFO matching). It talks to a FastAPI backend hosted at `https://campulse-backend.fastapicloud.dev` — the base URL is hardcoded in `src/app/services/api.service.ts` (there is no environments file).
+Campulse is an Angular 21 frontend for a trading journal / portfolio tracker. It talks to a FastAPI backend (sibling repo `campulse-backend`) hosted at `https://campulse-backend.fastapicloud.dev` — the base URL is hardcoded in `src/app/app.constants.ts` (there is no environments file).
+
+The UI says "LIFO" throughout, but the backend matcher actually consumes the **cheapest open buy lots first** (best-profit: maximise realised P/L per sale), so treat "LIFO" in labels/copy as historical naming, not the current algorithm.
 
 ## Commands
 
@@ -17,6 +19,10 @@ ng test --include src/app/app.spec.ts   # run a single spec file
 ```
 
 Formatting is Prettier (`.prettierrc`): 100 char width, single quotes, Angular parser for HTML.
+
+Gotchas:
+- `npm run build` (production) **inlines the Google Fonts stylesheet at build time** by fetching `fonts.googleapis.com` — it fails offline or behind a self-signed-cert proxy. `npm start` (dev config) does not inline fonts, so prefer it for local verification.
+- The only spec is `src/app/app.spec.ts`. Its TestBed must provide `provideHttpClient()` + `provideHttpClientTesting()` + `provideRouter([...])` (include `dashboard`/`login`/`settings` stub routes so post-logout navigation resolves) + `provideTranslateService({ fallbackLang: 'en' })` — a component using `TranslatePipe` throws `NG0201: No provider for TranslateService` otherwise. jsdom has no layout/hit-testing, so CSS stacking/z-index/click bugs will NOT surface in specs; verify interactive fixes in a real browser.
 
 ## Architecture
 
@@ -48,6 +54,23 @@ Templates use the modern `@if (x; as y)` / `@for ... @empty` control flow — re
 
 - GSI script loads in `src/index.html`; the root `App` component re-renders the header sign-in button via an `effect()` whenever `isGuest()` flips (the `#googleBtn` container only exists while signed out). The login page renders its own button into `#googleBtnWall`.
 - `authGuard` (`src/app/guards/auth.guard.ts`) protects `portfolio`, `record-trade`, and `history` routes; guests are redirected to `/login` with a `returnUrl` query param. `dashboard` and `login` are public; unknown routes redirect to `dashboard`.
+
+### Internationalization (i18n)
+
+All UI strings go through `@ngx-translate`. `app.config.ts` wires `provideTranslateService` with an HTTP loader reading `public/assets/i18n/{en,km}.json` (English + Khmer), `fallbackLang: 'en'`. Templates use the `TranslatePipe` (`{{ 'SOME.KEY' | translate }}`); imperative strings (e.g. `confirm()` dialogs) use `TranslateService.instant('KEY')`. `App.switchLanguage()` sets the language and persists it under localStorage `lang` (restored in the `App` constructor). When you add UI text, add the key to **both** json files, and ensure the component `imports: [TranslatePipe]`.
+
+### Styling, theming & mobile layout
+
+Styling is essentially one global stylesheet, `src/styles.css` (~3600 lines) — per-component `.css` files are mostly empty, and several templates (notably `portfolio`, `record-trade`) use heavy inline `style=`. There is no thorough CSS-variable design system; colors are largely literal hex.
+
+- **Theme**: `ThemeService` toggles a `light` class on `<body>` (dark is the default, persisted under localStorage `theme`). Light mode is implemented as `body.light .foo { ... }` overrides — when you add a new surface, add its light-mode override too. Inline dark backgrounds in templates can't be beaten by a plain stylesheet rule; use `!important` overrides (see the existing `body.light ... !important` cases) or move the style to a class.
+- **Mobile** (`≤768px`): the left `.sidebar` becomes a floating bottom nav (icon-only, with a "More" bottom-sheet for secondary items), `.sidebar-footer` is hidden, and the account entry point moves to a top-right topbar avatar (`.mobile-profile`). Breakpoints in use: 768 (primary), 860, 1024, 480. Zoom is disabled (`user-scalable=0` in `index.html` + `touch-action: manipulation`), and `body { overflow-x: hidden }` guards against stray sideways scroll — so an over-wide element gets **clipped, not scrollable**; wrap wide tables in `.table-container` (has `overflow-x: auto`).
+
+### Notable page behaviors
+
+- **Charts** (`chart.js` dependency): `dashboard.ts` (performance/equity line) and `portfolio.ts` (allocation donut) build `Chart` instances against `<canvas #ref>`. Destroy/recreate on data change and keep canvases inside a sized `.chart-container`.
+- **History** (`history.ts`) is server-paginated: `api.getTrades(ticker, limit, offset)` returns `Paginated<Trade>` driving `components/pager`; CSV export walks all pages client-side (200/page). It also has an inline edit drawer (`updateTrade`) and `deleteTrade`.
+- **Avatars**: the session profile carries an optional `picture` — Google's is decoded client-side from the ID-token JWT `picture` claim (display-only; the token is still verified server-side), Telegram's is `photo_url`. Templates render `<img class="avatar-img" (error)="onAvatarError()">` with an initials fallback.
 
 ### TypeScript strictness
 
