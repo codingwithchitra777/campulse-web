@@ -3528,3 +3528,67 @@ body.light .premium-upgrade-card {
     max-width: 100% !important;
   }
 }
+
+/* ============================================================
+   Profile avatars & mobile account entry point
+   ============================================================ */
+
+/* Provider avatar (Google `picture` / Telegram `photo_url`) fills its round
+   container; falls back to initials text when absent or on load error. */
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-avatar-container {
+  position: relative;
+}
+
+/* Round account button in the mobile topbar (mirrors the sidebar avatar). */
+.topbar-avatar-btn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #334155;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Topbar profile dropdown drops DOWN from the avatar (the sidebar one pops up). */
+.profile-dropdown-card.topbar-dropdown {
+  top: calc(100% + 10px);
+  bottom: auto;
+  left: auto;
+  right: 0;
+  width: 280px;
+}
+
+/* The mobile account entry point only exists on phones. */
+.mobile-profile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-profile {
+    display: flex;
+  }
+  /* Free topbar space + avoid a stray GSI button in the tiny bar:
+     Refresh is redundant on mobile, and guests sign in from /login. */
+  .refresh-btn,
+  .topbar-google-btn {
+    display: none;
+  }
+}

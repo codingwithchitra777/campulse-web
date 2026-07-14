@@ -99,6 +99,13 @@ export class App {
     // Inside the Telegram Mini App, sign the user in from initData silently.
     this.telegramAuth.autoLoginFromWebApp();
 
+    // A new profile (login / user switch) means a new avatar URL: clear any
+    // stale broken-image flag so the picture gets a fresh chance to load.
+    effect(() => {
+      this.session.googleProfile();
+      this.avatarBroken.set(false);
+    });
+
     // Re-render the header sign-in button whenever auth state changes
     // (the #googleBtn container only exists in the DOM while signed out).
     effect(() => {
@@ -171,6 +178,20 @@ export class App {
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
     return parts[0].substring(0, Math.min(2, parts[0].length)).toUpperCase();
+  }
+
+  // Set when the provider avatar URL fails to load, so we fall back to initials.
+  // Reset on every auth change (see effect in constructor).
+  readonly avatarBroken = signal(false);
+
+  /** Provider avatar URL (Google/Telegram), or null to fall back to initials. */
+  profilePicture(): string | null {
+    if (this.avatarBroken()) return null;
+    return this.session.googleProfile()?.picture ?? null;
+  }
+
+  onAvatarError() {
+    this.avatarBroken.set(true);
   }
 
   logoutGoogle() {

@@ -23,6 +23,8 @@ export interface GoogleProfile {
   email: string | null;
   token: string;
   role: string;
+  /** Avatar URL from the provider (Google `picture` claim / Telegram `photo_url`). */
+  picture?: string | null;
 }
 
 /** The Telegram Login Widget's signed user object, sent verbatim to /api/auth/telegram. */

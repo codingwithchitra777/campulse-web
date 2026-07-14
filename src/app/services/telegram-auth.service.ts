@@ -51,10 +51,11 @@ export class TelegramAuthService {
     if (!initData || !this.session.isGuest()) return;
 
     webApp.ready?.();
+    const photo: string | null = webApp?.initDataUnsafe?.user?.photo_url ?? null;
     this.api.telegramWebAppLogin(initData).subscribe({
       next: (res) => {
         if (!res.success) return;
-        this.setProfileFromResponse(res);
+        this.setProfileFromResponse(res, photo);
       },
       error: (err) => console.error('Telegram Mini App auto-login failed', err)
     });
@@ -64,7 +65,7 @@ export class TelegramAuthService {
     this.api.telegramLogin(user).subscribe({
       next: (res) => {
         if (!res.success) return;
-        this.setProfileFromResponse(res);
+        this.setProfileFromResponse(res, user.photo_url ?? null);
         onSignedIn?.();
       },
       error: (err) => {
@@ -75,15 +76,17 @@ export class TelegramAuthService {
     });
   }
 
-  private setProfileFromResponse(res: {
-    userId: string; userName: string; email: string | null; token: string; role: string;
-  }): void {
+  private setProfileFromResponse(
+    res: { userId: string; userName: string; email: string | null; token: string; role: string; },
+    picture: string | null = null
+  ): void {
     this.session.setProfile({
       userId: res.userId,
       name: res.userName,
       email: res.email,
       token: res.token,
-      role: res.role
+      role: res.role,
+      picture
     });
   }
 }

@@ -6,6 +6,17 @@ import { GOOGLE_CLIENT_ID } from '../app.constants';
 /** Options accepted by google.accounts.id.renderButton. */
 export type GsiButtonOptions = Record<string, string | number>;
 
+/** Extract the `picture` claim from a Google ID token (JWT) without verifying it. */
+function pictureFromIdToken(jwt: string): string | null {
+  try {
+    const payload = jwt.split('.')[1];
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    return JSON.parse(json).picture ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Single owner of the Google Identity Services (GSI) integration.
  * Previously the init + hardcoded client ID were duplicated in App and
@@ -81,6 +92,10 @@ export class GoogleAuthService {
   }
 
   private handleCredential(credential: string, onSignedIn?: () => void): void {
+    // The GSI credential is the Google ID token (a JWT) whose payload carries
+    // the `picture` claim. Read it client-side for the avatar — the backend
+    // still verifies the token for auth, this decode is display-only.
+    const picture = pictureFromIdToken(credential);
     this.api.googleLogin(credential).subscribe({
       next: (res) => {
         if (!res.success) return;
@@ -89,7 +104,8 @@ export class GoogleAuthService {
           name: res.userName,
           email: res.email,
           token: res.token,
-          role: res.role
+          role: res.role,
+          picture
         });
         onSignedIn?.();
       },

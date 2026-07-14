@@ -78,7 +78,13 @@
     <div class="sidebar-footer">
       @if (session.googleProfile(); as profile) {
         <div class="sidebar-user" (click)="toggleProfileDropdown($event)" style="cursor: pointer; position: relative;">
-          <div class="sidebar-avatar">{{ getUserInitials() }}</div>
+          <div class="sidebar-avatar">
+            @if (profilePicture(); as pic) {
+              <img class="avatar-img" [src]="pic" alt="" referrerpolicy="no-referrer" (error)="onAvatarError()" />
+            } @else {
+              {{ getUserInitials() }}
+            }
+          </div>
           <div class="sidebar-user-info">
             <span class="sidebar-user-name">{{ profile.name }}</span>
             <span class="sidebar-user-badge">{{ 'NAV.PREMIUM_TRADER' | translate }}</span>
@@ -87,7 +93,13 @@
           <!-- Floating Profile Dropdown Card -->
           <div class="profile-dropdown-card" *ngIf="showProfileDropdown" (click)="$event.stopPropagation()">
             <div class="profile-dropdown-header">
-              <div class="large-avatar">{{ getUserInitials() }}</div>
+              <div class="large-avatar">
+                @if (profilePicture(); as pic) {
+                  <img class="avatar-img" [src]="pic" alt="" referrerpolicy="no-referrer" (error)="onAvatarError()" />
+                } @else {
+                  {{ getUserInitials() }}
+                }
+              </div>
               <div class="user-details">
                 <span class="user-name">{{ profile.name }}</span>
                 <span class="user-email" *ngIf="profile.email">{{ profile.email }}</span>
@@ -187,10 +199,54 @@
           </div>
         </div>
 
-        <!-- Refresh -->
-        <button class="topbar-icon-btn" (click)="refreshActivePage()" title="Refresh Data">
+        <!-- Refresh (hidden on mobile: pages auto-refetch on nav/login) -->
+        <button class="topbar-icon-btn refresh-btn" (click)="refreshActivePage()" title="Refresh Data">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
         </button>
+
+        <!-- Mobile-only account entry point (the sidebar profile is hidden on
+             phones, so surface it here — the universal top-right avatar spot). -->
+        @if (session.googleProfile(); as profile) {
+          <div class="profile-avatar-container mobile-profile">
+            <button class="topbar-avatar-btn" (click)="toggleProfileDropdown($event)" title="Account">
+              @if (profilePicture(); as pic) {
+                <img class="avatar-img" [src]="pic" alt="" referrerpolicy="no-referrer" (error)="onAvatarError()" />
+              } @else {
+                {{ getUserInitials() }}
+              }
+            </button>
+
+            <div class="profile-dropdown-card topbar-dropdown" *ngIf="showProfileDropdown" (click)="$event.stopPropagation()">
+              <div class="profile-dropdown-header">
+                <div class="large-avatar">
+                  @if (profilePicture(); as pic) {
+                    <img class="avatar-img" [src]="pic" alt="" referrerpolicy="no-referrer" (error)="onAvatarError()" />
+                  } @else {
+                    {{ getUserInitials() }}
+                  }
+                </div>
+                <div class="user-details">
+                  <span class="user-name">{{ profile.name }}</span>
+                  <span class="user-email" *ngIf="profile.email">{{ profile.email }}</span>
+                  <span class="user-role-badge">{{ 'NAV.PREMIUM_TRADER' | translate }}</span>
+                </div>
+              </div>
+              <div class="profile-dropdown-divider"></div>
+              <div class="profile-dropdown-actions">
+                <a class="signout-btn-modern" routerLink="/settings" (click)="closeProfileDropdown()">
+                  <span>🔗</span> Connected accounts
+                </a>
+                <button class="signout-btn-modern" (click)="logoutGoogle()">
+                  <span>🚪</span> {{ 'NAV.SIGN_OUT' | translate }}
+                </button>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <a class="topbar-icon-btn mobile-profile" routerLink="/login" title="Sign in">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+          </a>
+        }
 
       </div>
     </header>
