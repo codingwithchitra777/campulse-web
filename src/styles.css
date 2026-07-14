@@ -3241,23 +3241,10 @@ body.light .topbar-search input {
     padding-bottom: 100px; /* Increased space for floating bottom nav */
   }
 
+  /* The desktop sidebar is replaced wholesale by `.mobile-bottom-nav` on phones
+     (see the mobile bottom nav + account sheet block below). */
   .sidebar {
-    position: fixed;
-    bottom: 20px;
-    top: auto;
-    left: 20px;
-    width: calc(100% - 40px) !important;
-    height: 72px; /* Bigger */
-    flex-direction: row;
-    padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    z-index: 1000;
-    background: rgba(13, 18, 30, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    overflow: visible !important; /* Ensure popups aren't clipped */
+    display: none !important;
   }
 
   /* Hide desktop-only elements in sidebar */
@@ -3582,8 +3569,10 @@ body.light .premium-upgrade-card {
 }
 
 @media (max-width: 768px) {
+  /* The account entry point now lives in the bottom nav's Account slot, so the
+     topbar avatar is redundant on phones — hide it to avoid two account menus. */
   .mobile-profile {
-    display: flex;
+    display: none !important;
   }
   /* Free topbar space + avoid a stray GSI button in the tiny bar:
      Refresh is redundant on mobile, and guests sign in from /login. */
@@ -3591,4 +3580,253 @@ body.light .premium-upgrade-card {
   .topbar-google-btn {
     display: none;
   }
+}
+
+/* ============================================================
+   Mobile bottom nav + account sheet (<=768px)
+   Five flat slots (Dashboard, Portfolio, Record FAB, History, Account)
+   replacing the reshaped sidebar. Record Trade is the elevated center "+";
+   Account opens a bottom sheet holding settings / premium / admin / sign-out.
+   ============================================================ */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    height: 66px;
+    padding: 0 6px;
+    border-radius: 22px;
+    background: rgba(13, 18, 30, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+
+  .mbn-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mbn-item svg {
+    width: 22px;
+    height: 22px;
+  }
+  .mbn-item span {
+    white-space: nowrap;
+  }
+  .mbn-item.active {
+    color: #3b82f6;
+  }
+  .mbn-item.active svg {
+    stroke: #3b82f6;
+    fill: rgba(59, 130, 246, 0.15);
+  }
+
+  /* Round avatar chip in the Account slot (mirrors sidebar/topbar avatars). */
+  .mbn-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* Elevated center FAB: Record Trade — the app's primary action. */
+  .mbn-fab {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    margin-top: -26px; /* lift above the bar */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: #fff;
+    border: 4px solid var(--bg-color);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    text-decoration: none;
+    transition: transform 0.15s ease;
+  }
+  .mbn-fab:active {
+    transform: scale(0.92);
+  }
+  .mbn-fab.active {
+    box-shadow: 0 6px 24px rgba(139, 92, 246, 0.7);
+  }
+
+  /* --- Account sheet --- */
+  .mobile-account-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 1005;
+  }
+  .mobile-account-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-account-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-color);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 16px calc(20px + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+    z-index: 1006;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  }
+  .mobile-account-sheet.open {
+    transform: translateY(0);
+  }
+  /* grab handle */
+  .mobile-account-sheet::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 12px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .mas-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 4px 12px;
+  }
+  .mas-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .mas-avatar-guest {
+    background: #334155;
+  }
+  .mas-user {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .mas-name {
+    font-weight: 600;
+    color: #f1f5f9;
+    font-size: 15px;
+  }
+  .mas-email {
+    font-size: 12px;
+    color: #94a3b8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .mas-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 6px 0;
+  }
+  .mas-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 8px;
+    background: transparent;
+    border: none;
+    color: #e2e8f0;
+    font-family: inherit;
+    font-size: 15px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  .mas-row:active {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .mas-row.danger {
+    color: #f87171;
+  }
+  .mas-ico {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+  }
+}
+
+/* Light-mode surfaces (elements are hidden on desktop, so these only bite on phones). */
+body.light .mobile-bottom-nav {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+body.light .mbn-item {
+  color: #64748b;
+}
+body.light .mobile-account-sheet {
+  border-top-color: #e2e8f0;
+}
+body.light .mas-name {
+  color: #0f172a;
+}
+body.light .mas-email {
+  color: #64748b;
+}
+body.light .mas-row {
+  color: #1e293b;
+}
+body.light .mas-divider,
+body.light .mobile-account-sheet::before {
+  background: #e2e8f0;
+}
+body.light .mas-row:active {
+  background: rgba(0, 0, 0, 0.04);
 }

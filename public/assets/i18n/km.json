@@ -11,7 +11,10 @@
     "WATCHLIST": "បញ្ជីតាមដាន",
     "SETTINGS": "ការកំណត់",
     "SIGN_OUT": "ចាកចេញ",
-    "PREMIUM_TRADER": "អ្នកជួញដូរពិសេស"
+    "PREMIUM_TRADER": "អ្នកជួញដូរពិសេស",
+    "ACCOUNT": "គណនី",
+    "UPGRADE": "ដំឡើងកំណែ Premium",
+    "CONNECTED_ACCOUNTS": "គណនីភ្ជាប់"
   },
   "DASHBOARD": {
     "TITLE": "CamPulse - កម្មវិធីតាមដានការវិនិយោគ និងផលប័ត្រឈានមុខគេនៅកម្ពុជា",

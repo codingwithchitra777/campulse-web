@@ -257,6 +257,94 @@
     </main>
   </div>
 
+  <!-- ============================================================
+       Mobile bottom navigation (phones only, <=768px)
+       Five flat slots with an elevated center "Record" FAB. Replaces the
+       reshaped sidebar's Trades submenu + "More" popup: Record Trade is the
+       primary action (center +), History is a flat tab, and everything
+       account/premium lives behind the Account sheet below.
+       ============================================================ -->
+  <nav class="mobile-bottom-nav mobile-only">
+    <a routerLink="/dashboard" routerLinkActive="active" class="mbn-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      <span>{{ 'NAV.DASHBOARD' | translate }}</span>
+    </a>
+    <a routerLink="/portfolio" routerLinkActive="active" class="mbn-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+      <span>{{ 'NAV.PORTFOLIO' | translate }}</span>
+    </a>
+
+    <!-- Center action: Record Trade -->
+    <a routerLink="/record-trade" routerLinkActive="active" class="mbn-fab" [title]="'NAV.RECORD_TRADE' | translate">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </a>
+
+    <a routerLink="/history" routerLinkActive="active" class="mbn-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      <span>{{ 'NAV.HISTORY' | translate }}</span>
+    </a>
+
+    <!-- Account: opens the sheet (absorbs old "More" + profile dropdown) -->
+    <button class="mbn-item" [class.active]="mobileAccountOpen" (click)="toggleMobileAccount($event)">
+      @if (session.googleProfile() && profilePicture(); as pic) {
+        <span class="mbn-avatar"><img class="avatar-img" [src]="pic" alt="" referrerpolicy="no-referrer" (error)="onAvatarError()" /></span>
+      } @else if (session.googleProfile()) {
+        <span class="mbn-avatar">{{ getUserInitials() }}</span>
+      } @else {
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      }
+      <span>{{ 'NAV.ACCOUNT' | translate }}</span>
+    </button>
+  </nav>
+
+  <!-- Mobile Account Sheet -->
+  <div class="mobile-account-backdrop mobile-only" [class.open]="mobileAccountOpen" (click)="closeMobileAccount()"></div>
+  <div class="mobile-account-sheet mobile-only" [class.open]="mobileAccountOpen">
+    @if (session.googleProfile(); as profile) {
+      <div class="mas-header">
+        <div class="mas-avatar">
+          @if (profilePicture(); as pic) {
+            <img class="avatar-img" [src]="pic" alt="" referrerpolicy="no-referrer" (error)="onAvatarError()" />
+          } @else {
+            {{ getUserInitials() }}
+          }
+        </div>
+        <div class="mas-user">
+          <span class="mas-name">{{ profile.name }}</span>
+          <span class="mas-email" *ngIf="profile.email">{{ profile.email }}</span>
+        </div>
+      </div>
+      <div class="mas-divider"></div>
+      <a class="mas-row" routerLink="/settings" (click)="closeMobileAccount()">
+        <span class="mas-ico">⚙️</span> {{ 'NAV.SETTINGS' | translate }}
+      </a>
+      <a class="mas-row" href="#" (click)="openPremiumModal('Premium', $event); closeMobileAccount()">
+        <span class="mas-ico">👑</span> {{ 'NAV.UPGRADE' | translate }}
+      </a>
+      @if (session.isAdmin()) {
+        <a class="mas-row" routerLink="/admin" (click)="closeMobileAccount()">
+          <span class="mas-ico">🛡️</span> Admin
+        </a>
+      }
+      <div class="mas-divider"></div>
+      <button class="mas-row danger" (click)="logoutGoogle(); closeMobileAccount()">
+        <span class="mas-ico">🚪</span> {{ 'NAV.SIGN_OUT' | translate }}
+      </button>
+    } @else {
+      <div class="mas-header">
+        <div class="mas-avatar mas-avatar-guest">G</div>
+        <div class="mas-user">
+          <span class="mas-name">Guest</span>
+          <span class="mas-email">Not signed in</span>
+        </div>
+      </div>
+      <div class="mas-divider"></div>
+      <a class="mas-row" routerLink="/login" (click)="closeMobileAccount()">
+        <span class="mas-ico">➡️</span> Sign in
+      </a>
+    }
+  </div>
+
   <!-- Dropdown Backdrop to close on click outside -->
   <div class="dropdown-backdrop" *ngIf="showProfileDropdown || showNotifications" (click)="closeProfileDropdown(); showNotifications = false"></div>
 

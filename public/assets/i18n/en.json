@@ -11,7 +11,10 @@
     "WATCHLIST": "Watchlist",
     "SETTINGS": "Settings",
     "SIGN_OUT": "Sign Out",
-    "PREMIUM_TRADER": "Premium Trader"
+    "PREMIUM_TRADER": "Premium Trader",
+    "ACCOUNT": "Account",
+    "UPGRADE": "Upgrade to Premium",
+    "CONNECTED_ACCOUNTS": "Connected accounts"
   },
   "DASHBOARD": {
     "TITLE": "CamPulse - Cambodia's Premium Investment & Portfolio Tracker",

@@ -39,6 +39,20 @@ export class App {
 
   tradesMenuOpen = false;
   mobileMoreMenuOpen = false;
+  // Mobile-only account sheet (the 5th bottom-nav slot). Absorbs what used to be
+  // the "More" popup + the top-right profile dropdown into one surface on phones.
+  mobileAccountOpen = false;
+
+  toggleMobileAccount(event?: Event) {
+    event?.stopPropagation();
+    this.mobileAccountOpen = !this.mobileAccountOpen;
+    this.showNotifications = false;
+    this.showProfileDropdown = false;
+  }
+
+  closeMobileAccount() {
+    this.mobileAccountOpen = false;
+  }
 
   toggleTradesMenu() {
     if (this.sidebarCollapsed()) {
