@@ -3484,3 +3484,47 @@ body.light .premium-upgrade-card {
 .modern-table tr:hover td {
   background: rgba(255, 255, 255, 0.02);
 }
+
+/* ============================================================
+   Portfolio page — mobile fit (<=768px)
+   The Current Holdings table has 6 columns and the Allocation donut
+   can overflow a phone width. Trim the table to the essentials
+   (ticker, P/L, action) — the full per-share breakdown stays one tap
+   away via each row's "View" drawer — and cap the donut.
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Give routed content a bit more horizontal room on phones. */
+  .app-body {
+    padding: 16px 12px;
+  }
+
+  /* Hide SHARES / AVG COST / MKT PRICE columns; keep TICKER, TOTAL P/L, ACTION. */
+  .holdings-panel .modern-table th:nth-child(2),
+  .holdings-panel .modern-table td:nth-child(2),
+  .holdings-panel .modern-table th:nth-child(3),
+  .holdings-panel .modern-table td:nth-child(3),
+  .holdings-panel .modern-table th:nth-child(4),
+  .holdings-panel .modern-table td:nth-child(4) {
+    display: none;
+  }
+
+  /* Inline cell padding is 16-20px; tighten it so the kept columns breathe. */
+  .holdings-panel .modern-table th,
+  .holdings-panel .modern-table td {
+    padding: 12px 10px !important;
+  }
+
+  /* Drop the company-name subtitle under each ticker to save width. */
+  .holdings-panel .ticker-info .muted {
+    display: none;
+  }
+
+  /* Keep the allocation donut inside the panel on narrow screens. */
+  .allocation-panel .chart-container {
+    height: 200px !important;
+  }
+  .allocation-panel canvas,
+  .chart-panel canvas {
+    max-width: 100% !important;
+  }
+}
