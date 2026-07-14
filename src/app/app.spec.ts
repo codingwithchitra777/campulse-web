@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
+import { provideTranslateService } from '@ngx-translate/core';
 import { App } from './app';
 import { SessionService } from './services/session.service';
 
@@ -21,7 +22,12 @@ describe('App', () => {
         provideRouter([
           { path: '', component: DummyPage },
           { path: 'dashboard', component: DummyPage },
+          { path: 'login', component: DummyPage },
+          { path: 'settings', component: DummyPage },
         ]),
+        // No HTTP loader needed: with no translations loaded the pipe renders
+        // the key itself, which is all these DOM assertions rely on.
+        provideTranslateService({ fallbackLang: 'en' }),
       ],
     }).compileComponents();
   });
@@ -94,13 +100,14 @@ describe('App', () => {
     expect(session.isGuest()).toBe(false);
 
     const compiled = fixture.nativeElement as HTMLElement;
-    // Open the profile dropdown (chevron button inside the avatar container)
-    const chevron = compiled.querySelector<HTMLButtonElement>('.profile-avatar-container button')!;
-    expect(chevron).toBeTruthy();
-    chevron.click();
+    // Open the profile dropdown (clicking the user chip in the sidebar footer)
+    const userChip = compiled.querySelector<HTMLElement>('.sidebar-user')!;
+    expect(userChip).toBeTruthy();
+    userChip.click();
     await fixture.whenStable();
 
-    const signOut = compiled.querySelector<HTMLButtonElement>('.signout-btn-modern')!;
+    // Sign out is the <button> in the dropdown; the <a> sibling is Settings.
+    const signOut = compiled.querySelector<HTMLButtonElement>('button.signout-btn-modern')!;
     expect(signOut).toBeTruthy();
     signOut.click();
     await fixture.whenStable();

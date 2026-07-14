@@ -14,6 +14,11 @@ body {
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  /* Never scroll sideways; a stray wide element shouldn't shift the layout. */
+  overflow-x: hidden;
+  /* Kill double-tap-to-zoom on mobile (complements user-scalable=0 in the
+     viewport meta, which some browsers ignore for double-tap). */
+  touch-action: manipulation;
 }
 
 /* App Shell: fixed left sidebar + main area (topbar + routed content) */
@@ -33,7 +38,11 @@ body {
   background: rgba(13, 18, 30, 0.95);
   border-right: 1px solid #1e293b;
   padding: 20px 14px;
-  z-index: 100;
+  /* Above the profile/notification dropdown-backdrop (1030) so the profile
+     dropdown — nested in this sidebar's stacking context — receives clicks
+     (a lower value let the transparent backdrop swallow the Sign Out click).
+     Kept below the drawer-backdrop (1040) so open drawers still cover it. */
+  z-index: 1036;
   overflow: hidden;
   white-space: nowrap;
   transition: width 0.25s ease, padding 0.25s ease;
@@ -654,7 +663,7 @@ body.light .toolbar-filter select {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%; /* not 100vw: that includes the scrollbar and causes horizontal scroll on mobile */
   height: 100vh;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
@@ -1711,7 +1720,7 @@ body.light .toolbar-filter select {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%; /* not 100vw: that includes the scrollbar and causes horizontal scroll on mobile */
   height: 100vh;
   z-index: 1030;
   background: transparent;
@@ -2578,7 +2587,7 @@ body.light {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%; /* not 100vw: that includes the scrollbar and causes horizontal scroll on mobile */
   height: 100vh;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
@@ -3378,12 +3387,23 @@ body.light .topbar-search input {
     display: none;
   }
   
-  .topbar-search input {
-    width: 140px;
+  /* The topbar can't fit the search box + full market badge + action icons on
+     a phone, and it neither wraps nor scrolls — so trim the secondary bits. */
+  .topbar-search {
+    display: none;
   }
-  
+
+  .market-status-badge .status-text {
+    display: none; /* keep just the colored status dot */
+  }
+
+  .topbar-actions {
+    gap: 8px;
+  }
+
   .topbar {
     padding: 0 15px;
+    gap: 8px;
   }
 }
 
