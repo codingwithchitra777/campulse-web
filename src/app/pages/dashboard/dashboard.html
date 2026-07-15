@@ -91,7 +91,7 @@
 
         <!-- Market Overview -->
         <div class="dashboard-panel">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
             <h2 class="panel-title" style="margin-bottom: 0;">{{ 'DASHBOARD.MARKET_OVERVIEW' | translate }}</h2>
             <div class="sort-controls" style="display: flex; gap: 12px; font-size: 0.9em;">
               <button (click)="setMarketSort('symbol')" [style.color]="marketSort() === 'symbol' ? 'var(--primary-color)' : 'var(--text-color)'" style="background: transparent; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px;">
