@@ -12,7 +12,7 @@
       @if (tradeSuccess(); as success) {
         <div class="alert alert-success animate-slide-in">
           <h3>✅ {{ 'TRADE.SUCCESS_TITLE' | translate }}</h3>
-          <p>{{ 'TRADE.RECORDED' | translate }} <strong>{{ success.trade.qty }}</strong> {{ 'TRADE.SHARES_OF' | translate }} <strong>{{ success.trade.ticker }}</strong> @ <strong>{{ success.trade.price | number }} riel</strong>.</p>
+          <p>{{ 'TRADE.RECORDED' | translate }} <strong>{{ success.trade.qty }}</strong> {{ 'TRADE.SHARES_OF' | translate }} <strong>{{ success.trade.ticker }}</strong> @ <strong>{{ success.trade.price | money:success.trade.currency }}</strong>.</p>
           @if (success.warning) {
             <div class="warning-box">
               ⚠️ {{ success.warning }}
@@ -25,14 +25,14 @@
               <ul>
                 @for (a of success.allocations; track a.allocId) {
                   <li>
-                    {{ 'TRADE.MATCHED' | translate }} <strong>{{ a.qtyAllocated }}</strong> {{ 'TRADE.SHARES_FROM_LOT' | translate }} @ <strong>{{ a.buyPrice | number }} riel</strong>.
+                    {{ 'TRADE.MATCHED' | translate }} <strong>{{ a.qtyAllocated }}</strong> {{ 'TRADE.SHARES_FROM_LOT' | translate }} @ <strong>{{ a.buyPrice | money:success.trade.currency }}</strong>.
                   </li>
                 }
               </ul>
               <p class="realised-pnl-summary">
                 {{ 'TRADE.REAL_PNL' | translate }}:
                 <span [ngClass]="success.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
-                  {{ success.realisedPnl >= 0 ? '+' : '' }}{{ success.realisedPnl | number }} riel
+                  {{ success.realisedPnl | money:success.trade.currency:true }}
                 </span>
               </p>
             </div>
@@ -41,21 +41,69 @@
       }
 
       <form (submit)="startTradeSubmit($event)" class="trade-form">
+        <!-- Market / asset type -->
+        <div class="form-group">
+          <label>Market</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="market" [(ngModel)]="market" value="CSX" (ngModelChange)="onMarketChange()">
+              <span class="radio-custom">🇰🇭 CSX</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="market" [(ngModel)]="market" value="US" (ngModelChange)="onMarketChange()">
+              <span class="radio-custom">🇺🇸 US</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="market" [(ngModel)]="market" value="GOLD_KH" (ngModelChange)="onMarketChange()">
+              <span class="radio-custom">🥇 Gold</span>
+            </label>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="tickerSelect">{{ 'TRADE.SELECT_STOCK' | translate }}</label>
-          <div *ngIf="loadingTickers()" style="color: #9ca3af; font-size: 13px;">Loading...</div>
-          <select 
-            *ngIf="!loadingTickers()"
-            id="tickerSelect" 
-            name="ticker" 
-            [(ngModel)]="tradeTicker" 
-            (change)="onTickerChange()"
-            required>
-            <option *ngFor="let t of tickersList()" [value]="t.ticker">
-              {{ t.ticker }} (CSX Market Price: {{ t.price | number }} riel)
-            </option>
-            <option *ngIf="tickersList().length === 0" value="">No tickers available</option>
-          </select>
+
+          <!-- CSX: dropdown of live CSX tickers -->
+          @if (market === 'CSX') {
+            <div *ngIf="loadingTickers()" style="color: #9ca3af; font-size: 13px;">Loading...</div>
+            <select
+              *ngIf="!loadingTickers()"
+              id="tickerSelect"
+              name="ticker"
+              [(ngModel)]="tradeTicker"
+              (change)="onTickerChange()"
+              required>
+              <option *ngFor="let t of tickersList()" [value]="t.ticker">
+                {{ t.ticker }} (CSX: {{ t.price | number }} riel)
+              </option>
+              <option *ngIf="tickersList().length === 0" value="">No tickers available</option>
+            </select>
+          }
+
+          <!-- US: Finnhub symbol search -->
+          @if (market === 'US') {
+            <input type="text" name="usSymbol" [(ngModel)]="tradeTicker" (ngModelChange)="searchSymbols($event)"
+                   placeholder="Search e.g. AAPL, MSFT" autocomplete="off" required>
+            @if (searchingSymbols()) { <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Searching…</div> }
+            @if (usResults().length) {
+              <div class="symbol-results" style="max-height: 180px; overflow-y: auto; border: 1px solid #1e293b; border-radius: 8px; margin-top: 4px;">
+                @for (r of usResults(); track r.symbol) {
+                  <div (click)="pickSymbol(r.symbol)" style="padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #1e293b;">
+                    <strong>{{ r.symbol }}</strong> <span style="color: #9ca3af; font-size: 12px;">{{ r.description }}</span>
+                  </div>
+                }
+              </div>
+            }
+            <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Priced in USD via Finnhub.</div>
+          }
+
+          <!-- Gold: the single local instrument, priced per chi -->
+          @if (market === 'GOLD_KH') {
+            <input type="text" name="goldSymbol" [value]="tradeTicker" disabled>
+            <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
+              Local Cambodian gold — priced per <strong>chi</strong> in USD from the admin board.{{ quoteLoading() ? ' Loading price…' : '' }}
+            </div>
+          }
         </div>
 
         <div class="form-group">
@@ -73,18 +121,18 @@
         </div>
 
         <div class="form-group">
-          <label for="price">{{ 'TRADE.PRICE_SHARE' | translate }}</label>
-          <input type="number" id="price" name="price" [(ngModel)]="tradePrice" (ngModelChange)="onPriceQtyChange()" placeholder="e.g. 7300" required min="1">
+          <label for="price">Price per {{ market === 'GOLD_KH' ? 'chi' : 'share' }} ({{ currencyUnit }})</label>
+          <input type="number" id="price" name="price" [(ngModel)]="tradePrice" (ngModelChange)="onPriceQtyChange()" placeholder="e.g. 7300" required min="0" step="any">
         </div>
 
         <div class="form-group">
-          <label for="qty">{{ 'TRADE.QTY' | translate }}</label>
+          <label for="qty">Quantity ({{ qtyUnit }})</label>
           <input type="number" id="qty" name="qty" [(ngModel)]="tradeQty" (ngModelChange)="onPriceQtyChange()" placeholder="e.g. 100" required min="1">
         </div>
 
         <div class="form-group">
-          <label for="commission">{{ 'TRADE.COMMISSION' | translate }}</label>
-          <input type="number" id="commission" name="commission" [(ngModel)]="tradeCommission" (input)="onCommissionInput()" placeholder="e.g. 47" required min="0">
+          <label for="commission">Commission ({{ currencyUnit }})</label>
+          <input type="number" id="commission" name="commission" [(ngModel)]="tradeCommission" (input)="onCommissionInput()" placeholder="e.g. 47" required min="0" step="any">
         </div>
 
         <div class="form-group">
@@ -96,16 +144,16 @@
         <div class="total-preview-box" *ngIf="tradePrice > 0 && tradeQty > 0" style="background: rgba(30, 41, 59, 0.5); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1e293b;">
           <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af; margin-bottom: 4px;">
             <span>{{ 'TRADE.SUBTOTAL' | translate }}:</span>
-            <span style="color: #f8fafc; font-weight: 500;">{{ (tradePrice * tradeQty) | number }} riel</span>
+            <span style="color: #f8fafc; font-weight: 500;">{{ (tradePrice * tradeQty) | money:currency }}</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af; margin-bottom: 6px;">
             <span>{{ 'PORTFOLIO.DRAWER.COMMISSION' | translate }}:</span>
-            <span style="color: #f8fafc; font-weight: 500;">{{ tradeCommission | number }} riel</span>
+            <span style="color: #f8fafc; font-weight: 500;">{{ tradeCommission | money:currency }}</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 15px; border-top: 1px solid #334155; padding-top: 8px; margin-top: 4px;">
             <span>{{ 'TRADE.EST_TOTAL' | translate }}:</span>
             <span [style.color]="tradeSide === 'BUY' ? '#ef4444' : '#10b981'">
-              {{ totalTradeAmount | number }} riel
+              {{ totalTradeAmount | money:currency }}
             </span>
           </div>
         </div>
@@ -137,13 +185,13 @@
             <div class="stat-box-html">
               <span class="stat-label-html">{{ 'TRADE.AVG_BUY_COST' | translate }}</span>
               <span class="stat-value-html" style="font-size: 15px;">
-                {{ averageCost() | number }} riel
+                {{ averageCost() | money:currency }}
               </span>
             </div>
             <div class="stat-box-html">
               <span class="stat-label-html">{{ 'DASHBOARD.REALISED_PL' | translate }}</span>
               <span class="stat-value-html" [ngClass]="pos.realisedPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'" style="font-size: 15px;">
-                {{ pos.realisedPnl >= 0 ? '+' : '' }}{{ pos.realisedPnl | number }} riel
+                {{ pos.realisedPnl | money:currency:true }}
               </span>
             </div>
           </div>
@@ -177,7 +225,7 @@
                   </div>
                   <div class="lot-body" style="display: grid; grid-template-columns: 1fr 1.2fr; row-gap: 2px; font-size: 12px;">
                     <div>{{ 'PORTFOLIO.DRAWER.REMAINING' | translate }}: <strong>{{ lot.qtyOpen | number }}</strong></div>
-                    <div>{{ 'PORTFOLIO.DRAWER.PRICE' | translate }}: <strong>{{ lot.price | number }} riel</strong></div>
+                    <div>{{ 'PORTFOLIO.DRAWER.PRICE' | translate }}: <strong>{{ lot.price | money:currency }}</strong></div>
                     <div class="date-text" style="grid-column: 1 / -1; font-size: 10px; color: #8b949e; margin-top: 2px;">
                       {{ 'PORTFOLIO.DRAWER.DATE' | translate }}: {{ lot.orderDate | date:'mediumDate' }}
                     </div>
@@ -234,11 +282,11 @@
         </div>
         <div class="confirm-item">
           <span class="confirm-label">{{ 'TRADE.QTY' | translate }}</span>
-          <span class="confirm-value">{{ tradeQty | number }} shares</span>
+          <span class="confirm-value">{{ tradeQty | number }} {{ qtyUnit }}</span>
         </div>
         <div class="confirm-item">
           <span class="confirm-label">{{ 'TRADE.PRICE_SHARE' | translate }}</span>
-          <span class="confirm-value">{{ tradePrice | number }} riel</span>
+          <span class="confirm-value">{{ tradePrice | money:currency }}</span>
         </div>
         <div class="confirm-item">
           <span class="confirm-label">{{ 'TRADE.ORDER_DATE' | translate }}</span>
@@ -247,7 +295,7 @@
         <div class="confirm-item confirm-total-row">
           <span class="confirm-label">{{ 'TRADE.EST_TOTAL' | translate }}</span>
           <span class="confirm-value font-bold" style="color: #f0f6fc;">
-            {{ (tradeQty * tradePrice) | number }} riel
+            {{ (tradeQty * tradePrice) | money:currency }}
           </span>
         </div>
       </div>
@@ -257,7 +305,7 @@
         <div class="confirm-item">
           <span class="confirm-label">{{ 'TRADE.SIMULATED_PL' | translate }}</span>
           <span class="confirm-value font-bold" [ngClass]="simulatedPnl() >= 0 ? 'text-profit' : 'text-loss'">
-            {{ simulatedPnl() >= 0 ? '+' : '' }}{{ simulatedPnl() | number }} riel
+            {{ simulatedPnl() | money:currency:true }}
           </span>
         </div>
 

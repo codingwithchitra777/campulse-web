@@ -6,6 +6,38 @@
 
 export type TradeSide = 'BUY' | 'SELL';
 
+/** A tradable market and its denominating currency (mirrors campulse-backend markets.py). */
+export type MarketKind = 'CSX' | 'US' | 'GOLD_KH';
+export type CurrencyCode = 'KHR' | 'USD';
+
+/** /api/market/search item (Finnhub symbol lookup for US equities). */
+export interface MarketSearchResult {
+  symbol: string;
+  description: string;
+  type: string;
+}
+
+/** /api/market/quote/{symbol} response. */
+export interface MarketQuote {
+  ticker: string;
+  market: string;
+  price: number;
+  change: number | null;
+  changeDirection: 'up' | 'down' | 'equal' | null;
+}
+
+/** /api/admin/manual-prices item — an admin-set board price (local gold). */
+export interface ManualPrice {
+  market: string;
+  symbol: string;
+  price: number;
+  currency: string;
+  change: number;
+  updatedBy: string | null;
+  /** ISO datetime string. */
+  updatedAt: string;
+}
+
 /** /api/auth/google and /api/auth/demo response. */
 export interface GoogleAuthResponse {
   success: boolean;
@@ -75,6 +107,8 @@ export interface Trade {
   commission: number;
   /** ISO datetime string. */
   orderDate: string;
+  market: MarketKind;
+  currency: CurrencyCode;
 }
 
 /**
@@ -90,6 +124,9 @@ export interface TradePayload {
   price: number;
   qty: number;
   commission?: number;
+  /** Omitted = CSX/KHR (backend default). */
+  market?: MarketKind;
+  currency?: CurrencyCode;
 }
 
 /**
@@ -147,6 +184,8 @@ export interface TradeInitResult {
 /** /api/portfolio item. */
 export interface Holding {
   ticker: string;
+  market: MarketKind;
+  currency: CurrencyCode;
   lastPrice: number | null;
   remainingQty: number;
   soldPercent: number;

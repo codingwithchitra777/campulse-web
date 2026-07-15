@@ -16,6 +16,31 @@
     </div>
   </section>
 
+  <!-- Local gold price board -->
+  <section class="history-panel" style="margin-bottom: 20px;">
+    <h2 class="panel-title">🥇 Local Gold Board</h2>
+    <p style="color: #9ca3af; font-size: 13px; margin-bottom: 12px;">
+      Set today's local Cambodian gold price (USD per <strong>chi</strong>, symbol XAU-KH). This values every user's gold holdings.
+    </p>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      <input type="number" step="any" min="0" [(ngModel)]="goldPrice" placeholder="e.g. 505.00"
+             style="max-width: 200px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+      <button class="btn-primary" (click)="saveGoldPrice()" [disabled]="goldSaving()">
+        {{ goldSaving() ? 'Saving…' : 'Save price' }}
+      </button>
+      @if (goldMsg(); as m) { <span style="font-size: 13px; color: #9ca3af;">{{ m }}</span> }
+    </div>
+    @if (manualPrices.value().items.length) {
+      <div style="margin-top: 12px; font-size: 13px; color: #cbd5e1;">
+        @for (mp of manualPrices.value().items; track mp.symbol) {
+          <div>Current <strong>{{ mp.symbol }}</strong>: <strong>{{ mp.price | money:mp.currency }}</strong>
+            <span style="color: #64748b;">(updated {{ mp.updatedAt | date:'short' }})</span>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
   <div class="history-panel">
     <h2 class="panel-title">👥 Users</h2>
     @if (users.isLoading()) {

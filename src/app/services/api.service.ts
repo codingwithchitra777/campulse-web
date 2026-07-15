@@ -8,6 +8,9 @@ import {
   Holding,
   LinkCodeResponse,
   LinkedAccount,
+  ManualPrice,
+  MarketQuote,
+  MarketSearchResult,
   Paginated,
   Position,
   Price,
@@ -69,8 +72,32 @@ export class ApiService {
     return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/trades/${tradeId}`);
   }
 
-  getPosition(symbol: string): Observable<Position> {
-    return this.http.get<Position>(`${this.baseUrl}/api/position/${symbol}`);
+  getPosition(symbol: string, market?: string): Observable<Position> {
+    return this.http.get<Position>(`${this.baseUrl}/api/position/${symbol}`, {
+      params: market ? { market } : {}
+    });
+  }
+
+  /** Finnhub symbol lookup for US equities. */
+  searchSymbols(q: string): Observable<{ results: MarketSearchResult[] }> {
+    return this.http.get<{ results: MarketSearchResult[] }>(`${this.baseUrl}/api/market/search`, {
+      params: { q }
+    });
+  }
+
+  /** Market-aware live quote (CSX feed / Finnhub / gold board). */
+  getMarketQuote(symbol: string, market: string): Observable<MarketQuote> {
+    return this.http.get<MarketQuote>(`${this.baseUrl}/api/market/quote/${symbol}`, {
+      params: { market }
+    });
+  }
+
+  getManualPrices(): Observable<{ items: ManualPrice[] }> {
+    return this.http.get<{ items: ManualPrice[] }>(`${this.baseUrl}/api/admin/manual-prices`);
+  }
+
+  setManualPrice(body: { price: number; market?: string; symbol?: string; currency?: string; change?: number }) {
+    return this.http.put<any>(`${this.baseUrl}/api/admin/manual-price`, body);
   }
 
   getPortfolio(): Observable<Holding[]> {

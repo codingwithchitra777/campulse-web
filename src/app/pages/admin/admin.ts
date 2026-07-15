@@ -1,15 +1,17 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { PagerComponent } from '../../components/pager/pager';
-import { AdminStats, AdminUser, Paginated, Trade } from '../../models';
+import { MoneyPipe } from '../../utils/money';
+import { AdminStats, AdminUser, ManualPrice, Paginated, Trade } from '../../models';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, PagerComponent],
+  imports: [CommonModule, FormsModule, PagerComponent, MoneyPipe],
   templateUrl: './admin.html'
 })
 export class AdminComponent {
@@ -48,6 +50,36 @@ export class AdminComponent {
     stream: () => this.api.getAdminStats(),
     defaultValue: { totalUsers: 0, totalTrades: 0, totalRealisedPnl: 0 } as AdminStats
   });
+
+  // Local gold board (admin-set price for XAU-KH).
+  readonly manualPrices = rxResource({
+    params: () => this.session.activeUserId(),
+    stream: () => this.api.getManualPrices(),
+    defaultValue: { items: [] as ManualPrice[] }
+  });
+  goldPrice: number | null = null;
+  readonly goldSaving = signal(false);
+  readonly goldMsg = signal<string | null>(null);
+
+  saveGoldPrice() {
+    if (!this.goldPrice || this.goldPrice <= 0) {
+      this.goldMsg.set('Enter a positive price');
+      return;
+    }
+    this.goldSaving.set(true);
+    this.goldMsg.set(null);
+    this.api.setManualPrice({ price: this.goldPrice, market: 'GOLD_KH', symbol: 'XAU-KH', currency: 'USD' }).subscribe({
+      next: () => {
+        this.goldSaving.set(false);
+        this.goldMsg.set('Saved ✓');
+        this.manualPrices.reload();
+      },
+      error: (err) => {
+        this.goldSaving.set(false);
+        this.goldMsg.set(err.error?.detail || 'Failed to save');
+      }
+    });
+  }
 
   constructor() {
     effect(() => {
