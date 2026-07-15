@@ -6,6 +6,8 @@ import { HistoryComponent } from './pages/history/history';
 import { LoginComponent } from './pages/login/login';
 import { AdminComponent } from './pages/admin/admin';
 import { SettingsComponent } from './pages/settings/settings';
+import { AnalyticsComponent } from './pages/analytics/analytics';
+import { WatchlistComponent } from './pages/watchlist/watchlist';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 
@@ -17,6 +19,8 @@ export const routes: Routes = [
   { path: 'history', component: HistoryComponent, canActivate: [authGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+  { path: 'analytics', component: AnalyticsComponent, canActivate: [authGuard] },
+  { path: 'watchlist', component: WatchlistComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: '**', redirectTo: 'dashboard' }
 ];

@@ -1,0 +1,99 @@
+<div class="view-container animate-fade-in">
+  <div class="portfolio-header-area" style="margin-bottom: 24px;">
+    <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">📊 Analytics</h2>
+    <p class="muted" style="margin: 0; font-size: 14px;">Your trading performance, computed from your own trade history.</p>
+  </div>
+
+  @if (analytics.isLoading()) {
+    <div class="panel-loader">Loading analytics...</div>
+  } @else {
+    @let a = analytics.value();
+
+    <!-- Headline stats -->
+    <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div class="dashboard-panel metric-card" style="padding: 16px;">
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">WIN RATE</div>
+        <div class="font-bold" style="font-size: 26px;">{{ a.winRate | number:'1.0-1' }}%</div>
+        <div class="muted" style="font-size: 12px; margin-top: 4px;">{{ a.wins }}W · {{ a.losses }}L of {{ a.closedTradeCount }} closed</div>
+      </div>
+      <div class="dashboard-panel metric-card" style="padding: 16px;">
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">AVG HOLD TIME</div>
+        <div class="font-bold" style="font-size: 26px;">{{ a.avgHoldDays | number:'1.0-0' }} <span style="font-size: 14px;">days</span></div>
+      </div>
+      <div class="dashboard-panel metric-card" style="padding: 16px;">
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">TOTAL TRADES</div>
+        <div class="font-bold" style="font-size: 26px;">{{ a.tradeCount }}</div>
+        <div class="muted" style="font-size: 12px; margin-top: 4px;">{{ a.buyCount }} buys · {{ a.sellCount }} sells</div>
+      </div>
+    </div>
+
+    <!-- Best / worst closed trade -->
+    <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div class="dashboard-panel metric-card" style="padding: 16px;">
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">🏆 BEST CLOSED TRADE</div>
+        @if (a.bestTrade; as b) {
+          <div class="font-bold" style="font-size: 18px;">{{ b.ticker }}</div>
+          <div class="text-profit font-bold" style="font-size: 20px;">{{ b.realisedPnl | money:b.currency:true }}</div>
+          <div class="muted" style="font-size: 12px;">{{ b.sellDate | date:'mediumDate' }}</div>
+        } @else { <div class="muted" style="font-size: 13px;">No closed trades yet.</div> }
+      </div>
+      <div class="dashboard-panel metric-card" style="padding: 16px;">
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">📉 WORST CLOSED TRADE</div>
+        @if (a.worstTrade; as w) {
+          <div class="font-bold" style="font-size: 18px;">{{ w.ticker }}</div>
+          <div [ngClass]="w.realisedPnl >= 0 ? 'text-profit' : 'text-loss'" class="font-bold" style="font-size: 20px;">{{ w.realisedPnl | money:w.currency:true }}</div>
+          <div class="muted" style="font-size: 12px;">{{ w.sellDate | date:'mediumDate' }}</div>
+        } @else { <div class="muted" style="font-size: 13px;">No closed trades yet.</div> }
+      </div>
+    </div>
+
+    <!-- Per-currency breakdown -->
+    <div class="dashboard-panel" style="margin-bottom: 24px;">
+      <h3 class="panel-title" style="font-size: 18px;">By currency</h3>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Currency</th><th>Value</th><th>Invested</th><th>Unrealized</th><th>Realized</th><th>W/L</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of a.byCurrency; track c.currency) {
+              <tr>
+                <td class="font-bold">{{ c.currency }}</td>
+                <td>{{ c.value | money:c.currency }}</td>
+                <td>{{ c.invested | money:c.currency }}</td>
+                <td [ngClass]="c.unrealisedPnl >= 0 ? 'text-profit' : 'text-loss'">{{ c.unrealisedPnl | money:c.currency:true }}</td>
+                <td [ngClass]="c.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">{{ c.realisedPnl | money:c.currency:true }}</td>
+                <td>{{ c.wins }}/{{ c.losses }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="text-center" style="padding: 24px;">No trades yet — record one to see your stats.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Allocation by market -->
+    @if (a.byMarket.length) {
+      <div class="dashboard-panel">
+        <h3 class="panel-title" style="font-size: 18px;">Allocation by market</h3>
+        <div class="table-container">
+          <table class="data-table">
+            <thead><tr><th>Market</th><th>Open positions</th><th>Invested</th></tr></thead>
+            <tbody>
+              @for (m of a.byMarket; track m.market) {
+                <tr>
+                  <td class="font-bold">{{ m.market === 'GOLD_KH' ? 'Gold' : m.market }}</td>
+                  <td>{{ m.positions }}</td>
+                  <td>{{ m.invested | money:m.currency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>

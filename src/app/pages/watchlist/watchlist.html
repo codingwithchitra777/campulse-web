@@ -1,0 +1,86 @@
+<div class="view-container animate-fade-in">
+  <div class="portfolio-header-area" style="margin-bottom: 20px;">
+    <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">⭐ Watchlist</h2>
+    <p class="muted" style="margin: 0; font-size: 14px;">Track symbols you don't own — live prices across CSX, US, and gold, plus news for US symbols.</p>
+  </div>
+
+  <!-- Add form -->
+  <div class="dashboard-panel" style="margin-bottom: 20px; padding: 16px;">
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      <div class="radio-group" style="display: flex; gap: 8px;">
+        <label class="radio-label"><input type="radio" name="wmarket" [(ngModel)]="market" value="CSX" (ngModelChange)="onMarketChange()"><span class="radio-custom">🇰🇭 CSX</span></label>
+        <label class="radio-label"><input type="radio" name="wmarket" [(ngModel)]="market" value="US" (ngModelChange)="onMarketChange()"><span class="radio-custom">🇺🇸 US</span></label>
+        <label class="radio-label"><input type="radio" name="wmarket" [(ngModel)]="market" value="GOLD_KH" (ngModelChange)="onMarketChange()"><span class="radio-custom">🥇 Gold</span></label>
+      </div>
+      <input type="text" [(ngModel)]="symbolInput" [disabled]="market === 'GOLD_KH'" placeholder="e.g. AAPL / PWSA"
+             style="flex: 1; min-width: 140px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+      <button class="btn-primary" (click)="add()" [disabled]="adding()">{{ adding() ? 'Adding…' : '➕ Add' }}</button>
+    </div>
+    @if (error(); as e) { <div class="alert error" style="margin-top: 10px;">{{ e }}</div> }
+  </div>
+
+  <!-- List -->
+  <div class="dashboard-panel" style="padding: 0;">
+    @if (watchlist.isLoading()) {
+      <div class="panel-loader">Loading...</div>
+    } @else {
+      <div class="table-container">
+        <table class="data-table" style="width: 100%;">
+          <thead>
+            <tr>
+              <th style="text-align: left;">Symbol</th>
+              <th style="text-align: right;">Price</th>
+              <th style="text-align: right;">Change</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (it of watchlist.value().items; track keyOf(it)) {
+              <tr>
+                <td style="padding: 14px 16px;">
+                  <span class="font-bold">{{ it.symbol }}</span>
+                  @if (it.market !== 'CSX') {
+                    <span style="font-size: 10px; font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 6px;">{{ it.market === 'GOLD_KH' ? 'GOLD' : it.market }}</span>
+                  }
+                </td>
+                <td style="text-align: right;">{{ it.price !== null ? (it.price | money:it.currency) : '—' }}</td>
+                <td style="text-align: right;" [ngClass]="(it.change || 0) >= 0 ? 'text-profit' : 'text-loss'">
+                  {{ it.change !== null ? ((it.change >= 0 ? '▲ ' : '▼ ') + (it.change | number:'1.0-2')) : '—' }}
+                </td>
+                <td style="text-align: right; white-space: nowrap;">
+                  @if (it.market === 'US') {
+                    <button class="view-btn" (click)="toggleNews(it)" title="News" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer; margin-right: 6px;">📰 News</button>
+                  }
+                  <button class="view-btn" (click)="recordTrade(it)" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer; margin-right: 6px;">Trade</button>
+                  <button class="btn-danger" (click)="remove(it)" style="border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer;">Remove</button>
+                </td>
+              </tr>
+              @if (expandedKey() === keyOf(it)) {
+                <tr>
+                  <td colspan="4" style="padding: 0 16px 16px;">
+                    @if (newsLoading()) {
+                      <div class="muted" style="font-size: 13px; padding: 8px 0;">Loading news…</div>
+                    } @else if (news().length) {
+                      <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 8px;">
+                        @for (n of news(); track n.url) {
+                          <a [href]="n.url" target="_blank" rel="noopener" style="display: block; text-decoration: none; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div class="font-bold" style="font-size: 13px; color: var(--text-color);">{{ n.headline }}</div>
+                            <div class="muted" style="font-size: 11px; margin-top: 2px;">{{ n.source }} · {{ (n.datetime * 1000) | date:'MMM d' }}</div>
+                          </a>
+                        }
+                      </div>
+                    } @else {
+                      <div class="muted" style="font-size: 13px; padding: 8px 0;">No recent news.</div>
+                    }
+                  </td>
+                </tr>
+              }
+            } @empty {
+              <tr><td colspan="4" class="text-center" style="padding: 30px;">Your watchlist is empty. Add a symbol above.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

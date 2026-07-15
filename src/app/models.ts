@@ -294,6 +294,72 @@ export interface AdminStats {
   totalRealisedPnl: number;
 }
 
+/** /api/analytics — per-currency roll-up + descriptive stats. */
+export interface AnalyticsCurrency {
+  currency: CurrencyCode;
+  realisedPnl: number;
+  unrealisedPnl: number;
+  invested: number;
+  value: number;
+  wins: number;
+  losses: number;
+}
+
+export interface AnalyticsMarket {
+  market: MarketKind;
+  currency: CurrencyCode;
+  positions: number;
+  invested: number;
+}
+
+export interface ClosedTradeSummary {
+  ticker: string;
+  market: MarketKind;
+  currency: CurrencyCode;
+  realisedPnl: number;
+  /** ISO datetime string. */
+  sellDate: string;
+}
+
+export interface Analytics {
+  tradeCount: number;
+  buyCount: number;
+  sellCount: number;
+  closedTradeCount: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  avgHoldDays: number;
+  bestTrade: ClosedTradeSummary | null;
+  worstTrade: ClosedTradeSummary | null;
+  byCurrency: AnalyticsCurrency[];
+  byMarket: AnalyticsMarket[];
+}
+
+/** /api/watchlist item — a tracked symbol with a live quote. */
+export interface WatchlistItem {
+  market: MarketKind;
+  symbol: string;
+  currency: CurrencyCode;
+  /** ISO datetime string. */
+  addedAt: string;
+  price: number | null;
+  change: number | null;
+  changeDirection: 'up' | 'down' | 'equal' | null;
+}
+
+/** /api/market/news/{symbol} item (Finnhub company news, US symbols only). */
+export interface NewsItem {
+  headline: string;
+  summary: string | null;
+  source: string;
+  url: string;
+  image: string | null;
+  /** unix seconds */
+  datetime: number;
+  category: string | null;
+}
+
 /** Wrapped shape returned by paginated list endpoints (/api/trades, /api/admin/users, /api/admin/trades). */
 export interface Paginated<T> {
   items: T[];

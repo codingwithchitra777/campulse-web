@@ -4,8 +4,11 @@ import { Observable } from 'rxjs';
 import {
   AdminStats,
   AdminUser,
+  Analytics,
   GoogleAuthResponse,
   Holding,
+  NewsItem,
+  WatchlistItem,
   LinkCodeResponse,
   LinkedAccount,
   ManualPrice,
@@ -114,6 +117,30 @@ export class ApiService {
 
   getYearlyPnl(): Observable<YearlyPnl[]> {
     return this.http.get<YearlyPnl[]>(`${this.baseUrl}/api/pnl/yearly`);
+  }
+
+  getAnalytics(): Observable<Analytics> {
+    return this.http.get<Analytics>(`${this.baseUrl}/api/analytics`);
+  }
+
+  getWatchlist(): Observable<{ items: WatchlistItem[] }> {
+    return this.http.get<{ items: WatchlistItem[] }>(`${this.baseUrl}/api/watchlist`);
+  }
+
+  addWatchlist(body: { symbol: string; market?: string; currency?: string }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/api/watchlist`, body);
+  }
+
+  removeWatchlist(symbol: string, market: string): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/watchlist/${symbol}`, {
+      params: { market }
+    });
+  }
+
+  getSymbolNews(symbol: string, days = 7): Observable<{ symbol: string; news: NewsItem[] }> {
+    return this.http.get<{ symbol: string; news: NewsItem[] }>(`${this.baseUrl}/api/market/news/${symbol}`, {
+      params: { days }
+    });
   }
 
   getChartsTimeline(): Observable<any> {
