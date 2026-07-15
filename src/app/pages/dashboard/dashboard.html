@@ -106,15 +106,15 @@
           <div class="movers-list">
             @for (stock of sortedMarketList(); track stock.ticker) {
               <div class="mover-item">
-                <span class="mover-ticker" style="flex: 0 0 80px; font-weight: bold; font-size: 1.1em;">{{ stock.ticker }}</span>
-                <div style="flex: 1; display: flex; justify-content: center; padding: 0 15px;">
+                <span class="mover-ticker" style="flex: 1 1 30%; font-weight: bold; font-size: 1.1em; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ stock.ticker }}</span>
+                <div style="flex: 0 1 auto; display: flex; justify-content: center; padding: 0 10px; min-width: 0; overflow: hidden;">
                   @if (sparklines.value()[stock.ticker]) {
-                    <app-sparkline [data]="sparklines.value()[stock.ticker]" [width]="120" [height]="35"></app-sparkline>
+                    <app-sparkline [data]="sparklines.value()[stock.ticker]" [width]="120" [height]="35" style="max-width: 100%;"></app-sparkline>
                   }
                 </div>
-                <div style="flex: 0 0 120px; text-align: right; display: flex; flex-direction: column; justify-content: center;">
-                  <span class="mover-price" style="font-weight: 600;">{{ stock.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
-                  <span class="mover-change" [ngClass]="(stock.change || 0) >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 0.85em; margin-top: 2px;">{{ formatChange(stock) }}</span>
+                <div style="flex: 1 1 30%; text-align: right; display: flex; flex-direction: column; justify-content: center; min-width: 0;">
+                  <span class="mover-price" style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ stock.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
+                  <span class="mover-change" [ngClass]="(stock.change || 0) >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 0.85em; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ formatChange(stock) }}</span>
                 </div>
               </div>
             } @empty {
@@ -123,6 +123,11 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- Right Column: Market Movers & Promos -->
+      <div class="dashboard-side-col">
+        
         <!-- Recent Trades -->
         <div class="dashboard-panel">
           <h2 class="panel-title">{{ 'DASHBOARD.RECENT_TRADES' | translate }}</h2>
@@ -148,11 +153,7 @@
             }
           </div>
         </div>
-      </div>
 
-      <!-- Right Column: Market Movers & Promos -->
-      <div class="dashboard-side-col">
-        
         <!-- AI Insight Card -->
         <div class="ai-insight-card">
           <div class="insight-header">
