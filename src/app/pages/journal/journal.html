@@ -1,8 +1,8 @@
 <div class="view-container animate-fade-in">
   <div class="portfolio-header-area" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px;">
     <div>
-      <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">📓 {{ 'JOURNAL.TITLE' | translate }}</h2>
-      <p class="muted" style="margin: 0; font-size: 14px;">{{ 'JOURNAL.SUBTITLE' | translate }}</p>
+      <h2 class="panel-title" style="margin-bottom: 8px; font-size: calc(28px * var(--font-scale, 1));">📓 {{ 'JOURNAL.TITLE' | translate }}</h2>
+      <p class="muted" style="margin: 0; font-size: calc(14px * var(--font-scale, 1));">{{ 'JOURNAL.SUBTITLE' | translate }}</p>
     </div>
     <input type="text" [ngModel]="tagFilter()" (ngModelChange)="tagFilter.set($event)" [placeholder]="'JOURNAL.FILTER_PLACEHOLDER' | translate"
            style="min-width: 160px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
@@ -20,11 +20,11 @@
                 <span class="trade-side-badge" [ngClass]="t.side === 'BUY' ? 'badge-buy' : 'badge-sell'">{{ t.side }}</span>
                 <span class="font-bold">{{ t.ticker }}</span>
                 @if (t.market !== 'CSX') {
-                  <span style="font-size: 10px; font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px;">{{ t.market === 'GOLD_KH' ? ('JOURNAL.GOLD' | translate) : t.market }}</span>
+                  <span style="font-size: calc(10px * var(--font-scale, 1)); font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px;">{{ t.market === 'GOLD_KH' ? ('JOURNAL.GOLD' | translate) : t.market }}</span>
                 }
-                <span class="muted" style="font-size: 13px;">{{ t.qty | number }} @ {{ t.price | money:t.currency }}</span>
+                <span class="muted" style="font-size: calc(13px * var(--font-scale, 1));">{{ t.qty | number }} @ {{ t.price | money:t.currency }}</span>
               </div>
-              <span class="muted" style="font-size: 12px;">{{ t.orderDate | date:'mediumDate' }}</span>
+              <span class="muted" style="font-size: calc(12px * var(--font-scale, 1));">{{ t.orderDate | date:'mediumDate' }}</span>
             </div>
 
             @if (editingId() === t.tradeId) {
@@ -42,19 +42,19 @@
               <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
                 <div style="flex: 1;">
                   @if (t.note) {
-                    <p style="margin: 0; font-size: 14px; color: var(--text-color); white-space: pre-wrap;">{{ t.note }}</p>
+                    <p style="margin: 0; font-size: calc(14px * var(--font-scale, 1)); color: var(--text-color); white-space: pre-wrap;">{{ t.note }}</p>
                   } @else {
-                    <p class="muted" style="margin: 0; font-size: 13px; font-style: italic;">{{ 'JOURNAL.NO_NOTE' | translate }}</p>
+                    <p class="muted" style="margin: 0; font-size: calc(13px * var(--font-scale, 1)); font-style: italic;">{{ 'JOURNAL.NO_NOTE' | translate }}</p>
                   }
                   @if (tagList(t.tags).length) {
                     <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
                       @for (tag of tagList(t.tags); track tag) {
-                        <span style="font-size: 11px; font-weight: 500; color: #a5b4fc; background: rgba(99,102,241,0.12); padding: 2px 8px; border-radius: 10px;">#{{ tag }}</span>
+                        <span style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 500; color: #a5b4fc; background: rgba(99,102,241,0.12); padding: 2px 8px; border-radius: 10px;">#{{ tag }}</span>
                       }
                     </div>
                   }
                 </div>
-                <button class="view-btn" (click)="startEdit(t)" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; white-space: nowrap;">
+                <button class="view-btn" (click)="startEdit(t)" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; padding: 6px 12px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer; white-space: nowrap;">
                   {{ t.note ? ('JOURNAL.BTN_EDIT' | translate) : ('JOURNAL.BTN_ADD_NOTE' | translate) }}
                 </button>
               </div>

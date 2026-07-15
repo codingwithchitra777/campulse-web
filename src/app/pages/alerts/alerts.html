@@ -1,7 +1,7 @@
 <div class="view-container animate-fade-in">
   <div class="portfolio-header-area" style="margin-bottom: 20px;">
-    <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">🔔 {{ 'ALERTS.TITLE' | translate }}</h2>
-    <p class="muted" style="margin: 0; font-size: 14px;">{{ 'ALERTS.SUBTITLE' | translate }}</p>
+    <h2 class="panel-title" style="margin-bottom: 8px; font-size: calc(28px * var(--font-scale, 1));">🔔 {{ 'ALERTS.TITLE' | translate }}</h2>
+    <p class="muted" style="margin: 0; font-size: calc(14px * var(--font-scale, 1));">{{ 'ALERTS.SUBTITLE' | translate }}</p>
   </div>
 
   @if (!alerts.value().deliverable) {
@@ -25,13 +25,13 @@
              style="min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
       <button class="btn-primary" (click)="add()" [disabled]="adding()">{{ adding() ? ('ALERTS.BTN_ADDING' | translate) : '➕ ' + ('ALERTS.BTN_ADD' | translate) }}</button>
     </div>
-    <p class="muted" style="font-size: 11px; margin: 8px 0 0;">{{ 'ALERTS.DIRECTION_NOTE' | translate }}</p>
+    <p class="muted" style="font-size: calc(11px * var(--font-scale, 1)); margin: 8px 0 0;">{{ 'ALERTS.DIRECTION_NOTE' | translate }}</p>
     @if (error(); as e) { <div class="alert error" style="margin-top: 10px;">{{ e }}</div> }
   </div>
 
   <!-- Active -->
   <div class="dashboard-panel" style="margin-bottom: 20px; padding: 0;">
-    <h3 class="panel-title" style="font-size: 18px; padding: 16px 16px 0;">{{ 'ALERTS.ACTIVE_TITLE' | translate }}</h3>
+    <h3 class="panel-title" style="font-size: calc(18px * var(--font-scale, 1)); padding: 16px 16px 0;">{{ 'ALERTS.ACTIVE_TITLE' | translate }}</h3>
     @if (alerts.isLoading()) {
       <div class="panel-loader">{{ 'ALERTS.LOADING' | translate }}</div>
     } @else {
@@ -43,14 +43,14 @@
                 <td style="padding: 14px 16px;">
                   <span class="font-bold">{{ a.symbol }}</span>
                   @if (a.market !== 'CSX') {
-                    <span style="font-size: 10px; font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 6px;">{{ a.market === 'GOLD_KH' ? 'GOLD' : a.market }}</span>
+                    <span style="font-size: calc(10px * var(--font-scale, 1)); font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 6px;">{{ a.market === 'GOLD_KH' ? 'GOLD' : a.market }}</span>
                   }
                 </td>
                 <td>
                   {{ 'ALERTS.WHEN_PRICE' | translate }} <strong>{{ a.direction }}</strong> {{ a.targetPrice | money:a.currency }}
                 </td>
                 <td style="text-align: right; padding-right: 16px;">
-                  <button class="btn-danger" (click)="remove(a)" style="border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer;">{{ 'ALERTS.BTN_REMOVE' | translate }}</button>
+                  <button class="btn-danger" (click)="remove(a)" style="border-radius: 4px; padding: 5px 10px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer;">{{ 'ALERTS.BTN_REMOVE' | translate }}</button>
                 </td>
               </tr>
             } @empty {
@@ -65,7 +65,7 @@
   <!-- Triggered -->
   @if (triggeredAlerts().length) {
     <div class="dashboard-panel" style="padding: 0;">
-      <h3 class="panel-title" style="font-size: 18px; padding: 16px 16px 0;">{{ 'ALERTS.TRIGGERED_TITLE' | translate }}</h3>
+      <h3 class="panel-title" style="font-size: calc(18px * var(--font-scale, 1)); padding: 16px 16px 0;">{{ 'ALERTS.TRIGGERED_TITLE' | translate }}</h3>
       <div class="table-container" style="margin-top: 12px;">
         <table class="data-table" style="width: 100%;">
           <tbody>
@@ -73,9 +73,9 @@
               <tr style="opacity: 0.75;">
                 <td style="padding: 12px 16px;"><span class="font-bold">{{ a.symbol }}</span></td>
                 <td>{{ a.direction }} {{ a.targetPrice | money:a.currency }}</td>
-                <td class="muted" style="font-size: 12px;">{{ a.triggeredAt | date:'medium' }}</td>
+                <td class="muted" style="font-size: calc(12px * var(--font-scale, 1));">{{ a.triggeredAt | date:'medium' }}</td>
                 <td style="text-align: right; padding-right: 16px;">
-                  <button class="btn-danger" (click)="remove(a)" style="border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer;">{{ 'ALERTS.BTN_CLEAR' | translate }}</button>
+                  <button class="btn-danger" (click)="remove(a)" style="border-radius: 4px; padding: 5px 10px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer;">{{ 'ALERTS.BTN_CLEAR' | translate }}</button>
                 </td>
               </tr>
             }

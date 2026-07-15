@@ -42,7 +42,7 @@
                 <td class="font-bold">
                   {{ t.ticker }}
                   @if (t.market && t.market !== 'CSX') {
-                    <span class="market-tag" style="font-size: 10px; font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 4px;">{{ t.market === 'GOLD_KH' ? 'GOLD' : t.market }}</span>
+                    <span class="market-tag" style="font-size: calc(10px * var(--font-scale, 1)); font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 4px;">{{ t.market === 'GOLD_KH' ? 'GOLD' : t.market }}</span>
                   }
                 </td>
                 <td>
@@ -93,7 +93,7 @@
   <div class="side-drawer" [class.open]="editingTrade() !== null">
     @if (editingTrade(); as t) {
       <div class="drawer-header">
-        <h2 class="panel-title" style="margin: 0; font-size: 16px;">✏️ {{ 'HISTORY.BTN_EDIT' | translate }}: {{ t.ticker }}</h2>
+        <h2 class="panel-title" style="margin: 0; font-size: calc(16px * var(--font-scale, 1));">✏️ {{ 'HISTORY.BTN_EDIT' | translate }}: {{ t.ticker }}</h2>
         <button class="drawer-close-btn" (click)="closeDrawer()" title="Close">✕</button>
       </div>
       <div class="drawer-content-scroll">
@@ -120,7 +120,7 @@
           </div>
 
           <div class="total-preview-box" style="background: rgba(30, 41, 59, 0.5); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1e293b;">
-            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af;">
+            <div style="display: flex; justify-content: space-between; font-size: calc(13px * var(--font-scale, 1)); color: #9ca3af;">
               <span>{{ 'TRADE.SUBTOTAL' | translate }}:</span>
               <span style="color: #f8fafc; font-weight: 500;">{{ (editPrice * editQty) | number }} riel</span>
             </div>

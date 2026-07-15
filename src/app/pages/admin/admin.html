@@ -19,7 +19,7 @@
   <!-- Local gold price board -->
   <section class="history-panel" style="margin-bottom: 20px;">
     <h2 class="panel-title">🥇 {{ 'ADMIN.GOLD_BOARD_TITLE' | translate }}</h2>
-    <p style="color: #9ca3af; font-size: 13px; margin-bottom: 12px;" [innerHTML]="'ADMIN.GOLD_BOARD_DESC' | translate">
+    <p style="color: #9ca3af; font-size: calc(13px * var(--font-scale, 1)); margin-bottom: 12px;" [innerHTML]="'ADMIN.GOLD_BOARD_DESC' | translate">
     </p>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
       <input type="number" step="any" min="0" [(ngModel)]="goldPrice" [placeholder]="'ADMIN.GOLD_PRICE_PLACEHOLDER' | translate"
@@ -27,10 +27,10 @@
       <button class="btn-primary" (click)="saveGoldPrice()" [disabled]="goldSaving()">
         {{ goldSaving() ? ('ADMIN.BTN_SAVING' | translate) : ('ADMIN.BTN_SAVE_PRICE' | translate) }}
       </button>
-      @if (goldMsg(); as m) { <span style="font-size: 13px; color: #9ca3af;">{{ m }}</span> }
+      @if (goldMsg(); as m) { <span style="font-size: calc(13px * var(--font-scale, 1)); color: #9ca3af;">{{ m }}</span> }
     </div>
     @if (manualPrices.value().items.length) {
-      <div style="margin-top: 12px; font-size: 13px; color: #cbd5e1;">
+      <div style="margin-top: 12px; font-size: calc(13px * var(--font-scale, 1)); color: #cbd5e1;">
         @for (mp of manualPrices.value().items; track mp.symbol) {
           <div>Current <strong>{{ mp.symbol }}</strong>: <strong>{{ mp.price | money:mp.currency }}</strong>
             <span style="color: #64748b;">{{ 'ADMIN.CURRENT_UPDATED' | translate:{date: (mp.updatedAt | date:'short')} }}</span>

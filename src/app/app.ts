@@ -77,6 +77,11 @@ export class App {
     this.translate.use(lang);
     this.currentLang = lang;
     localStorage.setItem('lang', lang);
+    if (lang === 'km') {
+      document.documentElement.classList.add('lang-km');
+    } else {
+      document.documentElement.classList.remove('lang-km');
+    }
   }
   
   updateMarketStatus() {
@@ -105,6 +110,12 @@ export class App {
     this.translate.setFallbackLang('en');
     this.translate.use(savedLang);
     this.currentLang = savedLang;
+    
+    if (savedLang === 'km') {
+      document.documentElement.classList.add('lang-km');
+    } else {
+      document.documentElement.classList.remove('lang-km');
+    }
     
     this.updateMarketStatus();
     // Check status every minute

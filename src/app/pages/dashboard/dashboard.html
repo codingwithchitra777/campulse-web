@@ -96,7 +96,7 @@
             <span class="insight-title">{{ 'AI_INSIGHT.TITLE' | translate }}</span>
           </div>
           <p class="insight-text">{{ 'AI_INSIGHT.DESC' | translate }}</p>
-          <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 20px; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 16px; transition: background 0.2s;">{{ 'AI_INSIGHT.BTN_VIEW_REPORT' | translate }}</button>
+          <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 20px; padding: 8px 16px; font-size: calc(13px * var(--font-scale, 1)); font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 16px; transition: background 0.2s;">{{ 'AI_INSIGHT.BTN_VIEW_REPORT' | translate }}</button>
         </div>
 
         <!-- Recent Trades -->
@@ -120,7 +120,7 @@
                 </div>
               </div>
             } @empty {
-              <div class="text-center" style="color: #64748b; font-size: 13px;">{{ 'DASHBOARD.NO_RECENT_TRADES' | translate }}</div>
+              <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_RECENT_TRADES' | translate }}</div>
             }
           </div>
         </div>
@@ -142,7 +142,7 @@
                   <span class="mover-change text-profit">{{ formatChange(winner) }}</span>
                 </div>
               } @empty {
-                <div class="text-center" style="color: #64748b; font-size: 13px;">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
+                <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
               }
             </div>
           </div>
@@ -156,7 +156,7 @@
                   <span class="mover-change text-loss">{{ formatChange(loser) }}</span>
                 </div>
               } @empty {
-                <div class="text-center" style="color: #64748b; font-size: 13px;">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
+                <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
               }
             </div>
           </div>

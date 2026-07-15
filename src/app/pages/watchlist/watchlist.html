@@ -1,7 +1,7 @@
 <div class="view-container animate-fade-in">
   <div class="portfolio-header-area" style="margin-bottom: 20px;">
-    <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">⭐ {{ 'WATCHLIST.TITLE' | translate }}</h2>
-    <p class="muted" style="margin: 0; font-size: 14px;">{{ 'WATCHLIST.SUBTITLE' | translate }}</p>
+    <h2 class="panel-title" style="margin-bottom: 8px; font-size: calc(28px * var(--font-scale, 1));">⭐ {{ 'WATCHLIST.TITLE' | translate }}</h2>
+    <p class="muted" style="margin: 0; font-size: calc(14px * var(--font-scale, 1));">{{ 'WATCHLIST.SUBTITLE' | translate }}</p>
   </div>
 
   <!-- Add form -->
@@ -40,7 +40,7 @@
                 <td style="padding: 14px 16px;">
                   <span class="font-bold">{{ it.symbol }}</span>
                   @if (it.market !== 'CSX') {
-                    <span style="font-size: 10px; font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 6px;">{{ it.market === 'GOLD_KH' ? ('WATCHLIST.GOLD' | translate) : it.market }}</span>
+                    <span style="font-size: calc(10px * var(--font-scale, 1)); font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 6px;">{{ it.market === 'GOLD_KH' ? ('WATCHLIST.GOLD' | translate) : it.market }}</span>
                   }
                 </td>
                 <td style="text-align: right;">{{ it.price !== null ? (it.price | money:it.currency) : '—' }}</td>
@@ -49,28 +49,28 @@
                 </td>
                 <td style="text-align: right; white-space: nowrap;">
                   @if (it.market === 'US') {
-                    <button class="view-btn" (click)="toggleNews(it)" title="News" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer; margin-right: 6px;">{{ 'WATCHLIST.BTN_NEWS' | translate }}</button>
+                    <button class="view-btn" (click)="toggleNews(it)" title="News" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 5px 10px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer; margin-right: 6px;">{{ 'WATCHLIST.BTN_NEWS' | translate }}</button>
                   }
-                  <button class="view-btn" (click)="recordTrade(it)" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer; margin-right: 6px;">{{ 'WATCHLIST.BTN_TRADE' | translate }}</button>
-                  <button class="btn-danger" (click)="remove(it)" style="border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer;">{{ 'WATCHLIST.BTN_REMOVE' | translate }}</button>
+                  <button class="view-btn" (click)="recordTrade(it)" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 5px 10px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer; margin-right: 6px;">{{ 'WATCHLIST.BTN_TRADE' | translate }}</button>
+                  <button class="btn-danger" (click)="remove(it)" style="border-radius: 4px; padding: 5px 10px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer;">{{ 'WATCHLIST.BTN_REMOVE' | translate }}</button>
                 </td>
               </tr>
               @if (expandedKey() === keyOf(it)) {
                 <tr>
                   <td colspan="4" style="padding: 0 16px 16px;">
                     @if (newsLoading()) {
-                      <div class="muted" style="font-size: 13px; padding: 8px 0;">{{ 'WATCHLIST.LOADING_NEWS' | translate }}</div>
+                      <div class="muted" style="font-size: calc(13px * var(--font-scale, 1)); padding: 8px 0;">{{ 'WATCHLIST.LOADING_NEWS' | translate }}</div>
                     } @else if (news().length) {
                       <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 8px;">
                         @for (n of news(); track n.url) {
                           <a [href]="n.url" target="_blank" rel="noopener" style="display: block; text-decoration: none; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            <div class="font-bold" style="font-size: 13px; color: var(--text-color);">{{ n.headline }}</div>
-                            <div class="muted" style="font-size: 11px; margin-top: 2px;">{{ n.source }} · {{ (n.datetime * 1000) | date:'MMM d' }}</div>
+                            <div class="font-bold" style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-color);">{{ n.headline }}</div>
+                            <div class="muted" style="font-size: calc(11px * var(--font-scale, 1)); margin-top: 2px;">{{ n.source }} · {{ (n.datetime * 1000) | date:'MMM d' }}</div>
                           </a>
                         }
                       </div>
                     } @else {
-                      <div class="muted" style="font-size: 13px; padding: 8px 0;">{{ 'WATCHLIST.NO_RECENT_NEWS' | translate }}</div>
+                      <div class="muted" style="font-size: calc(13px * var(--font-scale, 1)); padding: 8px 0;">{{ 'WATCHLIST.NO_RECENT_NEWS' | translate }}</div>
                     }
                   </td>
                 </tr>

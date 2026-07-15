@@ -65,7 +65,7 @@
 
           <!-- CSX: dropdown of live CSX tickers -->
           @if (market === 'CSX') {
-            <div *ngIf="loadingTickers()" style="color: #9ca3af; font-size: 13px;">Loading...</div>
+            <div *ngIf="loadingTickers()" style="color: #9ca3af; font-size: calc(13px * var(--font-scale, 1));">Loading...</div>
             <select
               *ngIf="!loadingTickers()"
               id="tickerSelect"
@@ -84,23 +84,23 @@
           @if (market === 'US') {
             <input type="text" name="usSymbol" [(ngModel)]="tradeTicker" (ngModelChange)="searchSymbols($event)"
                    placeholder="Search e.g. AAPL, MSFT" autocomplete="off" required>
-            @if (searchingSymbols()) { <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Searching…</div> }
+            @if (searchingSymbols()) { <div style="font-size: calc(12px * var(--font-scale, 1)); color: #9ca3af; margin-top: 4px;">Searching…</div> }
             @if (usResults().length) {
               <div class="symbol-results" style="max-height: 180px; overflow-y: auto; border: 1px solid #1e293b; border-radius: 8px; margin-top: 4px;">
                 @for (r of usResults(); track r.symbol) {
                   <div (click)="pickSymbol(r.symbol)" style="padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #1e293b;">
-                    <strong>{{ r.symbol }}</strong> <span style="color: #9ca3af; font-size: 12px;">{{ r.description }}</span>
+                    <strong>{{ r.symbol }}</strong> <span style="color: #9ca3af; font-size: calc(12px * var(--font-scale, 1));">{{ r.description }}</span>
                   </div>
                 }
               </div>
             }
-            <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Priced in USD via Finnhub.</div>
+            <div style="font-size: calc(11px * var(--font-scale, 1)); color: #64748b; margin-top: 4px;">Priced in USD via Finnhub.</div>
           }
 
           <!-- Gold: the single local instrument, priced per chi -->
           @if (market === 'GOLD_KH') {
             <input type="text" name="goldSymbol" [value]="tradeTicker" disabled>
-            <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
+            <div style="font-size: calc(11px * var(--font-scale, 1)); color: #64748b; margin-top: 4px;">
               Local Cambodian gold — priced per <strong>chi</strong> in USD from the admin board.{{ quoteLoading() ? ' Loading price…' : '' }}
             </div>
           }
@@ -142,15 +142,15 @@
 
         <!-- Total Price Immediate Preview -->
         <div class="total-preview-box" *ngIf="tradePrice > 0 && tradeQty > 0" style="background: rgba(30, 41, 59, 0.5); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1e293b;">
-          <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af; margin-bottom: 4px;">
+          <div style="display: flex; justify-content: space-between; font-size: calc(13px * var(--font-scale, 1)); color: #9ca3af; margin-bottom: 4px;">
             <span>{{ 'TRADE.SUBTOTAL' | translate }}:</span>
             <span style="color: #f8fafc; font-weight: 500;">{{ (tradePrice * tradeQty) | money:currency }}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; font-size: 13px; color: #9ca3af; margin-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; font-size: calc(13px * var(--font-scale, 1)); color: #9ca3af; margin-bottom: 6px;">
             <span>{{ 'PORTFOLIO.DRAWER.COMMISSION' | translate }}:</span>
             <span style="color: #f8fafc; font-weight: 500;">{{ tradeCommission | money:currency }}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 15px; border-top: 1px solid #334155; padding-top: 8px; margin-top: 4px;">
+          <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: calc(15px * var(--font-scale, 1)); border-top: 1px solid #334155; padding-top: 8px; margin-top: 4px;">
             <span>{{ 'TRADE.EST_TOTAL' | translate }}:</span>
             <span [style.color]="tradeSide === 'BUY' ? '#ef4444' : '#10b981'">
               {{ totalTradeAmount | money:currency }}
@@ -178,26 +178,26 @@
           <div class="card-stats-row-html" style="margin-bottom: 20px;">
             <div class="stat-box-html">
               <span class="stat-label-html">{{ 'TRADE.AVAILABLE_SHARES' | translate }}</span>
-              <span class="stat-value-html" style="color: #60a5fa; font-size: 15px;">
+              <span class="stat-value-html" style="color: #60a5fa; font-size: calc(15px * var(--font-scale, 1));">
                 {{ pos.remainingQty | number }}
               </span>
             </div>
             <div class="stat-box-html">
               <span class="stat-label-html">{{ 'TRADE.AVG_BUY_COST' | translate }}</span>
-              <span class="stat-value-html" style="font-size: 15px;">
+              <span class="stat-value-html" style="font-size: calc(15px * var(--font-scale, 1));">
                 {{ averageCost() | money:currency }}
               </span>
             </div>
             <div class="stat-box-html">
               <span class="stat-label-html">{{ 'DASHBOARD.REALISED_PL' | translate }}</span>
-              <span class="stat-value-html" [ngClass]="pos.realisedPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'" style="font-size: 15px;">
+              <span class="stat-value-html" [ngClass]="pos.realisedPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'" style="font-size: calc(15px * var(--font-scale, 1));">
                 {{ pos.realisedPnl | money:currency:true }}
               </span>
             </div>
           </div>
 
           <!-- Total Bought vs Sold Ratio -->
-          <div class="ratio-box" style="margin-bottom: 20px; font-size: 13px;">
+          <div class="ratio-box" style="margin-bottom: 20px; font-size: calc(13px * var(--font-scale, 1));">
             <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #9ca3af;">
               <span>{{ 'TRADE.TOTAL_BOUGHT' | translate }}: <strong>{{ pos.totalBoughtQty | number }}</strong></span>
               <span>{{ 'TRADE.TOTAL_SOLD' | translate }}: <strong>{{ pos.totalSoldQty | number }}</strong></span>
@@ -206,33 +206,33 @@
             <div class="progress-bar-container" style="background: #1e293b; height: 6px; border-radius: 3px; overflow: hidden; width: 100%;">
               <div class="progress-bar-fill" [style.width.%]="pos.soldPercent" style="background: linear-gradient(90deg, #3b82f6, #8b5cf6); height: 100%; transition: width 0.3s ease;"></div>
             </div>
-            <div style="text-align: right; font-size: 11px; color: #64748b; margin-top: 4px;">
+            <div style="text-align: right; font-size: calc(11px * var(--font-scale, 1)); color: #64748b; margin-top: 4px;">
               {{ pos.soldPercent | number:'1.1-1' }}% {{ 'TRADE.HOLDINGS_SOLD' | translate }}
             </div>
           </div>
 
           <!-- LIFO open lots details -->
           <div class="lots-section" style="margin-top: 15px;">
-            <h3 class="lots-section-title" style="font-size: 12px; margin-bottom: 10px;">📥 {{ 'TRADE.LIFO_QUEUE' | translate }}</h3>
+            <h3 class="lots-section-title" style="font-size: calc(12px * var(--font-scale, 1)); margin-bottom: 10px;">📥 {{ 'TRADE.LIFO_QUEUE' | translate }}</h3>
             <div class="lots-list" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
               @for (lot of pos.remainingLots; track lot.tradeId) {
                 <div class="lot-card" style="padding: 10px; background: #0f172a; border: 1px solid #1e293b; border-radius: 10px;">
                   <div class="lot-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span class="lot-seq" style="font-weight: 700; font-size: 11px; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px;">Lot #{{ lot.seq }}</span>
-                    <span class="lot-status" [ngClass]="lot.qtyOpen > 0 ? 'text-profit-bright' : 'text-muted'" style="font-size: 11px; font-weight: 600;">
+                    <span class="lot-seq" style="font-weight: 700; font-size: calc(11px * var(--font-scale, 1)); color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px;">Lot #{{ lot.seq }}</span>
+                    <span class="lot-status" [ngClass]="lot.qtyOpen > 0 ? 'text-profit-bright' : 'text-muted'" style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 600;">
                       {{ lot.qtyOpen > 0 ? '🟢 Open' : '⚪ Sold' }}
                     </span>
                   </div>
-                  <div class="lot-body" style="display: grid; grid-template-columns: 1fr 1.2fr; row-gap: 2px; font-size: 12px;">
+                  <div class="lot-body" style="display: grid; grid-template-columns: 1fr 1.2fr; row-gap: 2px; font-size: calc(12px * var(--font-scale, 1));">
                     <div>{{ 'PORTFOLIO.DRAWER.REMAINING' | translate }}: <strong>{{ lot.qtyOpen | number }}</strong></div>
                     <div>{{ 'PORTFOLIO.DRAWER.PRICE' | translate }}: <strong>{{ lot.price | money:currency }}</strong></div>
-                    <div class="date-text" style="grid-column: 1 / -1; font-size: 10px; color: #8b949e; margin-top: 2px;">
+                    <div class="date-text" style="grid-column: 1 / -1; font-size: calc(10px * var(--font-scale, 1)); color: #8b949e; margin-top: 2px;">
                       {{ 'PORTFOLIO.DRAWER.DATE' | translate }}: {{ lot.orderDate | date:'mediumDate' }}
                     </div>
                   </div>
                 </div>
               } @empty {
-                <div class="empty-lots" style="text-align: center; color: #9ca3af; padding: 15px; font-size: 12px;">
+                <div class="empty-lots" style="text-align: center; color: #9ca3af; padding: 15px; font-size: calc(12px * var(--font-scale, 1));">
                   {{ 'TRADE.NO_BUY_LOTS' | translate }}
                 </div>
               }
@@ -240,7 +240,7 @@
           </div>
         </div>
       } @else {
-        <div style="color: #9ca3af; text-align: center; padding: 20px; font-size: 13px;">
+        <div style="color: #9ca3af; text-align: center; padding: 20px; font-size: calc(13px * var(--font-scale, 1));">
           No ticker details available.
         </div>
       }
@@ -259,7 +259,7 @@
       <div class="alert alert-danger" style="margin-bottom: 25px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 12px 16px; border-radius: 8px;">
         <strong>{{ 'TRADE.VAL_FAILED' | translate }}:</strong> {{ validationError() }}
       </div>
-      <p style="font-size: 13px; color: #9ca3af; text-align: center; margin-bottom: 20px;">
+      <p style="font-size: calc(13px * var(--font-scale, 1)); color: #9ca3af; text-align: center; margin-bottom: 20px;">
         Please adjust your trade parameters.
       </p>
       <button type="button" class="submit-btn" style="background: #4b5563;" (click)="cancelConfirm()">
