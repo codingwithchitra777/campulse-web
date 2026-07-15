@@ -99,6 +99,7 @@
               @for (winner of marketWinners(); track winner.ticker) {
                 <div class="mover-item" style="display: flex; align-items: center; justify-content: space-between;">
                   <span class="mover-ticker" style="flex: 1;">{{ winner.ticker }}</span>
+                  <span class="mover-price" style="flex: 1; text-align: center;">{{ winner.price | number }} riel</span>
                   <div style="flex: 1; display: flex; justify-content: center;">
                     @if (sparklines.value()?.[winner.ticker]) {
                       <app-sparkline [data]="sparklines.value()![winner.ticker]" [width]="60" [height]="20"></app-sparkline>
@@ -118,6 +119,7 @@
               @for (loser of marketLosers(); track loser.ticker) {
                 <div class="mover-item" style="display: flex; align-items: center; justify-content: space-between;">
                   <span class="mover-ticker" style="flex: 1;">{{ loser.ticker }}</span>
+                  <span class="mover-price" style="flex: 1; text-align: center;">{{ loser.price | number }} riel</span>
                   <div style="flex: 1; display: flex; justify-content: center;">
                     @if (sparklines.value()?.[loser.ticker]) {
                       <app-sparkline [data]="sparklines.value()![loser.ticker]" [width]="60" [height]="20"></app-sparkline>
