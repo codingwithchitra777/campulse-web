@@ -109,6 +109,9 @@ export interface Trade {
   orderDate: string;
   market: MarketKind;
   currency: CurrencyCode;
+  /** Journal note + comma-separated tags (nullable). */
+  note?: string | null;
+  tags?: string | null;
 }
 
 /**

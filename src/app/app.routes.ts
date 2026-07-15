@@ -9,6 +9,7 @@ import { SettingsComponent } from './pages/settings/settings';
 import { AnalyticsComponent } from './pages/analytics/analytics';
 import { WatchlistComponent } from './pages/watchlist/watchlist';
 import { AlertsComponent } from './pages/alerts/alerts';
+import { JournalComponent } from './pages/journal/journal';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 
@@ -23,6 +24,7 @@ export const routes: Routes = [
   { path: 'analytics', component: AnalyticsComponent, canActivate: [authGuard] },
   { path: 'watchlist', component: WatchlistComponent, canActivate: [authGuard] },
   { path: 'alerts', component: AlertsComponent, canActivate: [authGuard] },
+  { path: 'journal', component: JournalComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: '**', redirectTo: 'dashboard' }
 ];

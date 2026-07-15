@@ -76,6 +76,10 @@ export class ApiService {
     return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/trades/${tradeId}`);
   }
 
+  updateJournal(tradeId: string, body: { note?: string; tags?: string }): Observable<Trade> {
+    return this.http.patch<Trade>(`${this.baseUrl}/api/trades/${tradeId}/journal`, body);
+  }
+
   getPosition(symbol: string, market?: string): Observable<Position> {
     return this.http.get<Position>(`${this.baseUrl}/api/position/${symbol}`, {
       params: market ? { market } : {}
