@@ -157,71 +157,58 @@
             </div>
           </div>
 
-          <!-- Right: AI Insight Card -->
+          <!-- Right: Realized P/L by Year -->
           <div style="display: flex; flex-direction: column;">
-            @if (!session.isGuest()) {
-              <div class="dashboard-panel ai-insight-card" style="height: 100%; background: linear-gradient(145deg, #1e1b4b, #0f172a); border: 1px solid #312e81; display: flex; flex-direction: column; justify-content: center;">
-                <div class="insight-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                  <span class="insight-icon">✨</span>
-                  <span class="insight-title" style="font-size: calc(12px * var(--font-scale, 1)); font-weight: bold; letter-spacing: 0.5px; color: #a5b4fc; text-transform: uppercase;">{{ 'AI_INSIGHT.TITLE' | translate }}</span>
+            <div class="dashboard-panel" style="height: 100%;">
+              <h2 class="panel-title" style="font-size: calc(18px * var(--font-scale, 1)); margin-bottom: 16px;">📅 {{ 'DASHBOARD.PNL_BY_YEAR' | translate }}</h2>
+              @if (yearlyPnl.isLoading()) {
+                <div class="panel-loader">Loading...</div>
+              } @else {
+                <div class="table-container">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>{{ 'DASHBOARD.COL_YEAR' | translate }}</th>
+                        <th>{{ 'DASHBOARD.REALISED_PL' | translate }}</th>
+                        <th>{{ 'DASHBOARD.COL_SELLS' | translate }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (y of yearlyPnl.value(); track y.year) {
+                        <tr class="year-row" (click)="toggleYear(y.year)">
+                          <td class="font-bold">
+                            <span class="year-toggle">{{ expandedYear() === y.year ? '▾' : '▸' }}</span>
+                            {{ y.year }}
+                          </td>
+                          <td class="font-bold" [ngClass]="y.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
+                            {{ y.realisedPnl >= 0 ? '+' : '' }}{{ (y.realisedPnl >= 0 ? y.realisedPnl : -y.realisedPnl) | number }} riel
+                          </td>
+                          <td>{{ y.sellCount | number }}</td>
+                        </tr>
+                        @if (expandedYear() === y.year) {
+                          @for (tk of y.tickers; track tk.ticker) {
+                            <tr class="year-ticker-row">
+                              <td class="year-ticker-name">{{ tk.ticker }}</td>
+                              <td [ngClass]="tk.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
+                                {{ tk.realisedPnl >= 0 ? '+' : '' }}{{ (tk.realisedPnl >= 0 ? tk.realisedPnl : -tk.realisedPnl) | number }} riel
+                              </td>
+                              <td>{{ tk.sellCount | number }}</td>
+                            </tr>
+                          }
+                        }
+                      } @empty {
+                        <tr>
+                          <td colspan="3" class="text-center" style="padding: 20px;">{{ 'DASHBOARD.NO_HISTORY' | translate }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
                 </div>
-                <p class="insight-text" style="font-size: calc(16px * var(--font-scale, 1)); font-style: italic; line-height: 1.5; color: #e0e7ff; margin-bottom: 0;">{{ 'AI_INSIGHT.DESC' | translate }}</p>
-                <div style="margin-top: 24px;">
-                  <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid #4f46e5; color: #a5b4fc; border-radius: 20px; padding: 8px 16px; font-size: calc(13px * var(--font-scale, 1)); font-weight: 500; font-family: inherit; cursor: pointer; transition: background 0.2s;">{{ 'AI_INSIGHT.BTN_VIEW_REPORT' | translate }}</button>
-                </div>
-              </div>
-            }
+              }
+            </div>
           </div>
         </div>
 
-        <!-- Realized P/L by Year -->
-        <div class="dashboard-panel" style="margin-top: 30px;">
-          <h2 class="panel-title">📅 {{ 'DASHBOARD.PNL_BY_YEAR' | translate }}</h2>
-          @if (yearlyPnl.isLoading()) {
-            <div class="panel-loader">Loading...</div>
-          } @else {
-            <div class="table-container">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>{{ 'DASHBOARD.COL_YEAR' | translate }}</th>
-                    <th>{{ 'DASHBOARD.REALISED_PL' | translate }}</th>
-                    <th>{{ 'DASHBOARD.COL_SELLS' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (y of yearlyPnl.value(); track y.year) {
-                    <tr class="year-row" (click)="toggleYear(y.year)">
-                      <td class="font-bold">
-                        <span class="year-toggle">{{ expandedYear() === y.year ? '▾' : '▸' }}</span>
-                        {{ y.year }}
-                      </td>
-                      <td class="font-bold" [ngClass]="y.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
-                        {{ y.realisedPnl >= 0 ? '+' : '' }}{{ (y.realisedPnl >= 0 ? y.realisedPnl : -y.realisedPnl) | number }} riel
-                      </td>
-                      <td>{{ y.sellCount | number }}</td>
-                    </tr>
-                    @if (expandedYear() === y.year) {
-                      @for (tk of y.tickers; track tk.ticker) {
-                        <tr class="year-ticker-row">
-                          <td class="year-ticker-name">{{ tk.ticker }}</td>
-                          <td [ngClass]="tk.realisedPnl >= 0 ? 'text-profit' : 'text-loss'">
-                            {{ tk.realisedPnl >= 0 ? '+' : '' }}{{ (tk.realisedPnl >= 0 ? tk.realisedPnl : -tk.realisedPnl) | number }} riel
-                          </td>
-                          <td>{{ tk.sellCount | number }}</td>
-                        </tr>
-                      }
-                    }
-                  } @empty {
-                    <tr>
-                      <td colspan="3" class="text-center">{{ 'DASHBOARD.NO_HISTORY' | translate }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          }
-        </div>
     </div>
 
   <!-- Backdrop for Right Drawer -->
