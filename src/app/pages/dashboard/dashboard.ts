@@ -423,17 +423,16 @@ export class DashboardComponent implements OnDestroy {
 
   readonly sortedMarketList = computed(() => {
     const prices = this.marketPrices.value() || [];
-    const csxPrices = prices.filter(p => p.market === 'CSX');
     
-    return csxPrices.sort((a, b) => {
+    return [...prices].sort((a, b) => {
       const sort = this.marketSort();
       const desc = this.marketSortDesc() ? -1 : 1;
       
       if (sort === 'symbol') {
         return a.ticker.localeCompare(b.ticker) * desc;
       } else {
-        const changeA = a.change ? (a.change / (a.price - a.change)) : 0;
-        const changeB = b.change ? (b.change / (b.price - b.change)) : 0;
+        const changeA = a.change && a.price ? (a.change / (a.price - a.change)) : 0;
+        const changeB = b.change && b.price ? (b.change / (b.price - b.change)) : 0;
         return (changeA - changeB) * desc;
       }
     });
