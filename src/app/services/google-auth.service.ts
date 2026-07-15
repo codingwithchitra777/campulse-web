@@ -111,7 +111,14 @@ export class GoogleAuthService {
       },
       error: (err) => {
         console.error('Google Sign-In failed', err);
-        const errMsg = err.error?.detail || err.error?.error || 'Invalid credentials';
+        let errMsg = 'Invalid credentials';
+        
+        if (err.status === 0) {
+          errMsg = 'Backend server unreachable. Please make sure the backend is running on port 8000.';
+        } else {
+          errMsg = err.error?.detail || err.error?.error || errMsg;
+        }
+        
         alert('Google Authentication Failed: ' + errMsg);
       }
     });

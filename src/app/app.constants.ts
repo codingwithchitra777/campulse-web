@@ -1,7 +1,7 @@
 import { isDevMode } from '@angular/core';
 
 /** Single source of truth for values that were previously duplicated across services/components. */
-export const API_BASE_URL = isDevMode() ? 'http://localhost:8000' : 'https://campulse-backend.fastapicloud.dev';
+export const API_BASE_URL = isDevMode() ? 'http://localhost:8080' : 'https://campulse-backend.fastapicloud.dev';
 
 export const GOOGLE_CLIENT_ID =
   '1048965896991-dirq98278c5cj312k2o0kq3f307e2krf.apps.googleusercontent.com';
