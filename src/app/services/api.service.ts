@@ -51,8 +51,9 @@ export class ApiService {
   }
 
   getSparklines(tickers: string[]): Observable<Record<string, number[]>> {
-    return this.http.get<Record<string, number[]>>(`${this.baseUrl}/api/v1/market/sparklines`, {
-      params: { tickers: tickers.join(',') }
+    const tickerList = tickers.join(',');
+    return this.http.get<Record<string, number[]>>(`${this.baseUrl}/api/market/sparklines`, {
+      params: { tickers: tickerList }
     });
   }
 
