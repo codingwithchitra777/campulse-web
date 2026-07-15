@@ -50,6 +50,12 @@ export class ApiService {
     return this.http.get<Price>(`${this.baseUrl}/api/price/${symbol}`);
   }
 
+  getSparklines(tickers: string[]): Observable<Record<string, number[]>> {
+    return this.http.get<Record<string, number[]>>(`${this.baseUrl}/api/v1/market/sparklines`, {
+      params: { tickers: tickers.join(',') }
+    });
+  }
+
   getTrades(ticker?: string, limit = 50, offset = 0): Observable<Paginated<Trade>> {
     return this.http.get<Paginated<Trade>>(`${this.baseUrl}/api/trades`, {
       params: { ...(ticker ? { ticker } : {}), limit, offset }

@@ -5,7 +5,7 @@
       <!-- Header & Tabs -->
       <div class="portfolio-header-area" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
         <div>
-          <h2 class="panel-title" style="margin-bottom: 8px; font-size: calc(28px * var(--font-scale, 1));">Portfolio</h2>
+          <h2 class="panel-title" style="margin-bottom: 8px; font-size: calc(28px * var(--font-scale, 1));">{{ 'PORTFOLIO.TITLE' | translate }}</h2>
           <p class="muted" style="margin: 0; font-size: calc(14px * var(--font-scale, 1));">Manage your holdings and track performance across the Cambodian market.</p>
         </div>
       </div>
@@ -89,7 +89,7 @@
           
           <!-- Left: Allocation Donut -->
           <div class="dashboard-panel allocation-panel" style="display: flex; flex-direction: column;">
-            <h3 class="panel-title" style="font-size: calc(18px * var(--font-scale, 1));">Allocation</h3>
+            <h3 class="panel-title" style="font-size: calc(18px * var(--font-scale, 1));">{{ 'PORTFOLIO.ALLOCATION' | translate }}</h3>
             <div class="chart-container" style="height: 240px; position: relative; margin: 20px 0;">
               <canvas #allocationCanvas></canvas>
             </div>
@@ -110,20 +110,20 @@
           <!-- Right: Holdings List -->
           <div class="dashboard-panel holdings-panel" style="padding: 0;">
             <div class="chart-header" style="padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center;">
-              <h3 class="panel-title" style="margin-bottom: 0; font-size: calc(18px * var(--font-scale, 1));">Current Holdings</h3>
-              <button class="view-btn" style="background: transparent; border: none; font-size: calc(12px * var(--font-scale, 1)); color: var(--text-muted); cursor: pointer;">Download CSV 📥</button>
+              <h3 class="panel-title" style="margin-bottom: 0; font-size: calc(18px * var(--font-scale, 1));">{{ 'PORTFOLIO.CURRENT_HOLDINGS' | translate }}</h3>
+              <button class="view-btn" style="background: transparent; border: none; font-size: calc(12px * var(--font-scale, 1)); color: var(--text-muted); cursor: pointer;">{{ 'PORTFOLIO.DOWNLOAD_CSV' | translate }} 📥</button>
             </div>
             
             <div class="table-container" style="margin-top: 16px;">
               <table class="data-table selectable-rows modern-table" style="width: 100%; border-collapse: collapse;">
                 <thead>
                   <tr style="border-bottom: 1px solid var(--border-color);">
-                    <th style="padding: 12px 20px; text-align: left; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">TICKER</th>
-                    <th style="padding: 12px 20px; text-align: left; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">SHARES</th>
-                    <th style="padding: 12px 20px; text-align: left; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">AVG COST</th>
-                    <th style="padding: 12px 20px; text-align: left; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">MKT PRICE</th>
-                    <th style="padding: 12px 20px; text-align: right; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">TOTAL P/L</th>
-                    <th style="padding: 12px 20px; text-align: right; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">ACTION</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">{{ 'DASHBOARD.COL_TICKER' | translate | uppercase }}</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">{{ 'PORTFOLIO.COL_SHARES' | translate | uppercase }}</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">{{ 'PORTFOLIO.COL_AVG_BUY' | translate | uppercase }}</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">{{ 'PORTFOLIO.COL_MARKET_PRICE' | translate | uppercase }}</th>
+                    <th style="padding: 12px 20px; text-align: right; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">{{ 'PORTFOLIO.COL_PL' | translate | uppercase }}</th>
+                    <th style="padding: 12px 20px; text-align: right; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">{{ 'PORTFOLIO.COL_ACTIONS' | translate | uppercase }}</th>
                   </tr>
                 </thead>
                 <tbody>

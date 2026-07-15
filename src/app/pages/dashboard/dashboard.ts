@@ -7,11 +7,13 @@ import { Holding, Price, TopOrder, TopTicker, Trade, Paginated } from '../../mod
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
 import { Chart } from 'chart.js/auto';
+import { SparklineComponent } from '../../components/sparkline/sparkline';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, RouterLink],
+  imports: [CommonModule, TranslatePipe, RouterLink, SparklineComponent],
   templateUrl: './dashboard.html'
 })
 export class DashboardComponent implements OnDestroy {
@@ -399,6 +401,21 @@ export class DashboardComponent implements OnDestroy {
   readonly marketPrices = rxResource({
     stream: () => this.api.getPrices(),
     defaultValue: [] as Price[]
+  });
+
+  readonly marketTickers = computed(() => {
+    return this.marketPrices.value().map(p => p.ticker);
+  });
+
+  readonly sparklines = rxResource({
+    params: () => this.marketTickers(),
+    stream: ({ params: tickers }) => {
+      if (!tickers || tickers.length === 0) {
+        return of({} as Record<string, number[]>);
+      }
+      return this.api.getSparklines(tickers);
+    },
+    defaultValue: {} as Record<string, number[]>
   });
 
   readonly marketWinners = computed(() => {

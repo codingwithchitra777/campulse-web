@@ -31,6 +31,7 @@
               <th style="text-align: left;">{{ 'WATCHLIST.COL_SYMBOL' | translate }}</th>
               <th style="text-align: right;">{{ 'WATCHLIST.COL_PRICE' | translate }}</th>
               <th style="text-align: right;">{{ 'WATCHLIST.COL_CHANGE' | translate }}</th>
+              <th style="text-align: center;">Trend</th>
               <th style="text-align: right;">{{ 'WATCHLIST.COL_ACTIONS' | translate }}</th>
             </tr>
           </thead>
@@ -47,6 +48,13 @@
                 <td style="text-align: right;" [ngClass]="(it.change || 0) >= 0 ? 'text-profit' : 'text-loss'">
                   {{ it.change !== null ? ((it.change >= 0 ? '▲ ' : '▼ ') + (it.change | number:'1.0-2')) : '—' }}
                 </td>
+                <td style="text-align: center; vertical-align: middle;">
+                  @if (it.market === 'CSX' && sparklines.value()?.[it.symbol]) {
+                    <app-sparkline [data]="sparklines.value()![it.symbol]"></app-sparkline>
+                  } @else {
+                    <span style="color: #64748b;">—</span>
+                  }
+                </td>
                 <td style="text-align: right; white-space: nowrap;">
                   @if (it.market === 'US') {
                     <button class="view-btn" (click)="toggleNews(it)" title="News" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 5px 10px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer; margin-right: 6px;">{{ 'WATCHLIST.BTN_NEWS' | translate }}</button>
@@ -57,7 +65,7 @@
               </tr>
               @if (expandedKey() === keyOf(it)) {
                 <tr>
-                  <td colspan="4" style="padding: 0 16px 16px;">
+                  <td colspan="5" style="padding: 0 16px 16px;">
                     @if (newsLoading()) {
                       <div class="muted" style="font-size: calc(13px * var(--font-scale, 1)); padding: 8px 0;">{{ 'WATCHLIST.LOADING_NEWS' | translate }}</div>
                     } @else if (news().length) {

@@ -137,9 +137,14 @@
             <h3 class="movers-subtitle text-profit">{{ 'DASHBOARD.TOP_WINNERS' | translate }}</h3>
             <div class="movers-list">
               @for (winner of marketWinners(); track winner.ticker) {
-                <div class="mover-item">
-                  <span class="mover-ticker">{{ winner.ticker }}</span>
-                  <span class="mover-change text-profit">{{ formatChange(winner) }}</span>
+                <div class="mover-item" style="display: flex; align-items: center; justify-content: space-between;">
+                  <span class="mover-ticker" style="flex: 1;">{{ winner.ticker }}</span>
+                  <div style="flex: 1; display: flex; justify-content: center;">
+                    @if (sparklines.value()?.[winner.ticker]) {
+                      <app-sparkline [data]="sparklines.value()![winner.ticker]" [width]="60" [height]="20"></app-sparkline>
+                    }
+                  </div>
+                  <span class="mover-change text-profit" style="flex: 1; text-align: right;">{{ formatChange(winner) }}</span>
                 </div>
               } @empty {
                 <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
@@ -151,9 +156,14 @@
             <h3 class="movers-subtitle text-loss">{{ 'DASHBOARD.TOP_LOSERS' | translate }}</h3>
             <div class="movers-list">
               @for (loser of marketLosers(); track loser.ticker) {
-                <div class="mover-item">
-                  <span class="mover-ticker">{{ loser.ticker }}</span>
-                  <span class="mover-change text-loss">{{ formatChange(loser) }}</span>
+                <div class="mover-item" style="display: flex; align-items: center; justify-content: space-between;">
+                  <span class="mover-ticker" style="flex: 1;">{{ loser.ticker }}</span>
+                  <div style="flex: 1; display: flex; justify-content: center;">
+                    @if (sparklines.value()?.[loser.ticker]) {
+                      <app-sparkline [data]="sparklines.value()![loser.ticker]" [width]="60" [height]="20"></app-sparkline>
+                    }
+                  </div>
+                  <span class="mover-change text-loss" style="flex: 1; text-align: right;">{{ formatChange(loser) }}</span>
                 </div>
               } @empty {
                 <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>

@@ -1,20 +1,22 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { of } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { MoneyPipe } from '../../utils/money';
 import { CurrencyCode, MarketKind, NewsItem, WatchlistItem } from '../../models';
 
 import { TranslatePipe } from '@ngx-translate/core';
+import { SparklineComponent } from '../../components/sparkline/sparkline';
 
 /** Track symbols you don't own; live quotes per market + Finnhub news for US symbols. */
 @Component({
   selector: 'app-watchlist',
   standalone: true,
-  imports: [CommonModule, FormsModule, MoneyPipe, TranslatePipe],
+  imports: [CommonModule, FormsModule, MoneyPipe, TranslatePipe, SparklineComponent],
   templateUrl: './watchlist.html'
 })
 export class WatchlistComponent {
@@ -27,6 +29,23 @@ export class WatchlistComponent {
     params: () => this.session.activeUserId(),
     stream: () => this.api.getWatchlist(),
     defaultValue: { items: [] as WatchlistItem[] }
+  });
+
+  readonly csxTickers = computed(() => 
+    this.watchlist.value().items
+      .filter(i => i.market === 'CSX')
+      .map(i => i.symbol)
+  );
+
+  readonly sparklines = rxResource({
+    params: () => this.csxTickers(),
+    stream: ({ params: tickers }) => {
+      if (!tickers || tickers.length === 0) {
+        return of({} as Record<string, number[]>);
+      }
+      return this.api.getSparklines(tickers);
+    },
+    defaultValue: {} as Record<string, number[]>
   });
 
   market: MarketKind = 'CSX';
