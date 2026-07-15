@@ -97,15 +97,17 @@
             <h3 class="movers-subtitle text-profit">{{ 'DASHBOARD.TOP_WINNERS' | translate }}</h3>
             <div class="movers-list">
               @for (winner of marketWinners(); track winner.ticker) {
-                <div class="mover-item" style="display: flex; align-items: center; justify-content: space-between;">
-                  <span class="mover-ticker" style="flex: 1;">{{ winner.ticker }}</span>
-                  <span class="mover-price" style="flex: 1; text-align: center;">{{ winner.price | number }} riel</span>
-                  <div style="flex: 1; display: flex; justify-content: center;">
+                <div class="mover-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                  <span class="mover-ticker" style="flex: 0 0 80px; font-weight: bold; font-size: 1.1em;">{{ winner.ticker }}</span>
+                  <div style="flex: 1; display: flex; justify-content: center; padding: 0 15px;">
                     @if (sparklines.value()[winner.ticker]) {
-                      <app-sparkline [data]="sparklines.value()[winner.ticker]" [width]="60" [height]="20"></app-sparkline>
+                      <app-sparkline [data]="sparklines.value()[winner.ticker]" [width]="120" [height]="35"></app-sparkline>
                     }
                   </div>
-                  <span class="mover-change text-profit" style="flex: 1; text-align: right;">{{ formatChange(winner) }}</span>
+                  <div style="flex: 0 0 120px; text-align: right; display: flex; flex-direction: column; justify-content: center;">
+                    <span class="mover-price" style="font-weight: 600;">{{ winner.price | number }} riel</span>
+                    <span class="mover-change text-profit" style="font-size: 0.85em; margin-top: 2px;">{{ formatChange(winner) }}</span>
+                  </div>
                 </div>
               } @empty {
                 <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
@@ -117,15 +119,17 @@
             <h3 class="movers-subtitle text-loss">{{ 'DASHBOARD.TOP_LOSERS' | translate }}</h3>
             <div class="movers-list">
               @for (loser of marketLosers(); track loser.ticker) {
-                <div class="mover-item" style="display: flex; align-items: center; justify-content: space-between;">
-                  <span class="mover-ticker" style="flex: 1;">{{ loser.ticker }}</span>
-                  <span class="mover-price" style="flex: 1; text-align: center;">{{ loser.price | number }} riel</span>
-                  <div style="flex: 1; display: flex; justify-content: center;">
+                <div class="mover-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                  <span class="mover-ticker" style="flex: 0 0 80px; font-weight: bold; font-size: 1.1em;">{{ loser.ticker }}</span>
+                  <div style="flex: 1; display: flex; justify-content: center; padding: 0 15px;">
                     @if (sparklines.value()[loser.ticker]) {
-                      <app-sparkline [data]="sparklines.value()[loser.ticker]" [width]="60" [height]="20"></app-sparkline>
+                      <app-sparkline [data]="sparklines.value()[loser.ticker]" [width]="120" [height]="35"></app-sparkline>
                     }
                   </div>
-                  <span class="mover-change text-loss" style="flex: 1; text-align: right;">{{ formatChange(loser) }}</span>
+                  <div style="flex: 0 0 120px; text-align: right; display: flex; flex-direction: column; justify-content: center;">
+                    <span class="mover-price" style="font-weight: 600;">{{ loser.price | number }} riel</span>
+                    <span class="mover-change text-loss" style="font-size: 0.85em; margin-top: 2px;">{{ formatChange(loser) }}</span>
+                  </div>
                 </div>
               } @empty {
                 <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
