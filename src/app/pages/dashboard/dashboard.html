@@ -106,15 +106,15 @@
           <div class="movers-list">
             @for (stock of sortedMarketList(); track stock.ticker) {
               <div class="mover-item">
-                <span class="mover-ticker" style="flex: 1 1 30%; font-weight: bold; font-size: 1.1em; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ stock.ticker }}</span>
-                <div style="flex: 0 1 auto; display: flex; justify-content: center; padding: 0 10px; min-width: 0; overflow: hidden;">
+                <span class="mover-ticker-col">{{ stock.ticker }}</span>
+                <div class="mover-chart-col">
                   @if (sparklines.value()[stock.ticker]) {
                     <app-sparkline [data]="sparklines.value()[stock.ticker]" [width]="120" [height]="35" style="max-width: 100%;"></app-sparkline>
                   }
                 </div>
-                <div style="flex: 1 1 30%; text-align: right; display: flex; flex-direction: column; justify-content: center; min-width: 0;">
-                  <span class="mover-price" style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ stock.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
-                  <span class="mover-change" [ngClass]="(stock.change || 0) >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 0.85em; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ formatChange(stock) }}</span>
+                <div class="mover-price-col">
+                  <span class="mover-price">{{ stock.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
+                  <span class="mover-change" [ngClass]="(stock.change || 0) >= 0 ? 'text-profit' : 'text-loss'">{{ formatChange(stock) }}</span>
                 </div>
               </div>
             } @empty {

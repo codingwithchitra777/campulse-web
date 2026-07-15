@@ -3158,6 +3158,49 @@ body.light .topbar-search input {
   padding: 12px 8px;
   border-bottom: 1px solid rgba(51, 65, 85, 0.5);
   transition: background-color 0.2s ease;
+  flex-wrap: wrap; /* allow wrapping on small screens */
+}
+
+.mover-ticker-col {
+  flex: 1 1 30%;
+  font-weight: bold;
+  font-size: 1.1em;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mover-chart-col {
+  flex: 0 1 auto;
+  display: flex;
+  justify-content: center;
+  padding: 0 10px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mover-price-col {
+  flex: 1 1 30%;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .mover-ticker-col {
+    flex: 1 1 50%;
+  }
+  .mover-price-col {
+    flex: 1 1 50%;
+  }
+  .mover-chart-col {
+    flex: 1 1 100%;
+    order: 3;
+    margin-top: 12px;
+  }
 }
 
 .mover-item:last-child {
@@ -3842,3 +3885,5 @@ body.light .mobile-account-sheet::before {
 body.light .mas-row:active {
   background: rgba(0, 0, 0, 0.04);
 }
+@ m e d i a   ( m a x - w i d t h :   4 8 0 p x )   {   . p o r t f o l i o - s u m m a r y - c a r d s   {   g r i d - t e m p l a t e - c o l u m n s :   1 f r ;   }   }  
+ 
