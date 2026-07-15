@@ -89,46 +89,6 @@
           }
         </div>
 
-        <!-- AI Insight Card -->
-        <div class="ai-insight-card">
-          <div class="insight-header">
-            <span class="insight-icon">✨</span>
-            <span class="insight-title">{{ 'AI_INSIGHT.TITLE' | translate }}</span>
-          </div>
-          <p class="insight-text">{{ 'AI_INSIGHT.DESC' | translate }}</p>
-          <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 20px; padding: 8px 16px; font-size: calc(13px * var(--font-scale, 1)); font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 16px; transition: background 0.2s;">{{ 'AI_INSIGHT.BTN_VIEW_REPORT' | translate }}</button>
-        </div>
-
-        <!-- Recent Trades -->
-        <div class="dashboard-panel">
-          <h2 class="panel-title">{{ 'DASHBOARD.RECENT_TRADES' | translate }}</h2>
-          <div class="recent-trades-list">
-            @for (t of recentTrades.value().items; track t.tradeId) {
-              <div class="trade-item">
-                <div class="trade-icon" [ngClass]="t.side === 'BUY' ? 'icon-buy' : 'icon-sell'">
-                  {{ t.side === 'BUY' ? 'B' : 'S' }}
-                </div>
-                <div class="trade-details">
-                  <div class="trade-ticker-row">
-                    <span class="trade-ticker">{{ t.ticker }}</span>
-                    <span class="trade-amount">{{ t.qty }} shares</span>
-                  </div>
-                  <div class="trade-date-row">
-                    <span class="trade-date">{{ t.orderDate | date:'mediumDate' }}</span>
-                    <span class="trade-price">{{ t.price | number }} riel</span>
-                  </div>
-                </div>
-              </div>
-            } @empty {
-              <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_RECENT_TRADES' | translate }}</div>
-            }
-          </div>
-        </div>
-      </div>
-
-      <!-- Right Column: Market Movers & Promos -->
-      <div class="dashboard-side-col">
-        
         <!-- Market Movers -->
         <div class="dashboard-panel">
           <h2 class="panel-title">{{ 'DASHBOARD.MARKET_MOVERS' | translate }}</h2>
@@ -170,6 +130,46 @@
               }
             </div>
           </div>
+        </div>
+
+        <!-- Recent Trades -->
+        <div class="dashboard-panel">
+          <h2 class="panel-title">{{ 'DASHBOARD.RECENT_TRADES' | translate }}</h2>
+          <div class="recent-trades-list">
+            @for (t of recentTrades.value().items; track t.tradeId) {
+              <div class="trade-item">
+                <div class="trade-icon" [ngClass]="t.side === 'BUY' ? 'icon-buy' : 'icon-sell'">
+                  {{ t.side === 'BUY' ? 'B' : 'S' }}
+                </div>
+                <div class="trade-details">
+                  <div class="trade-ticker-row">
+                    <span class="trade-ticker">{{ t.ticker }}</span>
+                    <span class="trade-amount">{{ t.qty }} shares</span>
+                  </div>
+                  <div class="trade-date-row">
+                    <span class="trade-date">{{ t.orderDate | date:'mediumDate' }}</span>
+                    <span class="trade-price">{{ t.price | number }} riel</span>
+                  </div>
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_RECENT_TRADES' | translate }}</div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Market Movers & Promos -->
+      <div class="dashboard-side-col">
+        
+        <!-- AI Insight Card -->
+        <div class="ai-insight-card">
+          <div class="insight-header">
+            <span class="insight-icon">✨</span>
+            <span class="insight-title">{{ 'AI_INSIGHT.TITLE' | translate }}</span>
+          </div>
+          <p class="insight-text">{{ 'AI_INSIGHT.DESC' | translate }}</p>
+          <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 20px; padding: 8px 16px; font-size: calc(13px * var(--font-scale, 1)); font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 16px; transition: background 0.2s;">{{ 'AI_INSIGHT.BTN_VIEW_REPORT' | translate }}</button>
         </div>
 
         <!-- Premium Upgrade Card -->

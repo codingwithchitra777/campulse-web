@@ -423,7 +423,7 @@ export class DashboardComponent implements OnDestroy {
     return prices
       .filter(p => p.change !== null && p.change > 0)
       .sort((a, b) => (b.change || 0) - (a.change || 0))
-      .slice(0, 3);
+      .slice(0, 10);
   });
 
   readonly marketLosers = computed(() => {
@@ -431,7 +431,7 @@ export class DashboardComponent implements OnDestroy {
     return prices
       .filter(p => p.change !== null && p.change < 0)
       .sort((a, b) => (a.change || 0) - (b.change || 0))
-      .slice(0, 3);
+      .slice(0, 10);
   });
 
   formatChange(p: Price): string {
