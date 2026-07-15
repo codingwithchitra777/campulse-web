@@ -3164,11 +3164,12 @@ body.light .topbar-search input {
   padding: 12px 8px;
   border-bottom: 1px solid rgba(51, 65, 85, 0.5);
   transition: background-color 0.2s ease;
-  flex-wrap: wrap; /* allow wrapping on small screens */
+  flex-wrap: nowrap; /* keep on one line always */
+  gap: 12px;
 }
 
 .mover-ticker-col {
-  flex: 1 1 30%;
+  flex: 0 0 25%; /* fixed width for ticker */
   font-weight: bold;
   font-size: 1.1em;
   min-width: 0;
@@ -3178,16 +3179,18 @@ body.light .topbar-search input {
 }
 
 .mover-chart-col {
-  flex: 0 1 auto;
+  flex: 1 1 auto; /* take up remaining middle space */
   display: flex;
   justify-content: center;
-  padding: 0 10px;
+  align-items: center;
+  padding: 0;
   min-width: 0;
   overflow: hidden;
+  height: 40px; /* fixed height container for the stretching sparkline */
 }
 
 .mover-price-col {
-  flex: 1 1 30%;
+  flex: 0 0 30%; /* fixed width for price */
   text-align: right;
   display: flex;
   flex-direction: column;
@@ -3197,15 +3200,13 @@ body.light .topbar-search input {
 
 @media (max-width: 480px) {
   .mover-ticker-col {
-    flex: 1 1 50%;
+    flex: 0 0 20%;
   }
   .mover-price-col {
-    flex: 1 1 50%;
+    flex: 0 0 35%;
   }
   .mover-chart-col {
-    flex: 1 1 100%;
-    order: 3;
-    margin-top: 12px;
+    height: 36px;
   }
 }
 

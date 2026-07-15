@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <svg [attr.width]="width" [attr.height]="height" [attr.viewBox]="'0 0 ' + width + ' ' + height" style="display: block; overflow: visible;">
+    <svg width="100%" height="100%" [attr.viewBox]="'0 0 ' + width + ' ' + height" preserveAspectRatio="none" style="display: block; overflow: visible;">
       @if (points.length > 1) {
         <path [attr.d]="pathD" fill="none" [attr.stroke]="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         
@@ -23,8 +23,9 @@ import { CommonModule } from '@angular/common';
   `,
   styles: [`
     :host {
-      display: inline-block;
-      vertical-align: middle;
+      display: block;
+      width: 100%;
+      height: 100%;
     }
   `]
 })

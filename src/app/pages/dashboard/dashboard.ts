@@ -10,6 +10,8 @@ import { Chart } from 'chart.js/auto';
 import { SparklineComponent } from '../../components/sparkline/sparkline';
 import { of } from 'rxjs';
 
+// Trigger webpack recompile
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
