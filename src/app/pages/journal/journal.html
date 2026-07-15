@@ -1,16 +1,16 @@
 <div class="view-container animate-fade-in">
   <div class="portfolio-header-area" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px;">
     <div>
-      <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">📓 Journal</h2>
-      <p class="muted" style="margin: 0; font-size: 14px;">Annotate your trades — why you entered, what you learned. Tag them to spot patterns.</p>
+      <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">📓 {{ 'JOURNAL.TITLE' | translate }}</h2>
+      <p class="muted" style="margin: 0; font-size: 14px;">{{ 'JOURNAL.SUBTITLE' | translate }}</p>
     </div>
-    <input type="text" [ngModel]="tagFilter()" (ngModelChange)="tagFilter.set($event)" placeholder="Filter by tag…"
+    <input type="text" [ngModel]="tagFilter()" (ngModelChange)="tagFilter.set($event)" [placeholder]="'JOURNAL.FILTER_PLACEHOLDER' | translate"
            style="min-width: 160px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
   </div>
 
   <div class="dashboard-panel" style="padding: 0;">
     @if (trades.isLoading()) {
-      <div class="panel-loader">Loading...</div>
+      <div class="panel-loader">{{ 'JOURNAL.LOADING' | translate }}</div>
     } @else {
       <div style="display: flex; flex-direction: column;">
         @for (t of visible(); track t.tradeId) {
@@ -20,7 +20,7 @@
                 <span class="trade-side-badge" [ngClass]="t.side === 'BUY' ? 'badge-buy' : 'badge-sell'">{{ t.side }}</span>
                 <span class="font-bold">{{ t.ticker }}</span>
                 @if (t.market !== 'CSX') {
-                  <span style="font-size: 10px; font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px;">{{ t.market === 'GOLD_KH' ? 'GOLD' : t.market }}</span>
+                  <span style="font-size: 10px; font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px;">{{ t.market === 'GOLD_KH' ? ('JOURNAL.GOLD' | translate) : t.market }}</span>
                 }
                 <span class="muted" style="font-size: 13px;">{{ t.qty | number }} @ {{ t.price | money:t.currency }}</span>
               </div>
@@ -29,13 +29,13 @@
 
             @if (editingId() === t.tradeId) {
               <div style="margin-top: 12px;">
-                <textarea [(ngModel)]="noteDraft" rows="3" placeholder="Why did you make this trade? What did you learn?"
+                <textarea [(ngModel)]="noteDraft" rows="3" [placeholder]="'JOURNAL.NOTE_PLACEHOLDER' | translate"
                           style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc; font-family: inherit; resize: vertical;"></textarea>
-                <input type="text" [(ngModel)]="tagsDraft" placeholder="Tags, comma-separated e.g. earnings, FOMO, win"
+                <input type="text" [(ngModel)]="tagsDraft" [placeholder]="'JOURNAL.TAGS_PLACEHOLDER' | translate"
                        style="width: 100%; margin-top: 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
                 <div style="display: flex; gap: 8px; margin-top: 8px;">
-                  <button class="btn-primary" (click)="save(t)" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
-                  <button class="view-btn" (click)="cancel()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; padding: 6px 14px; cursor: pointer;">Cancel</button>
+                  <button class="btn-primary" (click)="save(t)" [disabled]="saving()">{{ saving() ? ('JOURNAL.BTN_SAVING' | translate) : ('JOURNAL.BTN_SAVE' | translate) }}</button>
+                  <button class="view-btn" (click)="cancel()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; padding: 6px 14px; cursor: pointer;">{{ 'JOURNAL.BTN_CANCEL' | translate }}</button>
                 </div>
               </div>
             } @else {
@@ -44,7 +44,7 @@
                   @if (t.note) {
                     <p style="margin: 0; font-size: 14px; color: var(--text-color); white-space: pre-wrap;">{{ t.note }}</p>
                   } @else {
-                    <p class="muted" style="margin: 0; font-size: 13px; font-style: italic;">No note yet.</p>
+                    <p class="muted" style="margin: 0; font-size: 13px; font-style: italic;">{{ 'JOURNAL.NO_NOTE' | translate }}</p>
                   }
                   @if (tagList(t.tags).length) {
                     <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
@@ -55,14 +55,14 @@
                   }
                 </div>
                 <button class="view-btn" (click)="startEdit(t)" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; white-space: nowrap;">
-                  {{ t.note ? '✏️ Edit' : '📝 Add note' }}
+                  {{ t.note ? ('JOURNAL.BTN_EDIT' | translate) : ('JOURNAL.BTN_ADD_NOTE' | translate) }}
                 </button>
               </div>
             }
           </div>
         } @empty {
           <div class="text-center" style="padding: 30px;">
-            {{ tagFilter() ? 'No trades match that tag on this page.' : 'No trades yet — record one to start journaling.' }}
+            {{ tagFilter() ? ('JOURNAL.NO_TRADES_FILTER' | translate) : ('JOURNAL.NO_TRADES_YET' | translate) }}
           </div>
         }
       </div>

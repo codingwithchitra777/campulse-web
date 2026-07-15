@@ -5,12 +5,13 @@ import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { MoneyPipe } from '../../utils/money';
 import { Analytics } from '../../models';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /** Descriptive portfolio analytics (win rate, hold time, per-currency P/L). */
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CommonModule, MoneyPipe],
+  imports: [CommonModule, MoneyPipe, TranslatePipe],
   templateUrl: './analytics.html'
 })
 export class AnalyticsComponent {

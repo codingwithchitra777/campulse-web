@@ -7,12 +7,13 @@ import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { MoneyPipe } from '../../utils/money';
 import { CurrencyCode, MarketKind, PriceAlert } from '../../models';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /** Price alerts delivered to the user's linked Telegram when a symbol crosses a target. */
 @Component({
   selector: 'app-alerts',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MoneyPipe],
+  imports: [CommonModule, FormsModule, RouterLink, MoneyPipe, TranslatePipe],
   templateUrl: './alerts.html'
 })
 export class AlertsComponent {

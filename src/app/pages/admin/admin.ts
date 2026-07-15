@@ -2,6 +2,7 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { PagerComponent } from '../../components/pager/pager';
@@ -11,7 +12,7 @@ import { AdminStats, AdminUser, ManualPrice, Paginated, Trade } from '../../mode
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, PagerComponent, MoneyPipe],
+  imports: [CommonModule, FormsModule, PagerComponent, MoneyPipe, TranslatePipe],
   templateUrl: './admin.html'
 })
 export class AdminComponent {

@@ -48,10 +48,10 @@
         <div class="dashboard-panel ai-insight-card" style="margin-bottom: 24px; background: linear-gradient(145deg, #1e1b4b, #0f172a); border: 1px solid #312e81;">
           <div class="insight-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
             <span class="insight-icon">✨</span>
-            <span class="insight-title" style="font-size: 12px; font-weight: bold; letter-spacing: 0.5px; color: #a5b4fc; text-transform: uppercase;">AI Insight (Premium)</span>
+            <span class="insight-title" style="font-size: 12px; font-weight: bold; letter-spacing: 0.5px; color: #a5b4fc; text-transform: uppercase;">{{ 'AI_INSIGHT.TITLE' | translate }}</span>
           </div>
-          <p class="insight-text" style="font-size: 16px; font-style: italic; line-height: 1.5; color: #e0e7ff; margin-bottom: 0;">"You have achieved a 68% win rate this month. Consider taking profits on your PWSA position which has hit your historical target zones."</p>
-          <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid #4f46e5; color: #a5b4fc; border-radius: 20px; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 16px; transition: background 0.2s;">View Full AI Report</button>
+          <p class="insight-text" style="font-size: 16px; font-style: italic; line-height: 1.5; color: #e0e7ff; margin-bottom: 0;">{{ 'AI_INSIGHT.DESC' | translate }}</p>
+          <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid #4f46e5; color: #a5b4fc; border-radius: 20px; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 16px; transition: background 0.2s;">{{ 'AI_INSIGHT.BTN_VIEW_REPORT' | translate }}</button>
         </div>
       }
 

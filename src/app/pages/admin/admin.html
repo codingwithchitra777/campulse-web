@@ -1,15 +1,15 @@
 <div class="view-container animate-fade-in">
   <section class="metrics-grid">
     <div class="metric-card">
-      <span class="metric-title">Total Users</span>
+      <span class="metric-title">{{ 'ADMIN.TOTAL_USERS' | translate }}</span>
       <span class="metric-value">{{ stats.value().totalUsers | number }}</span>
     </div>
     <div class="metric-card">
-      <span class="metric-title">Total Trades</span>
+      <span class="metric-title">{{ 'ADMIN.TOTAL_TRADES' | translate }}</span>
       <span class="metric-value">{{ stats.value().totalTrades | number }}</span>
     </div>
     <div class="metric-card">
-      <span class="metric-title">Total Realised P/L</span>
+      <span class="metric-title">{{ 'ADMIN.TOTAL_REALISED' | translate }}</span>
       <span class="metric-value" [ngClass]="stats.value().totalRealisedPnl >= 0 ? 'text-profit' : 'text-loss'">
         {{ stats.value().totalRealisedPnl >= 0 ? '+' : '' }}{{ stats.value().totalRealisedPnl | number }} <span class="currency">riel</span>
       </span>
@@ -18,15 +18,14 @@
 
   <!-- Local gold price board -->
   <section class="history-panel" style="margin-bottom: 20px;">
-    <h2 class="panel-title">🥇 Local Gold Board</h2>
-    <p style="color: #9ca3af; font-size: 13px; margin-bottom: 12px;">
-      Set today's local Cambodian gold price (USD per <strong>chi</strong>, symbol XAU-KH). This values every user's gold holdings.
+    <h2 class="panel-title">🥇 {{ 'ADMIN.GOLD_BOARD_TITLE' | translate }}</h2>
+    <p style="color: #9ca3af; font-size: 13px; margin-bottom: 12px;" [innerHTML]="'ADMIN.GOLD_BOARD_DESC' | translate">
     </p>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-      <input type="number" step="any" min="0" [(ngModel)]="goldPrice" placeholder="e.g. 505.00"
+      <input type="number" step="any" min="0" [(ngModel)]="goldPrice" [placeholder]="'ADMIN.GOLD_PRICE_PLACEHOLDER' | translate"
              style="max-width: 200px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
       <button class="btn-primary" (click)="saveGoldPrice()" [disabled]="goldSaving()">
-        {{ goldSaving() ? 'Saving…' : 'Save price' }}
+        {{ goldSaving() ? ('ADMIN.BTN_SAVING' | translate) : ('ADMIN.BTN_SAVE_PRICE' | translate) }}
       </button>
       @if (goldMsg(); as m) { <span style="font-size: 13px; color: #9ca3af;">{{ m }}</span> }
     </div>
@@ -34,7 +33,7 @@
       <div style="margin-top: 12px; font-size: 13px; color: #cbd5e1;">
         @for (mp of manualPrices.value().items; track mp.symbol) {
           <div>Current <strong>{{ mp.symbol }}</strong>: <strong>{{ mp.price | money:mp.currency }}</strong>
-            <span style="color: #64748b;">(updated {{ mp.updatedAt | date:'short' }})</span>
+            <span style="color: #64748b;">{{ 'ADMIN.CURRENT_UPDATED' | translate:{date: (mp.updatedAt | date:'short')} }}</span>
           </div>
         }
       </div>
@@ -42,18 +41,18 @@
   </section>
 
   <div class="history-panel">
-    <h2 class="panel-title">👥 Users</h2>
+    <h2 class="panel-title">👥 {{ 'ADMIN.USERS_TITLE' | translate }}</h2>
     @if (users.isLoading()) {
-      <div class="panel-loader">Loading users...</div>
+      <div class="panel-loader">{{ 'ADMIN.LOADING_USERS' | translate }}</div>
     } @else {
       <div class="table-container">
         <table class="data-table">
           <thead>
             <tr>
-              <th>User ID</th>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Joined</th>
+              <th>{{ 'ADMIN.COL_USER_ID' | translate }}</th>
+              <th>{{ 'ADMIN.COL_NAME' | translate }}</th>
+              <th>{{ 'ADMIN.COL_ROLE' | translate }}</th>
+              <th>{{ 'ADMIN.COL_JOINED' | translate }}</th>
               <th></th>
             </tr>
           </thead>
@@ -71,16 +70,16 @@
                 <td>
                   @if (u.userId !== session.activeUserId()) {
                     <button class="topbar-icon-btn" (click)="toggleRole(u)">
-                      {{ u.role === 'admin' ? 'Demote' : 'Promote' }}
+                      {{ u.role === 'admin' ? ('ADMIN.BTN_DEMOTE' | translate) : ('ADMIN.BTN_PROMOTE' | translate) }}
                     </button>
                   } @else {
-                    <span class="text-muted">You</span>
+                    <span class="text-muted">{{ 'ADMIN.YOU' | translate }}</span>
                   }
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="text-center">No users found.</td>
+                <td colspan="5" class="text-center">{{ 'ADMIN.NO_USERS' | translate }}</td>
               </tr>
             }
           </tbody>
@@ -97,21 +96,21 @@
   </div>
 
   <div class="history-panel">
-    <h2 class="panel-title">📜 All Trades</h2>
+    <h2 class="panel-title">📜 {{ 'ADMIN.ALL_TRADES_TITLE' | translate }}</h2>
     @if (trades.isLoading()) {
-      <div class="panel-loader">Loading trades...</div>
+      <div class="panel-loader">{{ 'ADMIN.LOADING_TRADES' | translate }}</div>
     } @else {
       <div class="table-container">
         <table class="data-table">
           <thead>
             <tr>
-              <th>User ID</th>
-              <th>Ticker</th>
-              <th>Side</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Commission</th>
-              <th>Date</th>
+              <th>{{ 'ADMIN.COL_USER_ID' | translate }}</th>
+              <th>{{ 'HISTORY.COL_STOCK' | translate }}</th>
+              <th>{{ 'HISTORY.COL_ACTION' | translate }}</th>
+              <th>{{ 'HISTORY.COL_QTY' | translate }}</th>
+              <th>{{ 'HISTORY.COL_PRICE' | translate }}</th>
+              <th>{{ 'HISTORY.COL_COMMISSION' | translate }}</th>
+              <th>{{ 'HISTORY.COL_DATE' | translate }}</th>
             </tr>
           </thead>
           <tbody>

@@ -8,11 +8,13 @@ import { SessionService } from '../../services/session.service';
 import { MoneyPipe } from '../../utils/money';
 import { CurrencyCode, MarketKind, NewsItem, WatchlistItem } from '../../models';
 
+import { TranslatePipe } from '@ngx-translate/core';
+
 /** Track symbols you don't own; live quotes per market + Finnhub news for US symbols. */
 @Component({
   selector: 'app-watchlist',
   standalone: true,
-  imports: [CommonModule, FormsModule, MoneyPipe],
+  imports: [CommonModule, FormsModule, MoneyPipe, TranslatePipe],
   templateUrl: './watchlist.html'
 })
 export class WatchlistComponent {

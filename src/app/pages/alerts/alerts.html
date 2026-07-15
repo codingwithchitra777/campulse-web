@@ -1,13 +1,13 @@
 <div class="view-container animate-fade-in">
   <div class="portfolio-header-area" style="margin-bottom: 20px;">
-    <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">🔔 Price Alerts</h2>
-    <p class="muted" style="margin: 0; font-size: 14px;">Get a Telegram message when a symbol crosses your target price.</p>
+    <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">🔔 {{ 'ALERTS.TITLE' | translate }}</h2>
+    <p class="muted" style="margin: 0; font-size: 14px;">{{ 'ALERTS.SUBTITLE' | translate }}</p>
   </div>
 
   @if (!alerts.value().deliverable) {
     <div class="alert info" style="margin-bottom: 16px;">
-      🔗 Alerts are delivered to your <strong>linked Telegram</strong>. Connect one on the
-      <a routerLink="/settings" style="text-decoration: underline;">Settings</a> page to receive them.
+      🔗 {{ 'ALERTS.INFO' | translate }} <strong>linked Telegram</strong>. Connect one on the
+      <a routerLink="/settings" style="text-decoration: underline;">{{ 'ALERTS.SETTINGS_LINK' | translate }}</a> {{ 'ALERTS.INFO_END' | translate }}
     </div>
   }
 
@@ -15,25 +15,25 @@
   <div class="dashboard-panel" style="margin-bottom: 20px; padding: 16px;">
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
       <div class="radio-group" style="display: flex; gap: 8px;">
-        <label class="radio-label"><input type="radio" name="amarket" [(ngModel)]="market" value="CSX" (ngModelChange)="onMarketChange()"><span class="radio-custom">🇰🇭 CSX</span></label>
-        <label class="radio-label"><input type="radio" name="amarket" [(ngModel)]="market" value="US" (ngModelChange)="onMarketChange()"><span class="radio-custom">🇺🇸 US</span></label>
-        <label class="radio-label"><input type="radio" name="amarket" [(ngModel)]="market" value="GOLD_KH" (ngModelChange)="onMarketChange()"><span class="radio-custom">🥇 Gold</span></label>
+        <label class="radio-label"><input type="radio" name="amarket" [(ngModel)]="market" value="CSX" (ngModelChange)="onMarketChange()"><span class="radio-custom">🇰🇭 {{ 'ALERTS.MARKET_CSX' | translate }}</span></label>
+        <label class="radio-label"><input type="radio" name="amarket" [(ngModel)]="market" value="US" (ngModelChange)="onMarketChange()"><span class="radio-custom">🇺🇸 {{ 'ALERTS.MARKET_US' | translate }}</span></label>
+        <label class="radio-label"><input type="radio" name="amarket" [(ngModel)]="market" value="GOLD_KH" (ngModelChange)="onMarketChange()"><span class="radio-custom">🥇 {{ 'ALERTS.MARKET_GOLD' | translate }}</span></label>
       </div>
-      <input type="text" [(ngModel)]="symbolInput" [disabled]="market === 'GOLD_KH'" placeholder="Symbol e.g. AAPL"
+      <input type="text" [(ngModel)]="symbolInput" [disabled]="market === 'GOLD_KH'" [placeholder]="'ALERTS.SYMBOL_PLACEHOLDER' | translate"
              style="min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
-      <input type="number" step="any" min="0" [(ngModel)]="targetPrice" placeholder="Target ({{ currency }})"
+      <input type="number" step="any" min="0" [(ngModel)]="targetPrice" [placeholder]="'ALERTS.TARGET_PLACEHOLDER' | translate:{currency: currency}"
              style="min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
-      <button class="btn-primary" (click)="add()" [disabled]="adding()">{{ adding() ? 'Adding…' : '➕ Add alert' }}</button>
+      <button class="btn-primary" (click)="add()" [disabled]="adding()">{{ adding() ? ('ALERTS.BTN_ADDING' | translate) : '➕ ' + ('ALERTS.BTN_ADD' | translate) }}</button>
     </div>
-    <p class="muted" style="font-size: 11px; margin: 8px 0 0;">Direction is set automatically from the current price (above if your target is higher, otherwise below).</p>
+    <p class="muted" style="font-size: 11px; margin: 8px 0 0;">{{ 'ALERTS.DIRECTION_NOTE' | translate }}</p>
     @if (error(); as e) { <div class="alert error" style="margin-top: 10px;">{{ e }}</div> }
   </div>
 
   <!-- Active -->
   <div class="dashboard-panel" style="margin-bottom: 20px; padding: 0;">
-    <h3 class="panel-title" style="font-size: 18px; padding: 16px 16px 0;">Active</h3>
+    <h3 class="panel-title" style="font-size: 18px; padding: 16px 16px 0;">{{ 'ALERTS.ACTIVE_TITLE' | translate }}</h3>
     @if (alerts.isLoading()) {
-      <div class="panel-loader">Loading...</div>
+      <div class="panel-loader">{{ 'ALERTS.LOADING' | translate }}</div>
     } @else {
       <div class="table-container" style="margin-top: 12px;">
         <table class="data-table" style="width: 100%;">
@@ -47,14 +47,14 @@
                   }
                 </td>
                 <td>
-                  when price goes <strong>{{ a.direction }}</strong> {{ a.targetPrice | money:a.currency }}
+                  {{ 'ALERTS.WHEN_PRICE' | translate }} <strong>{{ a.direction }}</strong> {{ a.targetPrice | money:a.currency }}
                 </td>
                 <td style="text-align: right; padding-right: 16px;">
-                  <button class="btn-danger" (click)="remove(a)" style="border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer;">Remove</button>
+                  <button class="btn-danger" (click)="remove(a)" style="border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer;">{{ 'ALERTS.BTN_REMOVE' | translate }}</button>
                 </td>
               </tr>
             } @empty {
-              <tr><td class="text-center" style="padding: 24px;">No active alerts. Add one above.</td></tr>
+              <tr><td class="text-center" style="padding: 24px;">{{ 'ALERTS.NO_ACTIVE' | translate }}</td></tr>
             }
           </tbody>
         </table>
@@ -65,7 +65,7 @@
   <!-- Triggered -->
   @if (triggeredAlerts().length) {
     <div class="dashboard-panel" style="padding: 0;">
-      <h3 class="panel-title" style="font-size: 18px; padding: 16px 16px 0;">Triggered</h3>
+      <h3 class="panel-title" style="font-size: 18px; padding: 16px 16px 0;">{{ 'ALERTS.TRIGGERED_TITLE' | translate }}</h3>
       <div class="table-container" style="margin-top: 12px;">
         <table class="data-table" style="width: 100%;">
           <tbody>
@@ -75,7 +75,7 @@
                 <td>{{ a.direction }} {{ a.targetPrice | money:a.currency }}</td>
                 <td class="muted" style="font-size: 12px;">{{ a.triggeredAt | date:'medium' }}</td>
                 <td style="text-align: right; padding-right: 16px;">
-                  <button class="btn-danger" (click)="remove(a)" style="border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer;">Clear</button>
+                  <button class="btn-danger" (click)="remove(a)" style="border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer;">{{ 'ALERTS.BTN_CLEAR' | translate }}</button>
                 </td>
               </tr>
             }

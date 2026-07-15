@@ -5,6 +5,7 @@ import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { ThemeService } from '../../services/theme.service';
 import { LinkCodeResponse, LinkedAccount } from '../../models';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * Account settings — "Connected accounts". Lets a signed-in (Google) user link a
@@ -15,7 +16,7 @@ import { LinkCodeResponse, LinkedAccount } from '../../models';
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './settings.html',
   styleUrl: './settings.css'
 })

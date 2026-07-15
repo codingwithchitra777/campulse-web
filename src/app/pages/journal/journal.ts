@@ -7,12 +7,13 @@ import { SessionService } from '../../services/session.service';
 import { PagerComponent } from '../../components/pager/pager';
 import { MoneyPipe } from '../../utils/money';
 import { Paginated, Trade } from '../../models';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /** Trade journal — annotate each trade with a note + tags (the reflection layer). */
 @Component({
   selector: 'app-journal',
   standalone: true,
-  imports: [CommonModule, FormsModule, PagerComponent, MoneyPipe],
+  imports: [CommonModule, FormsModule, PagerComponent, MoneyPipe, TranslatePipe],
   templateUrl: './journal.html'
 })
 export class JournalComponent {

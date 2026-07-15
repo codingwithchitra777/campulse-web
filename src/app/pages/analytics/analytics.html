@@ -1,60 +1,60 @@
 <div class="view-container animate-fade-in">
   <div class="portfolio-header-area" style="margin-bottom: 24px;">
-    <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">📊 Analytics</h2>
-    <p class="muted" style="margin: 0; font-size: 14px;">Your trading performance, computed from your own trade history.</p>
+    <h2 class="panel-title" style="margin-bottom: 8px; font-size: 28px;">📊 {{ 'ANALYTICS.TITLE' | translate }}</h2>
+    <p class="muted" style="margin: 0; font-size: 14px;">{{ 'ANALYTICS.SUBTITLE' | translate }}</p>
   </div>
 
   @if (analytics.isLoading()) {
-    <div class="panel-loader">Loading analytics...</div>
+    <div class="panel-loader">{{ 'ANALYTICS.LOADING' | translate }}</div>
   } @else {
     @let a = analytics.value();
 
     <!-- Headline stats -->
     <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px;">
       <div class="dashboard-panel metric-card" style="padding: 16px;">
-        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">WIN RATE</div>
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">{{ 'ANALYTICS.WIN_RATE' | translate }}</div>
         <div class="font-bold" style="font-size: 26px;">{{ a.winRate | number:'1.0-1' }}%</div>
-        <div class="muted" style="font-size: 12px; margin-top: 4px;">{{ a.wins }}W · {{ a.losses }}L of {{ a.closedTradeCount }} closed</div>
+        <div class="muted" style="font-size: 12px; margin-top: 4px;">{{ 'ANALYTICS.WINS_LOSSES' | translate:{wins: a.wins, losses: a.losses, closed: a.closedTradeCount} }}</div>
       </div>
       <div class="dashboard-panel metric-card" style="padding: 16px;">
-        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">AVG HOLD TIME</div>
-        <div class="font-bold" style="font-size: 26px;">{{ a.avgHoldDays | number:'1.0-0' }} <span style="font-size: 14px;">days</span></div>
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">{{ 'ANALYTICS.AVG_HOLD_TIME' | translate }}</div>
+        <div class="font-bold" style="font-size: 26px;">{{ a.avgHoldDays | number:'1.0-0' }} <span style="font-size: 14px;">{{ 'ANALYTICS.DAYS' | translate }}</span></div>
       </div>
       <div class="dashboard-panel metric-card" style="padding: 16px;">
-        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">TOTAL TRADES</div>
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">{{ 'ANALYTICS.TOTAL_TRADES' | translate }}</div>
         <div class="font-bold" style="font-size: 26px;">{{ a.tradeCount }}</div>
-        <div class="muted" style="font-size: 12px; margin-top: 4px;">{{ a.buyCount }} buys · {{ a.sellCount }} sells</div>
+        <div class="muted" style="font-size: 12px; margin-top: 4px;">{{ 'ANALYTICS.BUYS_SELLS' | translate:{buys: a.buyCount, sells: a.sellCount} }}</div>
       </div>
     </div>
 
     <!-- Best / worst closed trade -->
     <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
       <div class="dashboard-panel metric-card" style="padding: 16px;">
-        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">🏆 BEST CLOSED TRADE</div>
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">🏆 {{ 'ANALYTICS.BEST_CLOSED' | translate }}</div>
         @if (a.bestTrade; as b) {
           <div class="font-bold" style="font-size: 18px;">{{ b.ticker }}</div>
           <div class="text-profit font-bold" style="font-size: 20px;">{{ b.realisedPnl | money:b.currency:true }}</div>
           <div class="muted" style="font-size: 12px;">{{ b.sellDate | date:'mediumDate' }}</div>
-        } @else { <div class="muted" style="font-size: 13px;">No closed trades yet.</div> }
+        } @else { <div class="muted" style="font-size: 13px;">{{ 'ANALYTICS.NO_CLOSED' | translate }}</div> }
       </div>
       <div class="dashboard-panel metric-card" style="padding: 16px;">
-        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">📉 WORST CLOSED TRADE</div>
+        <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">📉 {{ 'ANALYTICS.WORST_CLOSED' | translate }}</div>
         @if (a.worstTrade; as w) {
           <div class="font-bold" style="font-size: 18px;">{{ w.ticker }}</div>
           <div [ngClass]="w.realisedPnl >= 0 ? 'text-profit' : 'text-loss'" class="font-bold" style="font-size: 20px;">{{ w.realisedPnl | money:w.currency:true }}</div>
           <div class="muted" style="font-size: 12px;">{{ w.sellDate | date:'mediumDate' }}</div>
-        } @else { <div class="muted" style="font-size: 13px;">No closed trades yet.</div> }
+        } @else { <div class="muted" style="font-size: 13px;">{{ 'ANALYTICS.NO_CLOSED' | translate }}</div> }
       </div>
     </div>
 
     <!-- Per-currency breakdown -->
     <div class="dashboard-panel" style="margin-bottom: 24px;">
-      <h3 class="panel-title" style="font-size: 18px;">By currency</h3>
+      <h3 class="panel-title" style="font-size: 18px;">{{ 'ANALYTICS.BY_CURRENCY' | translate }}</h3>
       <div class="table-container">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Currency</th><th>Value</th><th>Invested</th><th>Unrealized</th><th>Realized</th><th>W/L</th>
+              <th>{{ 'ANALYTICS.COL_CURRENCY' | translate }}</th><th>{{ 'ANALYTICS.COL_VALUE' | translate }}</th><th>{{ 'ANALYTICS.COL_INVESTED' | translate }}</th><th>{{ 'ANALYTICS.COL_UNREALIZED' | translate }}</th><th>{{ 'ANALYTICS.COL_REALIZED' | translate }}</th><th>{{ 'ANALYTICS.COL_WL' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -68,7 +68,7 @@
                 <td>{{ c.wins }}/{{ c.losses }}</td>
               </tr>
             } @empty {
-              <tr><td colspan="6" class="text-center" style="padding: 24px;">No trades yet — record one to see your stats.</td></tr>
+              <tr><td colspan="6" class="text-center" style="padding: 24px;">{{ 'ANALYTICS.NO_TRADES' | translate }}</td></tr>
             }
           </tbody>
         </table>
@@ -78,11 +78,11 @@
     <!-- Performance by journal tag -->
     @if (a.byTag.length) {
       <div class="dashboard-panel" style="margin-bottom: 24px;">
-        <h3 class="panel-title" style="font-size: 18px;">Performance by tag</h3>
-        <p class="muted" style="font-size: 12px; margin: -4px 0 12px;">How your journal tags actually performed — win rate per tag across closed trades. Tag entries in the Journal to see patterns here.</p>
+        <h3 class="panel-title" style="font-size: 18px;">{{ 'ANALYTICS.BY_TAG' | translate }}</h3>
+        <p class="muted" style="font-size: 12px; margin: -4px 0 12px;">{{ 'ANALYTICS.BY_TAG_DESC' | translate }}</p>
         <div class="table-container">
           <table class="data-table">
-            <thead><tr><th>Tag</th><th>Closed trades</th><th>W / L</th><th>Win rate</th></tr></thead>
+            <thead><tr><th>{{ 'ANALYTICS.COL_TAG' | translate }}</th><th>{{ 'ANALYTICS.COL_CLOSED_TRADES' | translate }}</th><th>{{ 'ANALYTICS.COL_WL' | translate }}</th><th>{{ 'ANALYTICS.COL_WIN_RATE' | translate }}</th></tr></thead>
             <tbody>
               @for (t of a.byTag; track t.tag) {
                 <tr>

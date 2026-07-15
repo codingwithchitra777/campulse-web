@@ -4,7 +4,7 @@
     
     <!-- Hero Section -->
     <section class="dashboard-hero">
-      <h1 class="greeting">Good Morning, {{ userName() }} 👋</h1>
+      <h1 class="greeting">{{ 'DASHBOARD.GREETING' | translate:{name: userName()} }}</h1>
       
       <div class="portfolio-summary-cards">
         
@@ -12,12 +12,12 @@
         <div class="summary-card">
           <div class="card-label">
             <span class="label-icon">📄</span>
-            PORTFOLIO VALUE
+            {{ 'DASHBOARD.PORTFOLIO_VALUE' | translate }}
           </div>
           <div class="card-value">{{ totalPortfolioValue() | number }} <span class="currency">riel</span></div>
           <div class="card-subtitle">
             <span class="badge profit-badge">↗ +1.2%</span>
-            <span class="subtitle-text">vs yesterday</span>
+            <span class="subtitle-text">{{ 'DASHBOARD.VS_YESTERDAY' | translate }}</span>
           </div>
         </div>
         
@@ -25,7 +25,7 @@
         <div class="summary-card">
           <div class="card-label">
             <span class="label-icon">📅</span>
-            TODAY'S GAIN
+            {{ 'DASHBOARD.TODAYS_GAIN' | translate }}
           </div>
           <div class="card-value" [ngClass]="totalUnrealisedPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
             {{ totalUnrealisedPnl() >= 0 ? '+' : '' }}{{ totalUnrealisedPnl() | number }} <span class="currency">riel</span>
@@ -34,7 +34,7 @@
             <div class="progress-bar-container">
               <div class="progress-bar-fill" style="width: 65%;"></div>
             </div>
-            <span class="subtitle-text">Target 65%</span>
+            <span class="subtitle-text">{{ 'DASHBOARD.TARGET' | translate }}</span>
           </div>
         </div>
 
@@ -42,7 +42,7 @@
         <div class="summary-card">
           <div class="card-label">
             <span class="label-icon">📈</span>
-            TOTAL RETURN
+            {{ 'DASHBOARD.TOTAL_RETURN' | translate }}
           </div>
           <div class="card-value" [ngClass]="totalPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
             {{ totalPnl() >= 0 ? '+' : '' }}{{ totalPnl() | number }} <span class="currency">riel</span>
@@ -56,7 +56,7 @@
                 0.0%
               }
             </span>
-            <span class="subtitle-text">All time</span>
+            <span class="subtitle-text">{{ 'DASHBOARD.ALL_TIME' | translate }}</span>
           </div>
         </div>
 
@@ -93,15 +93,15 @@
         <div class="ai-insight-card">
           <div class="insight-header">
             <span class="insight-icon">✨</span>
-            <span class="insight-title">AI Insight (Premium)</span>
+            <span class="insight-title">{{ 'AI_INSIGHT.TITLE' | translate }}</span>
           </div>
-          <p class="insight-text">"You have achieved a 68% win rate this month. Consider taking profits on your PWSA position which has hit your historical target zones."</p>
-          <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 20px; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 16px; transition: background 0.2s;">View Full AI Report</button>
+          <p class="insight-text">{{ 'AI_INSIGHT.DESC' | translate }}</p>
+          <button class="view-btn" (click)="showComingSoon()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 20px; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 16px; transition: background 0.2s;">{{ 'AI_INSIGHT.BTN_VIEW_REPORT' | translate }}</button>
         </div>
 
         <!-- Recent Trades -->
         <div class="dashboard-panel">
-          <h2 class="panel-title">Recent Trades</h2>
+          <h2 class="panel-title">{{ 'DASHBOARD.RECENT_TRADES' | translate }}</h2>
           <div class="recent-trades-list">
             @for (t of recentTrades.value().items; track t.tradeId) {
               <div class="trade-item">
@@ -120,7 +120,7 @@
                 </div>
               </div>
             } @empty {
-              <div class="text-center" style="color: #64748b; font-size: 13px;">No recent trades.</div>
+              <div class="text-center" style="color: #64748b; font-size: 13px;">{{ 'DASHBOARD.NO_RECENT_TRADES' | translate }}</div>
             }
           </div>
         </div>
@@ -131,10 +131,10 @@
         
         <!-- Market Movers -->
         <div class="dashboard-panel">
-          <h2 class="panel-title">Market Movers</h2>
+          <h2 class="panel-title">{{ 'DASHBOARD.MARKET_MOVERS' | translate }}</h2>
           
           <div class="movers-section">
-            <h3 class="movers-subtitle text-profit">🔥 Top Winners</h3>
+            <h3 class="movers-subtitle text-profit">{{ 'DASHBOARD.TOP_WINNERS' | translate }}</h3>
             <div class="movers-list">
               @for (winner of marketWinners(); track winner.ticker) {
                 <div class="mover-item">
@@ -142,13 +142,13 @@
                   <span class="mover-change text-profit">{{ formatChange(winner) }}</span>
                 </div>
               } @empty {
-                <div class="text-center" style="color: #64748b; font-size: 13px;">No data</div>
+                <div class="text-center" style="color: #64748b; font-size: 13px;">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
               }
             </div>
           </div>
 
           <div class="movers-section mt-15">
-            <h3 class="movers-subtitle text-loss">❄️ Top Losers</h3>
+            <h3 class="movers-subtitle text-loss">{{ 'DASHBOARD.TOP_LOSERS' | translate }}</h3>
             <div class="movers-list">
               @for (loser of marketLosers(); track loser.ticker) {
                 <div class="mover-item">
@@ -156,7 +156,7 @@
                   <span class="mover-change text-loss">{{ formatChange(loser) }}</span>
                 </div>
               } @empty {
-                <div class="text-center" style="color: #64748b; font-size: 13px;">No data</div>
+                <div class="text-center" style="color: #64748b; font-size: 13px;">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
               }
             </div>
           </div>
@@ -165,9 +165,9 @@
         <!-- Premium Upgrade Card -->
         <div class="premium-upgrade-card">
           <div class="crown-icon">👑</div>
-          <h3>Upgrade to Premium</h3>
-          <p>Get full access to AI insights, LIFO simulations, and custom real-time alerts.</p>
-          <button class="upgrade-btn">View Plans</button>
+          <h3>{{ 'DASHBOARD.PREMIUM_TITLE' | translate }}</h3>
+          <p>{{ 'DASHBOARD.PREMIUM_DESC' | translate }}</p>
+          <button class="upgrade-btn">{{ 'DASHBOARD.BTN_VIEW_PLANS' | translate }}</button>
         </div>
 
       </div>
@@ -200,9 +200,9 @@
       
       <div class="locked-analytics-overlay" style="margin-top: 40px; border-radius: 12px; background: rgba(30, 41, 59, 0.5);">
         <div class="locked-icon-wrapper">🔒</div>
-        <h3 class="locked-title">Sign in to view your dashboard</h3>
+        <h3 class="locked-title">{{ 'DASHBOARD.GUEST_TITLE' | translate }}</h3>
         <p class="locked-desc">
-          Sign in with your Google account to record trades, track your realized and unrealized profits, and see matching lots.
+          {{ 'DASHBOARD.GUEST_DESC' | translate }}
         </p>
       </div>
     </section>
