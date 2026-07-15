@@ -109,7 +109,7 @@
                 <span class="mover-ticker-col">{{ stock.ticker }}</span>
                 <div class="mover-chart-col">
                   @if (sparklines.value()[stock.ticker]) {
-                    <app-sparkline [data]="sparklines.value()[stock.ticker]" [width]="120" [height]="35" style="max-width: 100%;"></app-sparkline>
+                    <app-sparkline [data]="sparklines.value()[stock.ticker]" [width]="160" [height]="50" style="max-width: 100%;"></app-sparkline>
                   }
                 </div>
                 <div class="mover-price-col">
