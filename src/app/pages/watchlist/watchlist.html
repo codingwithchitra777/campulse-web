@@ -49,8 +49,8 @@
                   {{ it.change !== null ? ((it.change >= 0 ? '▲ ' : '▼ ') + (it.change | number:'1.0-2')) : '—' }}
                 </td>
                 <td style="text-align: center; vertical-align: middle;">
-                  @if (it.market === 'CSX' && sparklines.value()?.[it.symbol]) {
-                    <app-sparkline [data]="sparklines.value()![it.symbol]"></app-sparkline>
+                  @if (it.market === 'CSX' && sparklines.value()[it.symbol]) {
+                    <app-sparkline [data]="sparklines.value()[it.symbol]"></app-sparkline>
                   } @else {
                     <span style="color: #64748b;">—</span>
                   }

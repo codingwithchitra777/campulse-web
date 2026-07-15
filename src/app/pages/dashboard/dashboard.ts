@@ -13,7 +13,7 @@ import { of } from 'rxjs';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, RouterLink, SparklineComponent],
+  imports: [CommonModule, TranslatePipe, SparklineComponent],
   templateUrl: './dashboard.html'
 })
 export class DashboardComponent implements OnDestroy {
