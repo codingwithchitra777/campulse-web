@@ -8,6 +8,7 @@ import {
   GoogleAuthResponse,
   Holding,
   NewsItem,
+  PriceAlert,
   WatchlistItem,
   LinkCodeResponse,
   LinkedAccount,
@@ -141,6 +142,18 @@ export class ApiService {
     return this.http.get<{ symbol: string; news: NewsItem[] }>(`${this.baseUrl}/api/market/news/${symbol}`, {
       params: { days }
     });
+  }
+
+  getAlerts(): Observable<{ items: PriceAlert[]; deliverable: boolean }> {
+    return this.http.get<{ items: PriceAlert[]; deliverable: boolean }>(`${this.baseUrl}/api/alerts`);
+  }
+
+  createAlert(body: { symbol: string; targetPrice: number; market?: string; currency?: string; direction?: 'above' | 'below' }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/api/alerts`, body);
+  }
+
+  removeAlert(alertId: string): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/alerts/${alertId}`);
   }
 
   getChartsTimeline(): Observable<any> {

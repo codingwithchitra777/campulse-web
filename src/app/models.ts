@@ -360,6 +360,20 @@ export interface NewsItem {
   category: string | null;
 }
 
+/** /api/alerts item — a one-shot price alert delivered via linked Telegram. */
+export interface PriceAlert {
+  alertId: string;
+  market: MarketKind;
+  symbol: string;
+  currency: CurrencyCode;
+  targetPrice: number;
+  direction: 'above' | 'below';
+  active: boolean;
+  /** ISO datetime string. */
+  createdAt: string | null;
+  triggeredAt: string | null;
+}
+
 /** Wrapped shape returned by paginated list endpoints (/api/trades, /api/admin/users, /api/admin/trades). */
 export interface Paginated<T> {
   items: T[];
