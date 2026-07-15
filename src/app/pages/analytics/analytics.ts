@@ -23,7 +23,7 @@ export class AnalyticsComponent {
     defaultValue: {
       tradeCount: 0, buyCount: 0, sellCount: 0, closedTradeCount: 0,
       wins: 0, losses: 0, winRate: 0, avgHoldDays: 0,
-      bestTrade: null, worstTrade: null, byCurrency: [], byMarket: []
+      bestTrade: null, worstTrade: null, byCurrency: [], byMarket: [], byTag: []
     } as Analytics
   });
 }

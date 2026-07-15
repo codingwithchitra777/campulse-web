@@ -324,6 +324,14 @@ export interface ClosedTradeSummary {
   sellDate: string;
 }
 
+export interface AnalyticsTag {
+  tag: string;
+  trades: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+}
+
 export interface Analytics {
   tradeCount: number;
   buyCount: number;
@@ -337,6 +345,7 @@ export interface Analytics {
   worstTrade: ClosedTradeSummary | null;
   byCurrency: AnalyticsCurrency[];
   byMarket: AnalyticsMarket[];
+  byTag: AnalyticsTag[];
 }
 
 /** /api/watchlist item — a tracked symbol with a live quote. */

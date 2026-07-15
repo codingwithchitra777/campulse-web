@@ -75,6 +75,29 @@
       </div>
     </div>
 
+    <!-- Performance by journal tag -->
+    @if (a.byTag.length) {
+      <div class="dashboard-panel" style="margin-bottom: 24px;">
+        <h3 class="panel-title" style="font-size: 18px;">Performance by tag</h3>
+        <p class="muted" style="font-size: 12px; margin: -4px 0 12px;">How your journal tags actually performed — win rate per tag across closed trades. Tag entries in the Journal to see patterns here.</p>
+        <div class="table-container">
+          <table class="data-table">
+            <thead><tr><th>Tag</th><th>Closed trades</th><th>W / L</th><th>Win rate</th></tr></thead>
+            <tbody>
+              @for (t of a.byTag; track t.tag) {
+                <tr>
+                  <td><span style="font-size: 12px; font-weight: 500; color: #a5b4fc; background: rgba(99,102,241,0.12); padding: 2px 8px; border-radius: 10px;">#{{ t.tag }}</span></td>
+                  <td>{{ t.trades }}</td>
+                  <td>{{ t.wins }} / {{ t.losses }}</td>
+                  <td class="font-bold" [ngClass]="t.winRate >= 50 ? 'text-profit' : 'text-loss'">{{ t.winRate | number:'1.0-0' }}%</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
     <!-- Allocation by market -->
     @if (a.byMarket.length) {
       <div class="dashboard-panel">
