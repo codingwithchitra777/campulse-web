@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
  * USD shows a leading $ with two decimals. Keeps the app from hardcoding "riel"
  * now that positions can be in different currencies (see campulse-backend markets.py).
  */
-const SYMBOL: Record<string, string> = { KHR: '៛', USD: '$' };
+const SYMBOL: Record<string, string> = { KHR: 'riel', USD: '$' };
 const DECIMALS: Record<string, number> = { KHR: 0, USD: 2 };
 
 export function currencySymbol(currency?: string | null): string {
