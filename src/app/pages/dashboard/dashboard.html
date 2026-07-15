@@ -89,52 +89,37 @@
           }
         </div>
 
-        <!-- Market Movers -->
+        <!-- Market Overview -->
         <div class="dashboard-panel">
-          <h2 class="panel-title">{{ 'DASHBOARD.MARKET_MOVERS' | translate }}</h2>
-          
-          <div class="movers-section">
-            <h3 class="movers-subtitle text-profit">{{ 'DASHBOARD.TOP_WINNERS' | translate }}</h3>
-            <div class="movers-list">
-              @for (winner of marketWinners(); track winner.ticker) {
-                <div class="mover-item">
-                  <span class="mover-ticker" style="flex: 0 0 80px; font-weight: bold; font-size: 1.1em;">{{ winner.ticker }}</span>
-                  <div style="flex: 1; display: flex; justify-content: center; padding: 0 15px;">
-                    @if (sparklines.value()[winner.ticker]) {
-                      <app-sparkline [data]="sparklines.value()[winner.ticker]" [width]="120" [height]="35"></app-sparkline>
-                    }
-                  </div>
-                  <div style="flex: 0 0 120px; text-align: right; display: flex; flex-direction: column; justify-content: center;">
-                    <span class="mover-price" style="font-weight: 600;">{{ winner.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
-                    <span class="mover-change text-profit" style="font-size: 0.85em; margin-top: 2px;">{{ formatChange(winner) }}</span>
-                  </div>
-                </div>
-              } @empty {
-                <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
-              }
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 class="panel-title" style="margin-bottom: 0;">{{ 'DASHBOARD.MARKET_OVERVIEW' | translate }}</h2>
+            <div class="sort-controls" style="display: flex; gap: 12px; font-size: 0.9em;">
+              <button (click)="setMarketSort('symbol')" [style.color]="marketSort() === 'symbol' ? 'var(--primary-color)' : 'var(--text-color)'" style="background: transparent; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px;">
+                Symbol @if (marketSort() === 'symbol') { <span style="font-size: 0.8em;">{{ marketSortDesc() ? '▼' : '▲' }}</span> }
+              </button>
+              <button (click)="setMarketSort('change')" [style.color]="marketSort() === 'change' ? 'var(--primary-color)' : 'var(--text-color)'" style="background: transparent; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px;">
+                Change @if (marketSort() === 'change') { <span style="font-size: 0.8em;">{{ marketSortDesc() ? '▼' : '▲' }}</span> }
+              </button>
             </div>
           </div>
-
-          <div class="movers-section mt-15">
-            <h3 class="movers-subtitle text-loss">{{ 'DASHBOARD.TOP_LOSERS' | translate }}</h3>
-            <div class="movers-list">
-              @for (loser of marketLosers(); track loser.ticker) {
-                <div class="mover-item">
-                  <span class="mover-ticker" style="flex: 0 0 80px; font-weight: bold; font-size: 1.1em;">{{ loser.ticker }}</span>
-                  <div style="flex: 1; display: flex; justify-content: center; padding: 0 15px;">
-                    @if (sparklines.value()[loser.ticker]) {
-                      <app-sparkline [data]="sparklines.value()[loser.ticker]" [width]="120" [height]="35"></app-sparkline>
-                    }
-                  </div>
-                  <div style="flex: 0 0 120px; text-align: right; display: flex; flex-direction: column; justify-content: center;">
-                    <span class="mover-price" style="font-weight: 600;">{{ loser.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
-                    <span class="mover-change text-loss" style="font-size: 0.85em; margin-top: 2px;">{{ formatChange(loser) }}</span>
-                  </div>
+          
+          <div class="movers-list">
+            @for (stock of sortedMarketList(); track stock.ticker) {
+              <div class="mover-item">
+                <span class="mover-ticker" style="flex: 0 0 80px; font-weight: bold; font-size: 1.1em;">{{ stock.ticker }}</span>
+                <div style="flex: 1; display: flex; justify-content: center; padding: 0 15px;">
+                  @if (sparklines.value()[stock.ticker]) {
+                    <app-sparkline [data]="sparklines.value()[stock.ticker]" [width]="120" [height]="35"></app-sparkline>
+                  }
                 </div>
-              } @empty {
-                <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
-              }
-            </div>
+                <div style="flex: 0 0 120px; text-align: right; display: flex; flex-direction: column; justify-content: center;">
+                  <span class="mover-price" style="font-weight: 600;">{{ stock.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
+                  <span class="mover-change" [ngClass]="(stock.change || 0) >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 0.85em; margin-top: 2px;">{{ formatChange(stock) }}</span>
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
+            }
           </div>
         </div>
 

@@ -418,21 +418,35 @@ export class DashboardComponent implements OnDestroy {
     defaultValue: {} as Record<string, number[]>
   });
 
-  readonly marketWinners = computed(() => {
+  marketSort = signal<'symbol' | 'change'>('change');
+  marketSortDesc = signal<boolean>(true);
+
+  readonly sortedMarketList = computed(() => {
     const prices = this.marketPrices.value() || [];
-    return prices
-      .filter(p => p.change !== null && p.change > 0)
-      .sort((a, b) => (b.change || 0) - (a.change || 0))
-      .slice(0, 10);
+    const csxPrices = prices.filter(p => p.market === 'CSX');
+    
+    return csxPrices.sort((a, b) => {
+      const sort = this.marketSort();
+      const desc = this.marketSortDesc() ? -1 : 1;
+      
+      if (sort === 'symbol') {
+        return a.ticker.localeCompare(b.ticker) * desc;
+      } else {
+        const changeA = a.change ? (a.change / (a.price - a.change)) : 0;
+        const changeB = b.change ? (b.change / (b.price - b.change)) : 0;
+        return (changeA - changeB) * desc;
+      }
+    });
   });
 
-  readonly marketLosers = computed(() => {
-    const prices = this.marketPrices.value() || [];
-    return prices
-      .filter(p => p.change !== null && p.change < 0)
-      .sort((a, b) => (a.change || 0) - (b.change || 0))
-      .slice(0, 10);
-  });
+  setMarketSort(field: 'symbol' | 'change') {
+    if (this.marketSort() === field) {
+      this.marketSortDesc.set(!this.marketSortDesc());
+    } else {
+      this.marketSort.set(field);
+      this.marketSortDesc.set(field === 'change');
+    }
+  }
 
   formatChange(p: Price): string {
     if (!p.change) return '0 (0.0%)';
