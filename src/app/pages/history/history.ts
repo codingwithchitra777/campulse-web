@@ -5,6 +5,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { PagerComponent } from '../../components/pager/pager';
+import { MoneyPipe } from '../../utils/money';
 import { Paginated, Price, Trade } from '../../models';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -14,7 +15,7 @@ const EXPORT_PAGE_SIZE = 200;
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule, FormsModule, PagerComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, PagerComponent, TranslatePipe, MoneyPipe],
   templateUrl: './history.html'
 })
 export class HistoryComponent {

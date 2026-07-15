@@ -10,38 +10,38 @@
         </div>
       </div>
 
-      <!-- Top Metrics Grid -->
-      <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div class="dashboard-panel metric-card" style="padding: 16px;">
-          <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">TOTAL VALUE</div>
-          <div class="font-bold" style="font-size: 24px; line-height: 1.2;">៛ {{ totalValue() | number }}</div>
-          <div class="muted" style="font-size: 12px; margin-top: 4px;">≈ ${{ totalValue() / 4100 | number:'1.0-0' }} USD</div>
-        </div>
-        
-        <div class="dashboard-panel metric-card" style="padding: 16px;">
-          <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">INVESTED CAPITAL</div>
-          <div class="font-bold" style="font-size: 24px; line-height: 1.2;">៛ {{ investedCapital() | number }}</div>
-        </div>
-
-        <div class="dashboard-panel metric-card" style="padding: 16px;">
-          <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">UNREALIZED P/L</div>
-          <div class="font-bold" style="font-size: 24px; line-height: 1.2; display: flex; align-items: center; justify-content: space-between;">
-            <span [ngClass]="totalUnrealizedPnl() >= 0 ? 'text-profit' : 'text-loss'">
-              {{ totalUnrealizedPnl() >= 0 ? '+' : '' }}៛ <br/> {{ (totalUnrealizedPnl() >= 0 ? totalUnrealizedPnl() : -totalUnrealizedPnl()) | number }}
-            </span>
-            <span class="badge" [ngClass]="totalUnrealizedPnlPercent() >= 0 ? 'badge-profit' : 'badge-loss'" style="font-size: 12px; padding: 4px 8px; border-radius: 12px; background: rgba(16, 185, 129, 0.1);">
-              {{ totalUnrealizedPnlPercent() >= 0 ? '↑' : '↓' }} {{ (totalUnrealizedPnlPercent() >= 0 ? totalUnrealizedPnlPercent() : -totalUnrealizedPnlPercent()) | number:'1.2-2' }}%
-            </span>
+      <!-- Per-currency summary — one card group per currency held (no FX blending) -->
+      @for (s of currencySummaries(); track s.currency) {
+        <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+          <div class="dashboard-panel metric-card" style="padding: 16px;">
+            <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">TOTAL VALUE · {{ s.currency }}</div>
+            <div class="font-bold" style="font-size: 24px; line-height: 1.2;">{{ s.value | money:s.currency }}</div>
+          </div>
+          <div class="dashboard-panel metric-card" style="padding: 16px;">
+            <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">INVESTED · {{ s.currency }}</div>
+            <div class="font-bold" style="font-size: 24px; line-height: 1.2;">{{ s.invested | money:s.currency }}</div>
+          </div>
+          <div class="dashboard-panel metric-card" style="padding: 16px;">
+            <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">UNREALIZED P/L · {{ s.currency }}</div>
+            <div class="font-bold" style="font-size: 22px; line-height: 1.2; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span [ngClass]="s.unrealised >= 0 ? 'text-profit' : 'text-loss'">{{ s.unrealised | money:s.currency:true }}</span>
+              <span class="badge" [ngClass]="s.unrealisedPct >= 0 ? 'badge-profit' : 'badge-loss'" style="font-size: 12px; padding: 4px 8px; border-radius: 12px; background: rgba(16, 185, 129, 0.1);">
+                {{ s.unrealisedPct >= 0 ? '↑' : '↓' }} {{ (s.unrealisedPct >= 0 ? s.unrealisedPct : -s.unrealisedPct) | number:'1.2-2' }}%
+              </span>
+            </div>
+          </div>
+          <div class="dashboard-panel metric-card" style="padding: 16px;">
+            <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">REALIZED P/L · {{ s.currency }}</div>
+            <div class="font-bold" [ngClass]="s.realised >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 24px; line-height: 1.2;">{{ s.realised | money:s.currency:true }}</div>
           </div>
         </div>
-
-        <div class="dashboard-panel metric-card" style="padding: 16px;">
-          <div class="muted font-bold" style="font-size: 11px; letter-spacing: 0.5px; margin-bottom: 8px;">REALIZED P/L</div>
-          <div class="font-bold" [ngClass]="totalRealizedPnl() >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 24px; line-height: 1.2;">
-            {{ totalRealizedPnl() >= 0 ? '+' : '' }}៛ <br/> {{ (totalRealizedPnl() >= 0 ? totalRealizedPnl() : -totalRealizedPnl()) | number }}
+      } @empty {
+        <div class="metrics-grid" style="margin-bottom: 24px;">
+          <div class="dashboard-panel metric-card" style="padding: 16px;">
+            <div class="muted" style="font-size: 13px;">No holdings yet.</div>
           </div>
         </div>
-      </div>
+      }
 
       <!-- AI Insight Card (Premium) -->
       @if (!session.isGuest()) {
@@ -144,11 +144,11 @@
                           </div>
                         </td>
                         <td style="padding: 16px 20px; font-size: 14px; color: var(--text-muted);">{{ h.remainingQty | number }}</td>
-                        <td style="padding: 16px 20px; font-size: 14px; color: var(--text-muted);">៛ {{ h.avgCostRemaining | number:'1.0-0' }}</td>
-                        <td style="padding: 16px 20px; font-size: 14px; color: var(--text-muted);">៛ {{ h.lastPrice | number }}</td>
+                        <td style="padding: 16px 20px; font-size: 14px; color: var(--text-muted);">{{ h.avgCostRemaining | money:h.currency }}</td>
+                        <td style="padding: 16px 20px; font-size: 14px; color: var(--text-muted);">{{ h.lastPrice | money:h.currency }}</td>
                         <td style="padding: 16px 20px; text-align: right;">
                           <div class="font-bold" [ngClass]="h.totalPnl >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 14px;">
-                            {{ h.totalPnl >= 0 ? '+' : '' }}៛ {{ (h.totalPnl >= 0 ? h.totalPnl : -h.totalPnl) | number }}
+                            {{ h.totalPnl | money:h.currency:true }}
                           </div>
                           <div [ngClass]="h.totalPnlPercent >= 0 ? 'text-profit' : 'text-loss'" style="font-size: 11px; opacity: 0.9;">
                             {{ h.totalPnlPercent >= 0 ? '+' : '' }}{{ h.totalPnlPercent | number:'1.2-2' }}%
@@ -261,13 +261,13 @@
               <div class="stat-box-html">
                 <span class="stat-label-html">{{ 'DASHBOARD.REALISED_PL' | translate }}</span>
                 <span class="stat-value-html" [ngClass]="details.realisedPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-                  {{ details.realisedPnl >= 0 ? '+' : '' }}{{ details.realisedPnl | number }} riel
+                  {{ details.realisedPnl | money:sel.currency:true }}
                 </span>
               </div>
               <div class="stat-box-html">
                 <span class="stat-label-html">{{ 'DASHBOARD.TOTAL_PL' | translate }}</span>
                 <span class="stat-value-html" [ngClass]="sel.totalPnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-                  {{ sel.totalPnl >= 0 ? '+' : '' }}{{ sel.totalPnl | number }} riel
+                  {{ sel.totalPnl | money:sel.currency:true }}
                   <span style="font-size: 11px; font-weight: normal; margin-left: 2px; opacity: 0.9;">
                     ({{ sel.totalPnlPercent >= 0 ? '+' : '' }}{{ sel.totalPnlPercent | number:'1.2-2' }}%)
                   </span>
@@ -297,7 +297,7 @@
                             <span class="status-indicator-dot" [ngClass]="buy.qtyOpen > 0 ? 'dot-active' : 'dot-sold'"></span>
                             {{ buy.qtyOpen > 0 ? ('PORTFOLIO.OPEN' | translate) : ('PORTFOLIO.SOLD' | translate) }} #{{ buy.seq }}
                           </td>
-                          <td>{{ buy.qtyOriginal | number }}@{{ buy.price | number }}</td>
+                          <td>{{ buy.qtyOriginal | number }} @ {{ buy.price | money:sel.currency }}</td>
                           <td class="font-bold text-align-right" [ngClass]="buy.qtyOpen > 0 ? 'text-profit-bright' : 'text-muted'">
                             {{ buy.qtyOpen | number }}
                           </td>
@@ -305,7 +305,7 @@
                             @let pnl = lotPnl(buy);
                             @if (pnl !== null) {
                               <span [ngClass]="pnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-                                {{ pnl >= 0 ? '+' : '' }}{{ pnl | number }}
+                                {{ pnl | money:sel.currency:true }}
                                 @let pnlPct = lotPnlPercent(buy);
                                 @if (pnlPct !== null) {
                                   <span class="pnl-pct">({{ pnlPct >= 0 ? '+' : '' }}{{ pnlPct | number:'1.2-2' }}%)</span>
@@ -344,9 +344,9 @@
                           <td colspan="3">
                             <div class="sell-main-row-html">
                               <span class="font-bold">#{{ sell.seq }}</span>
-                              <span>{{ sell.qty | number }}@{{ sell.price | number }}</span>
+                              <span>{{ sell.qty | number }} @ {{ sell.price | money:sel.currency }}</span>
                               <span class="font-bold" [ngClass]="sell.pnl >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-                                {{ sell.pnl >= 0 ? '+' : '' }}{{ sell.pnl | number }}
+                                {{ sell.pnl | money:sel.currency:true }}
                                 @let sellPct = sellPnlPercent(sell);
                                 @if (sellPct !== null) {
                                   <span class="pnl-pct">({{ sellPct >= 0 ? '+' : '' }}{{ sellPct | number:'1.2-2' }}%)</span>
@@ -358,7 +358,7 @@
                               <div class="sell-matches-container-html">
                                 @for (match of sell.matched; track $index) {
                                   <div class="sell-match-subrow-html">
-                                    ↳ Matched #{{ match.buySeq }}: {{ match.qty | number }}@{{ match.price | number }}
+                                    ↳ Matched #{{ match.buySeq }}: {{ match.qty | number }} @ {{ match.price | money:sel.currency }}
                                   </div>
                                 }
                               </div>
@@ -391,13 +391,13 @@
                   </div>
                   <div class="lot-body">
                     <div>{{ 'PORTFOLIO.DRAWER.REMAINING' | translate }}: <strong>{{ lot.qtyOpen }} / {{ lot.qtyOriginal }}</strong></div>
-                    <div>{{ 'PORTFOLIO.DRAWER.PRICE' | translate }}: <strong>{{ lot.price | number }} riel</strong></div>
+                    <div>{{ 'PORTFOLIO.DRAWER.PRICE' | translate }}: <strong>{{ lot.price | money:sel.currency }}</strong></div>
                     @let lotUnrealised = lotPnl(lot);
                     @if (lotUnrealised !== null) {
                       <div>
                         {{ 'DASHBOARD.UNREALISED_PL' | translate }}:
                         <strong [ngClass]="lotUnrealised >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-                          {{ lotUnrealised >= 0 ? '+' : '' }}{{ lotUnrealised | number }} riel
+                          {{ lotUnrealised | money:sel.currency:true }}
                         </strong>
                       </div>
                     }

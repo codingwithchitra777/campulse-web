@@ -5,13 +5,23 @@ import { map } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { Holding, HoldingView, PositionSell, YearlyPnl } from '../../models';
+import { MoneyPipe } from '../../utils/money';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Chart } from 'chart.js/auto';
+
+interface CurrencySummary {
+  currency: string;
+  value: number;
+  invested: number;
+  unrealised: number;
+  realised: number;
+  unrealisedPct: number;
+}
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule, TranslatePipe, MoneyPipe],
   templateUrl: './portfolio.html'
 })
 export class PortfolioComponent implements OnDestroy {
@@ -63,6 +73,28 @@ export class PortfolioComponent implements OnDestroy {
 
   readonly totalRealizedPnl = computed(() => {
     return this.portfolio.value()?.reduce((sum, h) => sum + h.realisedPnl, 0) || 0;
+  });
+
+  /**
+   * Per-currency roll-up. We never blend currencies into one number (no FX),
+   * so the summary cards show a set of totals — one per currency held (KHR / USD).
+   */
+  readonly currencySummaries = computed<CurrencySummary[]>(() => {
+    const groups = new Map<string, CurrencySummary>();
+    for (const h of this.portfolio.value() || []) {
+      if (h.remainingQty <= 0 && h.realisedPnl === 0) continue;
+      const cur = h.currency || 'KHR';
+      const g = groups.get(cur) || { currency: cur, value: 0, invested: 0, unrealised: 0, realised: 0, unrealisedPct: 0 };
+      g.value += (h.lastPrice || 0) * h.remainingQty;
+      g.invested += (h.avgCostRemaining || 0) * h.remainingQty;
+      g.unrealised += h.unrealisedPnl;
+      g.realised += h.realisedPnl;
+      groups.set(cur, g);
+    }
+    const out = Array.from(groups.values());
+    for (const g of out) g.unrealisedPct = g.invested > 0 ? (g.unrealised / g.invested) * 100 : 0;
+    // KHR first, then others alphabetically.
+    return out.sort((a, b) => (a.currency === 'KHR' ? -1 : b.currency === 'KHR' ? 1 : a.currency.localeCompare(b.currency)));
   });
 
   // Loads whenever a holding is selected; idle while nothing is selected.

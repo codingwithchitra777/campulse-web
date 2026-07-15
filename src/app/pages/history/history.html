@@ -39,16 +39,21 @@
             @for (t of trades.value().items; track t.tradeId) {
               <tr>
                 <td class="font-bold">#{{ t.seq }}</td>
-                <td class="font-bold">{{ t.ticker }}</td>
+                <td class="font-bold">
+                  {{ t.ticker }}
+                  @if (t.market && t.market !== 'CSX') {
+                    <span class="market-tag" style="font-size: 10px; font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 4px;">{{ t.market === 'GOLD_KH' ? 'GOLD' : t.market }}</span>
+                  }
+                </td>
                 <td>
                   <span class="trade-side-badge" [ngClass]="t.side === 'BUY' ? 'badge-buy' : 'badge-sell'">
                     {{ t.side === 'BUY' ? ('TRADE.BUY' | translate) : ('TRADE.SELL' | translate) }}
                   </span>
                 </td>
                 <td>{{ t.qty | number }}</td>
-                <td>{{ t.price | number }} riel</td>
-                <td class="font-bold">{{ (t.qty * t.price) | number }} riel</td>
-                <td class="text-muted">{{ t.commission | number }} riel</td>
+                <td>{{ t.price | money:t.currency }}</td>
+                <td class="font-bold">{{ (t.qty * t.price) | money:t.currency }}</td>
+                <td class="text-muted">{{ t.commission | money:t.currency }}</td>
                 <td class="date-text">{{ t.orderDate | date:'medium' }}</td>
                 <td>
                   @if (t.side === 'BUY') {
