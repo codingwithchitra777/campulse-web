@@ -65,6 +65,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'ai-coach',
+    loadComponent: () => import('./pages/ai-coach/ai-coach').then(m => m.AiCoachComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'login',
     loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent)
   },

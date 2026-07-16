@@ -5,6 +5,8 @@ import {
   AdminStats,
   AdminUser,
   Analytics,
+  CoachInsight,
+  CoachRefreshResponse,
   GoogleAuthResponse,
   Holding,
   NewsItem,
@@ -133,6 +135,16 @@ export class ApiService {
 
   getAnalytics(): Observable<Analytics> {
     return this.http.get<Analytics>(`${this.baseUrl}/api/analytics`);
+  }
+
+  /** Free rule-based coach readout (+ any cached AI pass). Never bills anything. */
+  getCoachInsight(): Observable<CoachInsight> {
+    return this.http.get<CoachInsight>(`${this.baseUrl}/api/ai/insights`);
+  }
+
+  /** The paid AI regenerate — 429 when rate-limited, 503 when no key configured. */
+  refreshCoachInsight(): Observable<CoachRefreshResponse> {
+    return this.http.post<CoachRefreshResponse>(`${this.baseUrl}/api/ai/insights`, {});
   }
 
   getWatchlist(): Observable<{ items: WatchlistItem[] }> {

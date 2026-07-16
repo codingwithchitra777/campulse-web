@@ -386,6 +386,33 @@ export interface PriceAlert {
   triggeredAt: string | null;
 }
 
+/** The optional AI pass on the coach — cached server-side, absent until first generated. */
+export interface CoachAiInsight {
+  insight: string;
+  model: string;
+  /** ISO datetime string. */
+  generatedAt: string;
+  /** True when the user's numbers moved since this was generated. */
+  stale: boolean;
+  disclaimer: string;
+}
+
+/** GET /api/ai/insights — free rule-based readout, always present; `ai` only when generated. */
+export interface CoachInsight {
+  insight: string;
+  source: 'rules';
+  disclaimer: string;
+  /** Whether the backend has an ANTHROPIC_API_KEY (the refresh button's gate). */
+  aiEnabled: boolean;
+  ai: CoachAiInsight | null;
+}
+
+/** POST /api/ai/insights — the paid AI regenerate. */
+export interface CoachRefreshResponse extends CoachAiInsight {
+  enabled: boolean;
+  regenerated: boolean;
+}
+
 /** Wrapped shape returned by paginated list endpoints (/api/trades, /api/admin/users, /api/admin/trades). */
 export interface Paginated<T> {
   items: T[];

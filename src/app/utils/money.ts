@@ -22,11 +22,13 @@ export function formatMoney(
   const cur = (currency || 'KHR').toUpperCase();
   const dp = DECIMALS[cur] ?? 2;
   const sym = currencySymbol(cur);
-  const sign = opts.sign && value > 0 ? '+' : '';
+  // The +/- goes outside the symbol ("-$40.50", never "$-40.50"), so format the
+  // magnitude and attach the sign ourselves. Mirrors backend markets.format_money.
+  const sign = value < 0 ? '-' : opts.sign && value > 0 ? '+' : '';
   const num = new Intl.NumberFormat(undefined, {
     minimumFractionDigits: dp,
     maximumFractionDigits: dp
-  }).format(value);
+  }).format(Math.abs(value));
   return cur === 'USD' ? `${sign}${sym}${num}` : `${sign}${num} ${sym}`;
 }
 

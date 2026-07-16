@@ -221,6 +221,19 @@
     "ALL_TRADES_TITLE": "All Trades",
     "LOADING_TRADES": "Loading trades..."
   },
+  "COACH": {
+    "TITLE": "Coach",
+    "SUBTITLE": "A plain-language readout of your own trading patterns. Descriptive only — never buy/sell advice.",
+    "LOADING": "Reading your trade history...",
+    "SNAPSHOT_TITLE": "What your numbers show",
+    "AI_TITLE": "Deeper AI analysis",
+    "AI_GENERATE": "Generate",
+    "AI_REFRESH": "Refresh",
+    "AI_REFRESHING": "Analyzing...",
+    "AI_STALE": "Your numbers have changed since this was written",
+    "AI_NONE_YET": "No AI analysis yet — generate one to get a deeper read of the same numbers.",
+    "AI_ERROR": "The AI analysis is unavailable right now. Your free summary above still works."
+  },
   "ANALYTICS": {
     "TITLE": "Analytics",
     "SUBTITLE": "Your trading performance, computed from your own trade history.",

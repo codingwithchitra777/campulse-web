@@ -1,0 +1,49 @@
+<div class="view-container animate-fade-in">
+  <div class="portfolio-header-area" style="margin-bottom: 24px;">
+    <h2 class="panel-title" style="margin-bottom: 8px; font-size: calc(28px * var(--font-scale, 1));">🧠 {{ 'COACH.TITLE' | translate }}</h2>
+    <p class="muted" style="margin: 0; font-size: calc(14px * var(--font-scale, 1));">{{ 'COACH.SUBTITLE' | translate }}</p>
+  </div>
+
+  @if (coach.isLoading()) {
+    <div class="panel-loader">{{ 'COACH.LOADING' | translate }}</div>
+  } @else {
+    @let c = coach.value();
+
+    <!-- Free rule-based readout: always present, straight from the user's own numbers. -->
+    <div class="dashboard-panel" style="margin-bottom: 24px;">
+      <h3 class="panel-title" style="font-size: calc(18px * var(--font-scale, 1));">📋 {{ 'COACH.SNAPSHOT_TITLE' | translate }}</h3>
+      <p style="font-size: calc(15px * var(--font-scale, 1)); line-height: 1.7; margin: 0; white-space: pre-line;">{{ c.insight }}</p>
+    </div>
+
+    <!-- AI pass: only when the backend has a key. Explicit button — costs money server-side. -->
+    @if (c.aiEnabled) {
+      <div class="dashboard-panel" style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <h3 class="panel-title" style="font-size: calc(18px * var(--font-scale, 1)); margin: 0;">✨ {{ 'COACH.AI_TITLE' | translate }}</h3>
+          <button class="btn-primary" style="padding: 8px 16px;" (click)="refreshAi()" [disabled]="refreshing()">
+            {{ (refreshing() ? 'COACH.AI_REFRESHING' : (c.ai ? 'COACH.AI_REFRESH' : 'COACH.AI_GENERATE')) | translate }}
+          </button>
+        </div>
+
+        @if (refreshError(); as err) {
+          <p class="text-loss" style="font-size: calc(13px * var(--font-scale, 1)); margin: 12px 0 0;">{{ err }}</p>
+        }
+
+        @if (c.ai; as ai) {
+          <p style="font-size: calc(15px * var(--font-scale, 1)); line-height: 1.7; margin: 16px 0 8px; white-space: pre-line;">{{ ai.insight }}</p>
+          <div class="muted" style="font-size: calc(12px * var(--font-scale, 1)); display: flex; gap: 12px; flex-wrap: wrap;">
+            <span>{{ ai.generatedAt | date:'medium' }}</span>
+            @if (ai.stale) {
+              <span style="color: #fbbf24;">⚠ {{ 'COACH.AI_STALE' | translate }}</span>
+            }
+          </div>
+        } @else if (!refreshing()) {
+          <p class="muted" style="font-size: calc(13px * var(--font-scale, 1)); margin: 12px 0 0;">{{ 'COACH.AI_NONE_YET' | translate }}</p>
+        }
+      </div>
+    }
+
+    <!-- Not advice — appended server-side; rendered on every state. -->
+    <p class="muted" style="font-size: calc(12px * var(--font-scale, 1)); line-height: 1.5;">{{ c.disclaimer }}</p>
+  }
+</div>
