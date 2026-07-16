@@ -16,21 +16,11 @@
         <span>{{ 'NAV.PORTFOLIO' | translate }}</span>
       </a>
 
-      <!-- Trades Group -->
-      <div class="sidebar-group">
-        <div class="side-link" [class.active]="tradesMenuOpen" (click)="toggleTradesMenu()" [title]="sidebarCollapsed() ? ('NAV.TRADES' | translate) : ''" style="cursor: pointer; padding-bottom: 4px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-          <span>{{ 'NAV.TRADES' | translate }}</span>
-        </div>
-        <div class="sidebar-sub-menu" *ngIf="tradesMenuOpen" style="display: flex; flex-direction: column; gap: 2px; padding-left: 28px; margin-bottom: 8px;">
-          <a routerLink="/record-trade" routerLinkActive="active" class="side-link" style="padding: 6px 10px; font-size: calc(13px * var(--font-scale, 1));" (click)="toggleTradesMenu()">
-            <span>{{ 'NAV.RECORD_TRADE' | translate }}</span>
-          </a>
-          <a routerLink="/history" routerLinkActive="active" class="side-link" style="padding: 6px 10px; font-size: calc(13px * var(--font-scale, 1));" (click)="toggleTradesMenu()">
-            <span>{{ 'NAV.HISTORY' | translate }}</span>
-          </a>
-        </div>
-      </div>
+      <!-- Trades -->
+      <a routerLink="/trades" routerLinkActive="active" class="side-link" [title]="sidebarCollapsed() ? ('NAV.TRADES' | translate) : ''">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>{{ 'NAV.TRADES' | translate }}</span>
+      </a>
 
       <!-- Mobile "More" Button -->
       <div class="side-link mobile-only" (click)="toggleMobileMoreMenu()" [class.active]="mobileMoreMenuOpen" style="cursor: pointer;">
@@ -136,7 +126,7 @@
     </div>
 
     <!-- Mobile Backdrop for Popups -->
-    <div class="mobile-backdrop" *ngIf="tradesMenuOpen || mobileMoreMenuOpen" (click)="tradesMenuOpen = false; mobileMoreMenuOpen = false;"></div>
+    <div class="mobile-backdrop" *ngIf="mobileMoreMenuOpen" (click)="mobileMoreMenuOpen = false;"></div>
   </aside>
 
   <!-- Main Area -->
@@ -282,11 +272,11 @@
     </a>
 
     <!-- Center action: Record Trade -->
-    <a routerLink="/record-trade" routerLinkActive="active" class="mbn-fab" [title]="'NAV.RECORD_TRADE' | translate">
+    <a routerLink="/trades/record" routerLinkActive="active" class="mbn-fab" [title]="'NAV.RECORD_TRADE' | translate">
       <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </a>
 
-    <a routerLink="/history" routerLinkActive="active" class="mbn-item">
+    <a routerLink="/trades/history" routerLinkActive="active" class="mbn-item">
       <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
       <span>{{ 'NAV.HISTORY' | translate }}</span>
     </a>

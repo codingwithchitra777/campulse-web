@@ -3,6 +3,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard';
 import { PortfolioComponent } from './pages/portfolio/portfolio';
 import { RecordTradeComponent } from './pages/record-trade/record-trade';
 import { HistoryComponent } from './pages/history/history';
+import { TradesComponent } from './pages/trades/trades';
 import { LoginComponent } from './pages/login/login';
 import { AdminComponent } from './pages/admin/admin';
 import { SettingsComponent } from './pages/settings/settings';
@@ -17,8 +18,16 @@ export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'portfolio', component: PortfolioComponent, canActivate: [authGuard] },
-  { path: 'record-trade', component: RecordTradeComponent, canActivate: [authGuard] },
-  { path: 'history', component: HistoryComponent, canActivate: [authGuard] },
+  { 
+    path: 'trades', 
+    component: TradesComponent, 
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'record', pathMatch: 'full' },
+      { path: 'record', component: RecordTradeComponent },
+      { path: 'history', component: HistoryComponent }
+    ]
+  },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
   { path: 'analytics', component: AnalyticsComponent, canActivate: [authGuard] },

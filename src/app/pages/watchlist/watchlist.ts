@@ -95,7 +95,7 @@ export class WatchlistComponent {
   }
 
   recordTrade(item: WatchlistItem) {
-    this.router.navigate(['/record-trade']);
+    this.router.navigate(['/trades/record']);
   }
 
   keyOf(item: WatchlistItem): string {

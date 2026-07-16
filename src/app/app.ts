@@ -37,7 +37,6 @@ export class App {
   
   marketStatus = signal<{ open: boolean, text: string }>({ open: false, text: 'CSX Closed' });
 
-  tradesMenuOpen = false;
   mobileMoreMenuOpen = false;
   // Mobile-only account sheet (the 5th bottom-nav slot). Absorbs what used to be
   // the "More" popup + the top-right profile dropdown into one surface on phones.
@@ -54,18 +53,8 @@ export class App {
     this.mobileAccountOpen = false;
   }
 
-  toggleTradesMenu() {
-    if (this.sidebarCollapsed()) {
-      this.sidebarCollapsed.set(false);
-      localStorage.setItem('sidebar_collapsed', '0');
-    }
-    this.tradesMenuOpen = !this.tradesMenuOpen;
-    if (this.tradesMenuOpen) this.mobileMoreMenuOpen = false;
-  }
-
   toggleMobileMoreMenu() {
     this.mobileMoreMenuOpen = !this.mobileMoreMenuOpen;
-    if (this.mobileMoreMenuOpen) this.tradesMenuOpen = false;
   }
 
   toggleSidebar() {
