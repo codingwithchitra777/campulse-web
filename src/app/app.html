@@ -312,27 +312,36 @@
         </div>
       </div>
       <div class="mas-divider"></div>
-
-      <a class="mas-row" routerLink="/analytics" (click)="closeMobileAccount()">
-        <span class="mas-ico">📊</span> {{ 'NAV.ANALYTICS' | translate }}
-      </a>
-      <a class="mas-row" routerLink="/alerts" (click)="closeMobileAccount()">
-        <span class="mas-ico">🔔</span> {{ 'NAV.ALERTS' | translate }}
-      </a>
-      <a class="mas-row" routerLink="/journal" (click)="closeMobileAccount()">
-        <span class="mas-ico">📓</span> {{ 'NAV.JOURNAL' | translate }}
-      </a>
-      <a class="mas-row" routerLink="/settings" (click)="closeMobileAccount()">
-        <span class="mas-ico">⚙️</span> {{ 'NAV.SETTINGS' | translate }}
-      </a>
-      <a class="mas-row" href="#" (click)="openPremiumModal('Premium', $event); closeMobileAccount()">
-        <span class="mas-ico">👑</span> {{ 'NAV.UPGRADE' | translate }}
-      </a>
-      @if (session.isAdmin()) {
-        <a class="mas-row" routerLink="/admin" (click)="closeMobileAccount()">
-          <span class="mas-ico">🛡️</span> {{ 'NAV.ADMIN' | translate }}
+      
+      <div class="mas-grid">
+        <a class="mas-grid-item" routerLink="/analytics" (click)="closeMobileAccount()">
+          <span class="mas-ico">📊</span> 
+          <span class="mas-label">{{ 'NAV.ANALYTICS' | translate }}</span>
         </a>
-      }
+        <a class="mas-grid-item" routerLink="/alerts" (click)="closeMobileAccount()">
+          <span class="mas-ico">🔔</span> 
+          <span class="mas-label">{{ 'NAV.ALERTS' | translate }}</span>
+        </a>
+        <a class="mas-grid-item" routerLink="/journal" (click)="closeMobileAccount()">
+          <span class="mas-ico">📓</span> 
+          <span class="mas-label">{{ 'NAV.JOURNAL' | translate }}</span>
+        </a>
+        <a class="mas-grid-item" routerLink="/settings" (click)="closeMobileAccount()">
+          <span class="mas-ico">⚙️</span> 
+          <span class="mas-label">{{ 'NAV.SETTINGS' | translate }}</span>
+        </a>
+        <a class="mas-grid-item" href="#" (click)="openPremiumModal('Premium', $event); closeMobileAccount()">
+          <span class="mas-ico">👑</span> 
+          <span class="mas-label">{{ 'NAV.UPGRADE' | translate }}</span>
+        </a>
+        @if (session.isAdmin()) {
+          <a class="mas-grid-item" routerLink="/admin" (click)="closeMobileAccount()">
+            <span class="mas-ico">🛡️</span> 
+            <span class="mas-label">{{ 'NAV.ADMIN' | translate }}</span>
+          </a>
+        }
+      </div>
+
       <div class="mas-divider"></div>
       <button class="mas-row danger" (click)="logoutGoogle(); closeMobileAccount()">
         <span class="mas-ico">🚪</span> {{ 'NAV.SIGN_OUT' | translate }}

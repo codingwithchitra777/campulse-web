@@ -3859,6 +3859,36 @@ body.light .premium-upgrade-card {
   .mas-row.danger {
     color: #f87171;
   }
+  .mas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px 8px;
+    padding: 12px 0;
+  }
+  .mas-grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 16px 8px;
+    color: #e2e8f0;
+    text-decoration: none;
+    cursor: pointer;
+    text-align: center;
+  }
+  .mas-grid-item:active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .mas-grid-item .mas-ico {
+    font-size: calc(24px * var(--font-scale, 1));
+  }
+  .mas-label {
+    font-size: calc(12px * var(--font-scale, 1));
+    font-weight: 500;
+  }
   .mas-ico {
     font-size: calc(18px * var(--font-scale, 1));
     width: 24px;
@@ -3892,7 +3922,15 @@ body.light .mobile-account-sheet::before {
   background: #e2e8f0;
 }
 body.light .mas-row:active {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(0, 0, 0, 0.05);
+}
+body.light .mas-grid-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+body.light .mas-grid-item:active {
+  background: #f1f5f9;
 }
 
 @media (max-width: 480px) {
