@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.googleAuth.renderButton(
       'googleBtnWall',
-      { theme: 'filled_blue', size: 'large', width: 280, shape: 'pill' },
+      { theme: 'outline', type: 'standard', size: 'large', width: 280, shape: 'pill' },
       () => this.router.navigate([this.returnUrl])
     );
     this.telegramAuth.renderButton('telegramBtnWall', () => this.router.navigate([this.returnUrl]));

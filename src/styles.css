@@ -1268,8 +1268,8 @@ body.light .toolbar-filter select {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 20px;
-  min-height: 60vh;
+  padding: 20px;
+  min-height: 100dvh;
   width: 100%;
 }
 
@@ -1300,6 +1300,13 @@ body.light .toolbar-filter select {
   background: rgba(30, 41, 59, 0.25);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+#telegramBtnWall {
+  color: #ef4444;
+  font-size: 13px;
+  text-align: center;
+  min-height: 0 !important;
 }
 
 .auth-feature-item {

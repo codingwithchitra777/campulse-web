@@ -1,6 +1,6 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { SessionService } from './services/session.service';
 import { GoogleAuthService } from './services/google-auth.service';
 import { TelegramAuthService } from './services/telegram-auth.service';
@@ -94,10 +94,18 @@ export class App {
     }
   }
 
+  isLoginPage = signal(false);
+
   constructor() {
     const savedLang = localStorage.getItem('lang') || 'en';
     this.translate.setFallbackLang('en');
     this.translate.use(savedLang);
+
+    this.router.events.subscribe(e => {
+      if (e instanceof NavigationEnd) {
+        this.isLoginPage.set(this.router.url.split('?')[0].endsWith('/login'));
+      }
+    });
     this.currentLang = savedLang;
     
     if (savedLang === 'km') {
