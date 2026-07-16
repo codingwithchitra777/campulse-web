@@ -50,7 +50,9 @@
                 </td>
                 <td style="text-align: center; vertical-align: middle;">
                   @if (it.market === 'CSX' && sparklines.value()[it.symbol]) {
-                    <app-sparkline [data]="sparklines.value()[it.symbol]"></app-sparkline>
+                    <div style="width: 100px; height: 30px; display: inline-block;">
+                      <app-sparkline [data]="sparklines.value()[it.symbol]" [width]="100" [height]="30"></app-sparkline>
+                    </div>
                   } @else {
                     <span style="color: #64748b;">—</span>
                   }
