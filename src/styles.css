@@ -3762,6 +3762,8 @@ body.light .premium-upgrade-card {
   }
 
   .mobile-account-sheet {
+    display: flex;
+    flex-direction: column;
     position: fixed;
     left: 0;
     right: 0;
