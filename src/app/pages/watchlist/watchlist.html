@@ -45,8 +45,8 @@
                   }
                 </td>
                 <td style="text-align: right;">{{ it.price !== null ? (it.price | money:it.currency) : '—' }}</td>
-                <td style="text-align: right;" [ngClass]="(it.change || 0) >= 0 ? 'text-profit' : 'text-loss'">
-                  {{ it.change !== null ? ((it.change >= 0 ? '▲ ' : '▼ ') + (it.change | number:'1.0-2')) : '—' }}
+                <td style="text-align: right; white-space: nowrap;" [ngClass]="(it.change || 0) > 0 ? 'text-profit' : ((it.change || 0) < 0 ? 'text-loss' : 'text-muted')">
+                  {{ it.change !== null ? ((it.change > 0 ? '▲ ' : (it.change < 0 ? '▼ ' : '')) + ((it.change > 0 ? it.change : -it.change) | number:'1.0-2')) : '—' }}
                 </td>
                 <td style="text-align: center; vertical-align: middle;">
                   @if (it.market === 'CSX' && sparklines.value()[it.symbol]) {
