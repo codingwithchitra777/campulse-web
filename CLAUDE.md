@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Campulse is an Angular 21 frontend for a trading journal / portfolio tracker. It talks to a FastAPI backend (sibling repo `campulse-backend`) hosted at `https://campulse-backend.fastapicloud.dev` — the base URL is hardcoded in `src/app/app.constants.ts` (there is no environments file).
 
-The UI says "LIFO" throughout, but the backend matcher actually consumes the **cheapest open buy lots first** (best-profit: maximise realised P/L per sale), so treat "LIFO" in labels/copy as historical naming, not the current algorithm.
+The matcher consumes the **cheapest open buy lots first** (best-profit: maximise realised P/L per sale) — it is **not** LIFO. The old misleading "LIFO" naming has been purged from code and copy (backend: `services/best_profit_matcher.BestProfitMatcherService.match_sell` / `simulate_sell`); don't reintroduce it.
 
 ## Commands
 

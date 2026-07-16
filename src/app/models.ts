@@ -145,7 +145,7 @@ export interface TradeEditPayload {
   commission?: number;
 }
 
-/** LIFO allocation produced when a SELL is matched against BUY lots. */
+/** Allocation produced when a SELL is matched against BUY lots (cheapest lots first). */
 export interface Allocation {
   allocId: string;
   userId: string;
@@ -173,7 +173,7 @@ export interface TradeResult {
   warning: string | null;
 }
 
-/** POST /api/trades/init response — LIFO sell simulation before confirming. */
+/** POST /api/trades/init response — sell simulation before confirming. */
 export interface TradeInitResult {
   success: boolean;
   valid: boolean;

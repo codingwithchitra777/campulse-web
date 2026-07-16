@@ -21,7 +21,7 @@
           @if (success.trade.side === 'SELL' && success.allocations.length > 0) {
             <div class="matching-details">
               <hr>
-              <h4>📦 {{ 'TRADE.LIFO_MATCHED' | translate }}</h4>
+              <h4>📦 {{ 'TRADE.MATCHED_LOTS' | translate }}</h4>
               <ul>
                 @for (a of success.allocations; track a.allocId) {
                   <li>
@@ -211,9 +211,9 @@
             </div>
           </div>
 
-          <!-- LIFO open lots details -->
+          <!-- Open buy lots (cheapest matched first) -->
           <div class="lots-section" style="margin-top: 15px;">
-            <h3 class="lots-section-title" style="font-size: calc(12px * var(--font-scale, 1)); margin-bottom: 10px;">📥 {{ 'TRADE.LIFO_QUEUE' | translate }}</h3>
+            <h3 class="lots-section-title" style="font-size: calc(12px * var(--font-scale, 1)); margin-bottom: 10px;">📥 {{ 'TRADE.LOT_QUEUE' | translate }}</h3>
             <div class="lots-list" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
               @for (lot of pos.remainingLots; track lot.tradeId) {
                 <div class="lot-card" style="padding: 10px; background: #0f172a; border: 1px solid #1e293b; border-radius: 10px;">
@@ -300,7 +300,7 @@
         </div>
       </div>
 
-      <!-- Sell-Specific LIFO matching simulation feedback (P/L and Warning) -->
+      <!-- Sell-specific matching simulation feedback (P/L and Warning) -->
       <div *ngIf="tradeSide === 'SELL'" class="simulated-matching-box" style="margin-top: 20px;">
         <div class="confirm-item">
           <span class="confirm-label">{{ 'TRADE.SIMULATED_PL' | translate }}</span>

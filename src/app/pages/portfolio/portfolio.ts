@@ -197,7 +197,7 @@ export class PortfolioComponent implements OnDestroy {
     return ((lastPrice - lot.price) / lot.price) * 100;
   }
 
-  /** Realised P/L of a sell over the cost basis of its LIFO-matched buy lots, in percent. */
+  /** Realised P/L of a sell over the cost basis of its matched buy lots, in percent. */
   sellPnlPercent(sell: PositionSell): number | null {
     const costBasis = sell.matched.reduce((sum, m) => sum + m.qty * m.price, 0);
     if (costBasis <= 0) return null;

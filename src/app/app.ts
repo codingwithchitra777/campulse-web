@@ -32,7 +32,7 @@ export class App {
   notifications = signal<any[]>([
     { title: 'Welcome to CamPulse Premium', time: 'Just now', read: false },
     { title: 'CSX Market is now open', time: '2 hours ago', read: false },
-    { title: 'LIFO calculation complete', time: '1 day ago', read: true }
+    { title: 'Lot matching complete', time: '1 day ago', read: true }
   ]);
   
   marketStatus = signal<{ open: boolean, text: string }>({ open: false, text: 'CSX Closed' });
