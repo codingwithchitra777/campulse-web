@@ -16,6 +16,17 @@ export class ThemeService {
   readonly theme = signal<Theme>(restoreTheme());
 
   constructor() {
+    // Sync with Telegram WebApp theme if available
+    const webApp = (window as any).Telegram?.WebApp;
+    if (webApp) {
+      if (webApp.colorScheme) {
+        this.theme.set(webApp.colorScheme === 'light' ? 'light' : 'dark');
+      }
+      webApp.onEvent('themeChanged', () => {
+        this.theme.set(webApp.colorScheme === 'light' ? 'light' : 'dark');
+      });
+    }
+
     effect(() => {
       document.body.classList.toggle('light', this.theme() === 'light');
       localStorage.setItem(THEME_STORAGE_KEY, this.theme());

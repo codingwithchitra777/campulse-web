@@ -1268,8 +1268,8 @@ body.light .toolbar-filter select {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  min-height: 100dvh;
+  padding: 0;
+  min-height: calc(100vh - 80px);
   width: 100%;
 }
 
