@@ -3947,3 +3947,228 @@ body.light .mas-grid-item:active {
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   Record Trade refinements: live quote hint, SELL quantity chips,
+   cheapest-first lot preview, review lock note, and the mobile
+   sticky submit dock + collapsible position panel.
+   ============================================================ */
+.quote-hint {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #8a94a6;
+  margin-top: 4px;
+}
+.quote-hint strong {
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.qty-chips {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.qty-chip {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: #60a5fa;
+  font-family: inherit;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.qty-chip:hover {
+  background: rgba(59, 130, 246, 0.25);
+}
+.qty-chip-max {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+.qty-chip-max:hover {
+  background: rgba(239, 68, 68, 0.22);
+}
+
+.lot-preview {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px dashed #334155;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.lot-preview-title {
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8a94a6;
+  margin-bottom: 8px;
+}
+.lot-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+.lot-preview-table th {
+  text-align: left;
+  color: #64748b;
+  font-size: calc(10px * var(--font-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding: 2px 4px 6px;
+  border-bottom: 1px solid #1e293b;
+}
+.lot-preview-table td {
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.6);
+  color: #cbd5e1;
+}
+.lot-preview-table tr:last-child td {
+  border-bottom: none;
+}
+.lot-preview-table th:last-child,
+.lot-preview-table td:last-child {
+  text-align: right;
+}
+.lot-seq-chip {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  font-weight: 700;
+  font-size: calc(11px * var(--font-scale, 1));
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.lot-preview-note {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #8a94a6;
+  margin-top: 8px;
+}
+.lot-preview-warn {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #fbbf24;
+  margin-top: 6px;
+}
+
+.review-note {
+  text-align: center;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: #64748b;
+  margin-top: 8px;
+}
+
+/* Chevron only participates in the mobile accordion. */
+.balance-chevron {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Position context first, collapsed to one line; tap the title to expand. */
+  .record-trade-layout .balance-card {
+    order: -1;
+    padding: 16px 20px;
+  }
+  .balance-title {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .balance-chevron {
+    display: inline;
+    color: #64748b;
+  }
+  .balance-body {
+    display: none;
+  }
+  .balance-card.open .balance-body {
+    display: block;
+    margin-top: 14px;
+  }
+
+  /* Keep the running total + Review button in thumb reach, above the bottom nav. */
+  .trade-submit-dock {
+    position: sticky;
+    bottom: 90px;
+    background: #111827;
+    border-top: 1px solid #1e293b;
+    padding-top: 12px;
+    z-index: 20;
+  }
+}
+
+body.light .quote-hint {
+  color: #64748b;
+}
+body.light .quote-hint strong {
+  color: #0f172a;
+}
+body.light .lot-preview {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+body.light .lot-preview-table th {
+  border-bottom-color: #e2e8f0;
+}
+body.light .lot-preview-table td {
+  color: #334155;
+  border-bottom-color: #e2e8f0;
+}
+body.light .review-note {
+  color: #94a3b8;
+}
+@media (max-width: 768px) {
+  body.light .trade-submit-dock {
+    background: #ffffff;
+    border-top-color: #e2e8f0;
+  }
+}
+
+/* Selected state for the plain (market) pills — buy/sell variants below/above
+   carry more specific colors and still win. */
+.radio-label input:checked + .radio-custom {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+body.light .radio-custom {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+body.light .radio-label input:checked + .radio-custom {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+body.light .radio-label input:checked + .radio-custom.buy-selector {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+body.light .radio-label input:checked + .radio-custom.sell-selector {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+/* The totals box uses inline dark styles in the template — beat them here. */
+body.light .total-preview-box {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+body.light .total-preview-box > div {
+  color: #64748b !important;
+}
+body.light .total-preview-box > div[style*="border-top"] {
+  border-top-color: #cbd5e1 !important;
+}
+/* The two static value spans are inline #f8fafc; the signed total keeps its
+   green/red [style.color] binding, which this selector deliberately misses. */
+body.light .total-preview-box span[style*="f8fafc"] {
+  color: #0f172a !important;
+}

@@ -43,19 +43,19 @@
       <form (submit)="startTradeSubmit($event)" class="trade-form">
         <!-- Market / asset type -->
         <div class="form-group">
-          <label>Market</label>
+          <label>{{ 'TRADE.MARKET' | translate }}</label>
           <div class="radio-group">
             <label class="radio-label">
               <input type="radio" name="market" [(ngModel)]="market" value="CSX" (ngModelChange)="onMarketChange()">
-              <span class="radio-custom">🇰🇭 CSX</span>
+              <span class="radio-custom">🇰🇭 CSX · riel</span>
             </label>
             <label class="radio-label">
               <input type="radio" name="market" [(ngModel)]="market" value="US" (ngModelChange)="onMarketChange()">
-              <span class="radio-custom">🇺🇸 US</span>
+              <span class="radio-custom">🇺🇸 US · $</span>
             </label>
             <label class="radio-label">
               <input type="radio" name="market" [(ngModel)]="market" value="GOLD_KH" (ngModelChange)="onMarketChange()">
-              <span class="radio-custom">🥇 Gold</span>
+              <span class="radio-custom">🥇 Gold · $/chi</span>
             </label>
           </div>
         </div>
@@ -104,6 +104,18 @@
               Local Cambodian gold — priced per <strong>chi</strong> in USD from the admin board.{{ quoteLoading() ? ' Loading price…' : '' }}
             </div>
           }
+
+          <!-- Live market context for the selected symbol -->
+          @if (quoteInfo; as q) {
+            <div class="quote-hint">
+              {{ 'TRADE.MARKET_PRICE' | translate }}: <strong>{{ q.price | money:currency }}</strong>
+              @if (q.change !== null && q.change !== 0) {
+                <span [ngClass]="q.change > 0 ? 'text-profit' : 'text-loss'">
+                  {{ q.change > 0 ? '▲' : '▼' }} {{ q.change | money:currency:true }}
+                </span>
+              }
+            </div>
+          }
         </div>
 
         <div class="form-group">
@@ -128,11 +140,26 @@
         <div class="form-group">
           <label for="qty">Quantity ({{ qtyUnit }})</label>
           <input type="number" id="qty" name="qty" [(ngModel)]="tradeQty" (ngModelChange)="onPriceQtyChange()" placeholder="e.g. 100" required min="1">
+          @if (tradeSide === 'SELL') {
+            @if (activePosition(); as pos) {
+              <div class="quote-hint">
+                {{ 'TRADE.AVAILABLE' | translate }}: <strong>{{ pos.remainingQty | number }} {{ qtyUnit }}</strong>
+              </div>
+              @if (pos.remainingQty > 0) {
+                <div class="qty-chips">
+                  <button type="button" class="qty-chip" (click)="setQtyPercent(25)">25%</button>
+                  <button type="button" class="qty-chip" (click)="setQtyPercent(50)">50%</button>
+                  <button type="button" class="qty-chip qty-chip-max" (click)="setQtyPercent(100)">{{ 'TRADE.SELL_ALL' | translate }}</button>
+                </div>
+              }
+            }
+          }
         </div>
 
         <div class="form-group">
           <label for="commission">Commission ({{ currencyUnit }})</label>
           <input type="number" id="commission" name="commission" [(ngModel)]="tradeCommission" (input)="onCommissionInput()" placeholder="e.g. 47" required min="0" step="any">
+          <div class="quote-hint">{{ 'TRADE.COMMISSION_HINT' | translate }}</div>
         </div>
 
         <div class="form-group">
@@ -140,6 +167,43 @@
           <input type="date" id="tradeDate" name="tradeDate" [(ngModel)]="tradeDate" [max]="today" required>
         </div>
 
+        <!-- SELL: preview of how the sale consumes open lots (cheapest first). -->
+        @if (sellLotPreview; as lp) {
+          <div class="lot-preview">
+            <div class="lot-preview-title">📥 {{ 'TRADE.LOT_PREVIEW_TITLE' | translate }}</div>
+            <table class="lot-preview-table">
+              <thead>
+                <tr>
+                  <th>{{ 'TRADE.LP_LOT' | translate }}</th>
+                  <th>{{ 'TRADE.LP_BUY_PRICE' | translate }}</th>
+                  <th>{{ 'TRADE.LP_OPEN' | translate }}</th>
+                  <th>{{ 'TRADE.LP_USE' | translate }}</th>
+                  <th>{{ 'TRADE.LP_PL' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of lp.rows; track row.seq) {
+                  <tr>
+                    <td><span class="lot-seq-chip">#{{ row.seq }}</span></td>
+                    <td>{{ row.price | money:currency }}</td>
+                    <td>{{ row.qtyOpen | number }}</td>
+                    <td>{{ row.use | number }}</td>
+                    <td [ngClass]="row.pnl >= 0 ? 'text-profit' : 'text-loss'">{{ row.pnl | money:currency:true }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            <div class="lot-preview-note">
+              {{ 'TRADE.LOT_PREVIEW_NOTE' | translate }}:
+              <strong [ngClass]="lp.grossPnl >= 0 ? 'text-profit' : 'text-loss'">{{ lp.grossPnl | money:currency:true }}</strong>
+            </div>
+            @if (lp.shortfall > 0) {
+              <div class="lot-preview-warn">⚠️ {{ 'TRADE.LOT_PREVIEW_SHORT' | translate: { qty: tradeQty - lp.shortfall } }}</div>
+            }
+          </div>
+        }
+
+        <div class="trade-submit-dock">
         <!-- Total Price Immediate Preview -->
         <div class="total-preview-box" *ngIf="tradePrice > 0 && tradeQty > 0" style="background: rgba(30, 41, 59, 0.5); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1e293b;">
           <div style="display: flex; justify-content: space-between; font-size: calc(13px * var(--font-scale, 1)); color: #9ca3af; margin-bottom: 4px;">
@@ -151,7 +215,7 @@
             <span style="color: #f8fafc; font-weight: 500;">{{ tradeCommission | money:currency }}</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: calc(15px * var(--font-scale, 1)); border-top: 1px solid #334155; padding-top: 8px; margin-top: 4px;">
-            <span>{{ 'TRADE.EST_TOTAL' | translate }}:</span>
+            <span>{{ 'TRADE.EST_TOTAL' | translate }}</span>
             <span [style.color]="tradeSide === 'BUY' ? '#ef4444' : '#10b981'">
               {{ totalTradeAmount | money:currency }}
             </span>
@@ -161,13 +225,19 @@
         <button type="submit" class="submit-btn" [ngClass]="tradeSide === 'BUY' ? 'btn-buy' : 'btn-sell'" [disabled]="loadingTickers() || tickersList().length === 0 || loadingValidation()">
           {{ loadingValidation() ? ('TRADE.VALIDATING' | translate) : (tradeSide === 'BUY' ? ('TRADE.CONFIRM_BUY' | translate) : ('TRADE.CONFIRM_SELL' | translate)) }}
         </button>
+        <div class="review-note">🔒 {{ 'TRADE.REVIEW_NOTE' | translate }}</div>
+        </div>
       </form>
     </div>
 
     <!-- Right side: Stock Balance details -->
-    <div class="balance-card">
-      <h2 class="panel-title">📈 {{ 'TRADE.BALANCE_TITLE' | translate }} {{ tradeTicker }}</h2>
-      
+    <div class="balance-card" [class.open]="mobileBalanceOpen()">
+      <h2 class="panel-title balance-title" (click)="mobileBalanceOpen.set(!mobileBalanceOpen())">
+        <span>📈 {{ 'TRADE.BALANCE_TITLE' | translate }} {{ tradeTicker }}</span>
+        <span class="balance-chevron">{{ mobileBalanceOpen() ? '▴' : '▾' }}</span>
+      </h2>
+
+      <div class="balance-body">
       @if (loadingPosition()) {
         <div class="panel-loader" style="height: 150px;">
           Loading balance details...
@@ -244,6 +314,7 @@
           No ticker details available.
         </div>
       }
+      </div>
     </div>
   </div>
 

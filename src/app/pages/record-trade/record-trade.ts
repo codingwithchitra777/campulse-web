@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
-import { CurrencyCode, MarketKind, MarketSearchResult, Position, Price, TradePayload, TradeResult, TradeSide } from '../../models';
+import { CurrencyCode, MarketKind, MarketQuote, MarketSearchResult, Position, Price, TradePayload, TradeResult, TradeSide } from '../../models';
 import { MoneyPipe, currencySymbol } from '../../utils/money';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -25,6 +25,11 @@ export class RecordTradeComponent implements OnInit {
   readonly searchingSymbols = signal(false);
   readonly quoteLoading = signal(false);
   readonly GOLD_SYMBOL = 'XAU-KH';
+  /** Last quote fetched for a US/gold symbol (CSX prices come from the ticker list). */
+  readonly latestQuote = signal<MarketQuote | null>(null);
+
+  /** Mobile-only: whether the position panel accordion is expanded. */
+  readonly mobileBalanceOpen = signal(false);
 
   tradeTicker = '';
   tradeSide: TradeSide = 'BUY';
@@ -80,6 +85,55 @@ export class RecordTradeComponent implements OnInit {
     }
     return totalQty > 0 ? Math.round(totalCost / totalQty) : 0;
   });
+
+  /** Live market context for the selected symbol (price + day change when known). */
+  get quoteInfo(): { price: number; change: number | null } | null {
+    if (this.market === 'CSX') {
+      const t = this.tickersList().find((x) => x.ticker === this.tradeTicker);
+      return t ? { price: t.price, change: t.change } : null;
+    }
+    const q = this.latestQuote();
+    return q && q.ticker === this.tradeTicker ? { price: q.price, change: q.change } : null;
+  }
+
+  /**
+   * Client-side preview of how a SELL would consume the open lots — cheapest
+   * first, mirroring the backend's best-price matcher. Gross of commissions;
+   * the server's simulation at the review step stays the source of truth.
+   */
+  get sellLotPreview(): {
+    rows: { seq: number; price: number; qtyOpen: number; use: number; pnl: number }[];
+    grossPnl: number;
+    shortfall: number;
+  } | null {
+    const pos = this.activePosition();
+    const qty = Number(this.tradeQty);
+    const price = Number(this.tradePrice);
+    if (this.tradeSide !== 'SELL' || !pos || qty <= 0 || price <= 0) return null;
+    const lots = pos.remainingLots.filter((l) => l.qtyOpen > 0).sort((a, b) => a.price - b.price);
+    if (lots.length === 0) return null;
+
+    const rows: { seq: number; price: number; qtyOpen: number; use: number; pnl: number }[] = [];
+    let remaining = qty;
+    let grossPnl = 0;
+    for (const lot of lots) {
+      if (remaining <= 0) break;
+      const use = Math.min(lot.qtyOpen, remaining);
+      const pnl = (price - lot.price) * use;
+      rows.push({ seq: lot.seq, price: lot.price, qtyOpen: lot.qtyOpen, use, pnl });
+      grossPnl += pnl;
+      remaining -= use;
+    }
+    return { rows, grossPnl, shortfall: remaining };
+  }
+
+  /** SELL helper: set the quantity to a percentage of the open position. */
+  setQtyPercent(pct: number) {
+    const available = this.activePosition()?.remainingQty ?? 0;
+    if (available <= 0) return;
+    this.tradeQty = Math.max(1, Math.floor((available * pct) / 100));
+    this.onPriceQtyChange();
+  }
 
   ngOnInit() {
     this.loadTickers();
@@ -149,6 +203,7 @@ export class RecordTradeComponent implements OnInit {
     this.tradeCommission = 0;
     this.isCommissionManual = false;
     this.usResults.set([]);
+    this.latestQuote.set(null);
     this.activePosition.set(null);
 
     if (this.market === 'CSX') {
@@ -197,6 +252,7 @@ export class RecordTradeComponent implements OnInit {
     this.api.getMarketQuote(symbol, this.market).subscribe({
       next: (q) => {
         this.tradePrice = q.price;
+        this.latestQuote.set(q);
         this.onPriceQtyChange();
         this.quoteLoading.set(false);
       },
