@@ -28,11 +28,14 @@ export const routes: Routes = [
         path: 'record',
         loadComponent: () => import('./pages/record-trade/record-trade').then(m => m.RecordTradeComponent)
       },
-      {
-        path: 'history',
-        loadComponent: () => import('./pages/history/history').then(m => m.HistoryComponent)
-      }
+      // History moved to the top-level /history route (Tools group); keep old links working.
+      { path: 'history', redirectTo: '/history' }
     ]
+  },
+  {
+    path: 'history',
+    loadComponent: () => import('./pages/history/history').then(m => m.HistoryComponent),
+    canActivate: [authGuard]
   },
   {
     path: 'admin',

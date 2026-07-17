@@ -31,6 +31,10 @@
       <div class="secondary-nav-group" [class.mobile-menu-open]="mobileMoreMenuOpen">
         <!-- Tools -->
         <div class="sidebar-group-title" *ngIf="!sidebarCollapsed()" style="margin-top: 12px;">{{ 'NAV.TOOLS' | translate }}</div>
+        <a routerLink="/history" routerLinkActive="active" class="side-link" [title]="sidebarCollapsed() ? ('NAV.HISTORY' | translate) : ''">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>{{ 'NAV.HISTORY' | translate }}</span>
+        </a>
         <a routerLink="/analytics" routerLinkActive="active" class="side-link" [title]="sidebarCollapsed() ? ('NAV.ANALYTICS' | translate) : ''">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
           <span>{{ 'NAV.ANALYTICS' | translate }}</span>
