@@ -16,9 +16,12 @@ export class ThemeService {
   readonly theme = signal<Theme>(restoreTheme());
 
   constructor() {
-    // Sync with Telegram WebApp theme if available
+    // Sync with the Telegram theme only when actually running inside Telegram.
+    // telegram-web-app.js defines window.Telegram.WebApp in regular browsers too
+    // (with colorScheme defaulting to 'light'), but initData is only populated
+    // inside the Mini App — without this gate every refresh resets to light.
     const webApp = (window as any).Telegram?.WebApp;
-    if (webApp) {
+    if (webApp?.initData) {
       if (webApp.colorScheme) {
         this.theme.set(webApp.colorScheme === 'light' ? 'light' : 'dark');
       }
