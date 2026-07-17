@@ -1,0 +1,163 @@
+<div class="view-container animate-fade-in centered-view">
+  <div class="loan-page">
+    <div class="loan-layout">
+      <!-- Input card -->
+      <div class="form-card" style="margin: 0; max-width: 100%;">
+        <h2 class="panel-title">🧮 {{ 'LOAN.TITLE' | translate }}</h2>
+        <p class="quote-hint" style="margin: -8px 0 16px;">{{ 'LOAN.SUBTITLE' | translate }}</p>
+
+        <form (submit)="$event.preventDefault(); calculate()" class="trade-form">
+          <div class="form-group">
+            <label for="loanAmount">{{ 'LOAN.AMOUNT' | translate }}</label>
+            <input type="number" id="loanAmount" name="amount" [(ngModel)]="amount" required min="1" step="any">
+          </div>
+
+          <div class="form-group">
+            <label>{{ 'LOAN.CURRENCY' | translate }}</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="currency" [(ngModel)]="currency" value="USD">
+                <span class="radio-custom">$ USD</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="currency" [(ngModel)]="currency" value="KHR">
+                <span class="radio-custom">៛ KHR (riel)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="loanRate">{{ 'LOAN.RATE' | translate }}</label>
+            <input type="number" id="loanRate" name="ratePct" [(ngModel)]="ratePct" required min="0" step="any">
+            <div class="radio-group" style="margin-top: 6px;">
+              <label class="radio-label">
+                <input type="radio" name="ratePeriod" [(ngModel)]="ratePeriod" value="MONTH">
+                <span class="radio-custom">{{ 'LOAN.PER_MONTH' | translate }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="ratePeriod" [(ngModel)]="ratePeriod" value="YEAR">
+                <span class="radio-custom">{{ 'LOAN.PER_YEAR' | translate }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="loanTerm">{{ 'LOAN.TERM' | translate }}</label>
+            <input type="number" id="loanTerm" name="termMonths" [(ngModel)]="termMonths" required min="1" [max]="MAX_TERM">
+            <div class="qty-chips">
+              @for (t of termChips; track t) {
+                <button type="button" class="qty-chip" (click)="setTerm(t)">{{ t }}</button>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>{{ 'LOAN.METHOD' | translate }}</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="method" [(ngModel)]="method" value="DECLINING">
+                <span class="radio-custom">{{ 'LOAN.METHOD_DECLINING' | translate }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="method" [(ngModel)]="method" value="FLAT">
+                <span class="radio-custom">{{ 'LOAN.METHOD_FLAT' | translate }}</span>
+              </label>
+            </div>
+            <div class="quote-hint">
+              {{ (method === 'FLAT' ? 'LOAN.METHOD_FLAT_DESC' : 'LOAN.METHOD_DECLINING_DESC') | translate }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="loanStart">{{ 'LOAN.START_DATE' | translate }}</label>
+            <input type="date" id="loanStart" name="startDate" [(ngModel)]="startDate" required>
+          </div>
+
+          @if (error(); as err) {
+            <div class="alert alert-danger animate-slide-in">
+              ❌ {{ (err === 'TERM_TOO_LONG' ? 'LOAN.ERR_TERM' : 'LOAN.ERR_INVALID') | translate }}
+            </div>
+          }
+
+          <button type="submit" class="submit-btn btn-calc">{{ 'LOAN.CALC' | translate }}</button>
+        </form>
+      </div>
+
+      <!-- Summary card -->
+      <div class="balance-card">
+        <h2 class="panel-title">📊 {{ 'LOAN.SUMMARY' | translate }}</h2>
+        @if (schedule(); as s) {
+          <div class="card-stats-row-html" style="margin-bottom: 20px;">
+            <div class="stat-box-html">
+              <span class="stat-label-html">{{ 'LOAN.MONTHLY_PAYMENT' | translate }}</span>
+              <span class="stat-value-html" style="color: #60a5fa; font-size: calc(15px * var(--font-scale, 1));">
+                {{ s.monthlyPayment | money:resultCurrency() }}
+              </span>
+            </div>
+            <div class="stat-box-html">
+              <span class="stat-label-html">{{ 'LOAN.TOTAL_INTEREST' | translate }}</span>
+              <span class="stat-value-html" style="color: #f59e0b; font-size: calc(15px * var(--font-scale, 1));">
+                {{ s.totalInterest | money:resultCurrency() }}
+              </span>
+            </div>
+            <div class="stat-box-html">
+              <span class="stat-label-html">{{ 'LOAN.TOTAL_REPAY' | translate }}</span>
+              <span class="stat-value-html" style="font-size: calc(15px * var(--font-scale, 1));">
+                {{ s.totalPayment | money:resultCurrency() }}
+              </span>
+            </div>
+          </div>
+
+          @if (s.totalInterest !== s.otherMethodTotalInterest) {
+            <div class="loan-cmp">
+              💡
+              {{ (resultMethod() === 'FLAT' ? 'LOAN.CMP_FLAT_SELECTED' : 'LOAN.CMP_DECLINING_SELECTED') | translate: cmpParams(s) }}
+            </div>
+          }
+
+          <div class="quote-hint" style="margin-top: 14px;">⚠️ {{ 'LOAN.DISCLAIMER' | translate }}</div>
+        } @else {
+          <div class="quote-hint" style="padding: 20px 0; text-align: center;">
+            {{ 'LOAN.EMPTY' | translate }}
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Repayment schedule -->
+    @if (schedule(); as s) {
+      <div class="balance-card loan-schedule-card">
+        <div class="loan-schedule-head">
+          <h2 class="panel-title" style="margin: 0;">📅 {{ 'LOAN.SCHEDULE' | translate }}</h2>
+          <button type="button" class="qty-chip" (click)="exportCsv()">⬇ {{ 'LOAN.EXPORT_CSV' | translate }}</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>{{ 'LOAN.COL_NO' | translate }}</th>
+                <th>{{ 'LOAN.COL_DATE' | translate }}</th>
+                <th class="num">{{ 'LOAN.COL_PAYMENT' | translate }}</th>
+                <th class="num">{{ 'LOAN.COL_PRINCIPAL' | translate }}</th>
+                <th class="num">{{ 'LOAN.COL_INTEREST' | translate }}</th>
+                <th class="num">{{ 'LOAN.COL_BALANCE' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of s.rows; track row.no) {
+                <tr>
+                  <td>{{ row.no }}</td>
+                  <td>{{ row.date | date:'mediumDate' }}</td>
+                  <td class="num">{{ row.payment | money:resultCurrency() }}</td>
+                  <td class="num">{{ row.principal | money:resultCurrency() }}</td>
+                  <td class="num">{{ row.interest | money:resultCurrency() }}</td>
+                  <td class="num">{{ row.balance | money:resultCurrency() }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>

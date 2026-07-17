@@ -827,7 +827,8 @@ body.light .toolbar-filter select {
   padding-top: 20px;
 }
 
-.record-trade-layout {
+.record-trade-layout,
+.loan-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
@@ -848,7 +849,8 @@ body.light .toolbar-filter select {
 }
 
 @media (max-width: 860px) {
-  .record-trade-layout {
+  .record-trade-layout,
+  .loan-layout {
     grid-template-columns: 1fr;
     max-width: 500px;
   }
@@ -4171,4 +4173,63 @@ body.light .total-preview-box > div[style*="border-top"] {
    green/red [style.color] binding, which this selector deliberately misses. */
 body.light .total-preview-box span[style*="f8fafc"] {
   color: #0f172a !important;
+}
+
+/* ============================================================
+   Loan calculator (Tools) — layout shares .record-trade-layout rules
+   via the .loan-layout selector; only page-specific bits live here.
+   ============================================================ */
+.loan-page {
+  width: 100%;
+  max-width: 1050px;
+  display: flex;
+  flex-direction: column;
+}
+
+.loan-schedule-card {
+  margin-top: 24px;
+}
+
+.loan-schedule-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.btn-calc {
+  background: #3b82f6;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+.btn-calc:hover {
+  background: #2563eb;
+}
+
+/* Flat-vs-declining cost comparison strip. */
+.loan-cmp {
+  border: 1px dashed #334155;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: #9ca3af;
+  line-height: 1.5;
+}
+
+.data-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 860px) {
+  .loan-schedule-card {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+body.light .loan-cmp {
+  border-color: #cbd5e1;
+  color: #475569;
 }
