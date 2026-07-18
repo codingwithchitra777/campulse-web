@@ -10,8 +10,14 @@ import {
   CorporateAction,
   GoogleAuthResponse,
   Holding,
+  Loan,
+  LoanDirection,
+  LoanRepayment,
+  LoanStatus,
+  LoanSummaryRow,
   NewsItem,
   PriceAlert,
+  RepaymentResult,
   WatchlistItem,
   LinkCodeResponse,
   LinkedAccount,
@@ -60,9 +66,9 @@ export class ApiService {
     });
   }
 
-  getTrades(ticker?: string, limit = 50, offset = 0): Observable<Paginated<Trade>> {
+  getTrades(ticker?: string, limit = 50, offset = 0, market?: string): Observable<Paginated<Trade>> {
     return this.http.get<Paginated<Trade>>(`${this.baseUrl}/api/trades`, {
-      params: { ...(ticker ? { ticker } : {}), limit, offset }
+      params: { ...(ticker ? { ticker } : {}), ...(market ? { market } : {}), limit, offset }
     });
   }
 
@@ -204,6 +210,46 @@ export class ApiService {
 
   getChartsTimeline(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/api/charts/timeline`);
+  }
+
+  // --- Personal loan ledger (money lent / borrowed) ---
+
+  getLoans(direction?: LoanDirection, status?: LoanStatus): Observable<{ items: Loan[]; deliverable: boolean }> {
+    return this.http.get<{ items: Loan[]; deliverable: boolean }>(`${this.baseUrl}/api/loans`, {
+      params: { ...(direction ? { direction } : {}), ...(status ? { status } : {}) }
+    });
+  }
+
+  getLoanSummary(): Observable<{ items: LoanSummaryRow[] }> {
+    return this.http.get<{ items: LoanSummaryRow[] }>(`${this.baseUrl}/api/loans/summary`);
+  }
+
+  createLoan(body: {
+    direction: LoanDirection;
+    counterparty: string;
+    principal: number;
+    currency?: string;
+    loanDate?: string;
+    dueDate?: string;
+    note?: string;
+  }): Observable<{ success: boolean; loan: Loan }> {
+    return this.http.post<{ success: boolean; loan: Loan }>(`${this.baseUrl}/api/loans`, body);
+  }
+
+  deleteLoan(loanId: string): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/loans/${loanId}`);
+  }
+
+  getRepayments(loanId: string): Observable<{ items: LoanRepayment[] }> {
+    return this.http.get<{ items: LoanRepayment[] }>(`${this.baseUrl}/api/loans/${loanId}/repayments`);
+  }
+
+  addRepayment(loanId: string, body: { amount: number; paidDate?: string; note?: string }): Observable<RepaymentResult> {
+    return this.http.post<RepaymentResult>(`${this.baseUrl}/api/loans/${loanId}/repayments`, body);
+  }
+
+  deleteRepayment(loanId: string, repaymentId: string): Observable<{ success: boolean; loan: Loan }> {
+    return this.http.delete<{ success: boolean; loan: Loan }>(`${this.baseUrl}/api/loans/${loanId}/repayments/${repaymentId}`);
   }
 
   googleLogin(credential: string): Observable<GoogleAuthResponse> {

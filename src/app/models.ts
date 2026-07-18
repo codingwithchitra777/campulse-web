@@ -432,6 +432,56 @@ export interface CorporateAction {
   appliedAt: string | null;
 }
 
+/** Loan direction: money the user lent out vs money they borrowed. */
+export type LoanDirection = 'lent' | 'borrowed';
+export type LoanStatus = 'open' | 'partial' | 'settled';
+
+/** /api/loans item — a personal debt (kept entirely separate from trading P/L). */
+export interface Loan {
+  loanId: string;
+  direction: LoanDirection;
+  counterparty: string;
+  principal: number;
+  currency: CurrencyCode;
+  /** ISO date (YYYY-MM-DD). */
+  loanDate: string;
+  /** ISO date, nullable. */
+  dueDate: string | null;
+  note: string | null;
+  status: LoanStatus;
+  createdAt: string | null;
+  /** Σ repayments and principal − repaid (floored at 0), computed server-side. */
+  repaid: number;
+  outstanding: number;
+}
+
+/** A single repayment against a loan. */
+export interface LoanRepayment {
+  repaymentId: string;
+  amount: number;
+  /** ISO date (YYYY-MM-DD). */
+  paidDate: string;
+  note: string | null;
+  createdAt?: string | null;
+}
+
+/** /api/loans/summary row — outstanding per (direction, currency), never blended. */
+export interface LoanSummaryRow {
+  direction: LoanDirection;
+  currency: CurrencyCode;
+  outstanding: number;
+  openCount: number;
+}
+
+/** POST /api/loans/{id}/repayments response. */
+export interface RepaymentResult {
+  success: boolean;
+  loan: Loan;
+  repayment: LoanRepayment;
+  /** Whether a forwardable Telegram receipt was dispatched to the user. */
+  receiptSent: boolean;
+}
+
 /** Wrapped shape returned by paginated list endpoints (/api/trades, /api/admin/users, /api/admin/trades). */
 export interface Paginated<T> {
   items: T[];

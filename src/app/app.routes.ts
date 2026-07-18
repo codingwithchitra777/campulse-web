@@ -73,6 +73,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'loans',
+    loadComponent: () => import('./pages/loans/loans').then(m => m.LoansComponent),
+    canActivate: [authGuard]
+  },
+  {
     // Public on purpose: pure client-side tool, useful to guests too.
     path: 'loan-calculator',
     loadComponent: () => import('./pages/loan-calculator/loan-calculator').then(m => m.LoanCalculatorComponent)

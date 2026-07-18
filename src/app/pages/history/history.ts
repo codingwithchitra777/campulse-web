@@ -25,6 +25,7 @@ export class HistoryComponent {
 
   readonly offset = signal(0);
   readonly limit = signal(50);
+  readonly marketFilter = signal('');
   readonly tickerFilter = signal('');
   readonly exporting = signal(false);
 
@@ -33,9 +34,10 @@ export class HistoryComponent {
       userId: this.session.activeUserId(),
       offset: this.offset(),
       limit: this.limit(),
-      ticker: this.tickerFilter()
+      ticker: this.tickerFilter(),
+      market: this.marketFilter()
     }),
-    stream: ({ params }) => this.api.getTrades(params.ticker || undefined, params.limit, params.offset),
+    stream: ({ params }) => this.api.getTrades(params.ticker || undefined, params.limit, params.offset, params.market || undefined),
     defaultValue: { items: [], total: 0, limit: 50, offset: 0 } as Paginated<Trade>
   });
 
@@ -69,6 +71,11 @@ export class HistoryComponent {
     this.offset.set(0);
   }
 
+  setMarketFilter(market: string) {
+    this.marketFilter.set(market);
+    this.offset.set(0);
+  }
+
   setLimit(limit: number) {
     this.limit.set(limit);
     this.offset.set(0);
@@ -78,10 +85,11 @@ export class HistoryComponent {
     if (this.exporting()) return;
     this.exporting.set(true);
     const ticker = this.tickerFilter() || undefined;
+    const market = this.marketFilter() || undefined;
     const rows: Trade[] = [];
 
     const fetchPage = (offset: number) => {
-      this.api.getTrades(ticker, EXPORT_PAGE_SIZE, offset).subscribe({
+      this.api.getTrades(ticker, EXPORT_PAGE_SIZE, offset, market).subscribe({
         next: (page) => {
           rows.push(...page.items);
           if (rows.length < page.total && page.items.length > 0) {

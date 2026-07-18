@@ -55,6 +55,10 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
           <span>{{ 'NAV.JOURNAL' | translate }}</span>
         </a>
+        <a routerLink="/loans" routerLinkActive="active" class="side-link" [title]="sidebarCollapsed() ? ('NAV.LOANS' | translate) : ''">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><path d="M12 3v18"/></svg>
+          <span>{{ 'NAV.LOANS' | translate }}</span>
+        </a>
         <a routerLink="/ai-coach" routerLinkActive="active" class="side-link" [title]="sidebarCollapsed() ? ('NAV.AI_COACH' | translate) : ''">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 0 0-8 8v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a8 8 0 0 0-8-8Z"/><path d="M8 11h.01"/><path d="M16 11h.01"/></svg>
           <span>{{ 'NAV.AI_COACH' | translate }}</span>
@@ -331,6 +335,10 @@
         <a class="mas-grid-item" routerLink="/journal" (click)="closeMobileAccount()">
           <span class="mas-ico">📓</span>
           <span class="mas-label">{{ 'NAV.JOURNAL' | translate }}</span>
+        </a>
+        <a class="mas-grid-item" routerLink="/loans" (click)="closeMobileAccount()">
+          <span class="mas-ico">🤝</span>
+          <span class="mas-label">{{ 'NAV.LOANS' | translate }}</span>
         </a>
         <a class="mas-grid-item" routerLink="/ai-coach" (click)="closeMobileAccount()">
           <span class="mas-ico">🧠</span>

@@ -2,16 +2,39 @@
   <div class="history-panel">
     <h2 class="panel-title">📜 {{ 'HISTORY.TITLE' | translate }}</h2>
 
-    <div class="table-toolbar">
-      <label class="toolbar-filter">
-        <span class="text-muted">{{ 'HISTORY.FILTER_TICKER' | translate }}</span>
-        <select [ngModel]="tickerFilter()" (ngModelChange)="setFilter($event)" name="tickerFilter">
-          <option value="">{{ 'HISTORY.ALL_TICKERS' | translate }}</option>
-          @for (t of tickers.value(); track t.ticker) {
-            <option [value]="t.ticker">{{ t.ticker }}</option>
-          }
-        </select>
-      </label>
+    <div class="table-toolbar" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between;">
+      <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+        <!-- Market Filter (Radio Group) -->
+        <div class="radio-group" style="display: flex; gap: 8px;">
+          <label class="radio-label">
+            <input type="radio" name="marketFilter" [ngModel]="marketFilter()" (ngModelChange)="setMarketFilter($event)" value="">
+            <span class="radio-custom" style="padding: 4px 10px; font-size: calc(12px * var(--font-scale, 1));">All</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="marketFilter" [ngModel]="marketFilter()" (ngModelChange)="setMarketFilter($event)" value="CSX">
+            <span class="radio-custom" style="padding: 4px 10px; font-size: calc(12px * var(--font-scale, 1));">🇰🇭 CSX</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="marketFilter" [ngModel]="marketFilter()" (ngModelChange)="setMarketFilter($event)" value="US">
+            <span class="radio-custom" style="padding: 4px 10px; font-size: calc(12px * var(--font-scale, 1));">🇺🇸 US</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="marketFilter" [ngModel]="marketFilter()" (ngModelChange)="setMarketFilter($event)" value="GOLD_KH">
+            <span class="radio-custom" style="padding: 4px 10px; font-size: calc(12px * var(--font-scale, 1));">🥇 Gold</span>
+          </label>
+        </div>
+
+        <!-- Ticker Filter -->
+        <label class="toolbar-filter">
+          <span class="text-muted">{{ 'HISTORY.FILTER_TICKER' | translate }}</span>
+          <select [ngModel]="tickerFilter()" (ngModelChange)="setFilter($event)" name="tickerFilter">
+            <option value="">{{ 'HISTORY.ALL_TICKERS' | translate }}</option>
+            @for (t of tickers.value(); track t.ticker) {
+              <option [value]="t.ticker">{{ t.ticker }}</option>
+            }
+          </select>
+        </label>
+      </div>
       <button class="view-btn" (click)="exportCsv()" [disabled]="exporting() || trades.value().total === 0">
         📄 {{ exporting() ? '…' : ('HISTORY.EXPORT_CSV' | translate) }}
       </button>
