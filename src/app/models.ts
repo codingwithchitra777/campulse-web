@@ -112,6 +112,8 @@ export interface Trade {
   /** Journal note + comma-separated tags (nullable). */
   note?: string | null;
   tags?: string | null;
+  /** Set on rows created by a bonus/split; drives the "bonus" badge in history. */
+  corpActionId?: string | null;
 }
 
 /**
@@ -411,6 +413,23 @@ export interface CoachInsight {
 export interface CoachRefreshResponse extends CoachAiInsight {
   enabled: boolean;
   regenerated: boolean;
+}
+
+/** /api/admin/corporate-actions item — a bonus issue or forward split. */
+export interface CorporateAction {
+  actionId: string;
+  market: MarketKind;
+  symbol: string;
+  actionType: 'bonus' | 'split';
+  ratioNew: number;
+  ratioHeld: number;
+  /** ISO date (YYYY-MM-DD). */
+  exDate: string;
+  note: string | null;
+  createdBy: string | null;
+  createdAt: string | null;
+  /** ISO datetime once the daemon has applied it; null while pending. */
+  appliedAt: string | null;
 }
 
 /** Wrapped shape returned by paginated list endpoints (/api/trades, /api/admin/users, /api/admin/trades). */

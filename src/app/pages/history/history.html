@@ -44,6 +44,9 @@
                   @if (t.market && t.market !== 'CSX') {
                     <span class="market-tag" style="font-size: calc(10px * var(--font-scale, 1)); font-weight: 600; color: #94a3b8; background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 4px;">{{ t.market === 'GOLD_KH' ? 'GOLD' : t.market }}</span>
                   }
+                  @if (t.corpActionId) {
+                    <span class="market-tag" title="Bonus/split shares" style="font-size: calc(10px * var(--font-scale, 1)); font-weight: 600; color: #a5b4fc; background: rgba(99,102,241,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 4px;">🎁 BONUS</span>
+                  }
                 </td>
                 <td>
                   <span class="trade-side-badge" [ngClass]="t.side === 'BUY' ? 'badge-buy' : 'badge-sell'">

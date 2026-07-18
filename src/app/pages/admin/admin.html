@@ -40,6 +40,77 @@
     }
   </section>
 
+  <!-- Corporate actions (bonus shares / splits) -->
+  <section class="history-panel" style="margin-bottom: 20px;">
+    <h2 class="panel-title">🎁 Corporate actions</h2>
+    <p style="color: #9ca3af; font-size: calc(13px * var(--font-scale, 1)); margin-bottom: 12px;">
+      Register a bonus issue or forward split. On the ex-date, every holder's open lots are adjusted automatically
+      (shares up, average cost down, portfolio value unchanged) and their price alerts are rescaled — nothing happens until then.
+      Example: a PPSP 1:1 bonus is <strong>bonus, new 1, held 1</strong>.
+    </p>
+    <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #9ca3af;">Symbol
+        <input type="text" [(ngModel)]="ca.symbol" placeholder="PPSP"
+               style="max-width: 120px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #9ca3af;">Market
+        <select [(ngModel)]="ca.market" style="padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+          <option value="CSX">CSX</option><option value="US">US</option>
+        </select>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #9ca3af;">Type
+        <select [(ngModel)]="ca.actionType" style="padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+          <option value="bonus">Bonus</option><option value="split">Split</option>
+        </select>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #9ca3af;">New
+        <input type="number" min="1" [(ngModel)]="ca.ratioNew"
+               style="max-width: 70px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #9ca3af;">Held
+        <input type="number" min="1" [(ngModel)]="ca.ratioHeld"
+               style="max-width: 70px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #9ca3af;">Ex-date
+        <input type="date" [(ngModel)]="ca.exDate"
+               style="padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+      </label>
+      <button class="btn-primary" (click)="saveCorporateAction()" [disabled]="caSaving()">
+        {{ caSaving() ? 'Saving…' : 'Register' }}
+      </button>
+      @if (caMsg(); as m) { <span style="font-size: calc(13px * var(--font-scale, 1)); color: #9ca3af;">{{ m }}</span> }
+    </div>
+
+    @if (corpActions.value().items.length) {
+      <div class="table-container" style="margin-top: 14px;">
+        <table class="data-table">
+          <thead><tr><th>Symbol</th><th>Action</th><th>Ex-date</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            @for (a of corpActions.value().items; track a.actionId) {
+              <tr>
+                <td class="font-bold">{{ a.symbol }} <span style="color:#64748b;">({{ a.market }})</span></td>
+                <td>{{ a.ratioNew }}:{{ a.ratioHeld }} {{ a.actionType }}</td>
+                <td>{{ a.exDate | date:'mediumDate' }}</td>
+                <td>
+                  @if (a.appliedAt) {
+                    <span class="text-profit">Applied {{ a.appliedAt | date:'short' }}</span>
+                  } @else {
+                    <span style="color:#fbbf24;">Pending</span>
+                  }
+                </td>
+                <td>
+                  @if (!a.appliedAt) {
+                    <button class="btn-secondary" style="padding: 4px 10px;" (click)="deleteCorporateAction(a)">Delete</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
   <div class="history-panel">
     <h2 class="panel-title">👥 {{ 'ADMIN.USERS_TITLE' | translate }}</h2>
     @if (users.isLoading()) {

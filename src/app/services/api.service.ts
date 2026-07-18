@@ -7,6 +7,7 @@ import {
   Analytics,
   CoachInsight,
   CoachRefreshResponse,
+  CorporateAction,
   GoogleAuthResponse,
   Holding,
   NewsItem,
@@ -115,6 +116,28 @@ export class ApiService {
 
   setManualPrice(body: { price: number; market?: string; symbol?: string; currency?: string; change?: number }) {
     return this.http.put<any>(`${this.baseUrl}/api/admin/manual-price`, body);
+  }
+
+  getCorporateActions(): Observable<{ items: CorporateAction[] }> {
+    return this.http.get<{ items: CorporateAction[] }>(`${this.baseUrl}/api/admin/corporate-actions`);
+  }
+
+  createCorporateAction(body: {
+    symbol: string;
+    actionType: 'bonus' | 'split';
+    ratioNew: number;
+    ratioHeld: number;
+    exDate: string;
+    market?: string;
+    note?: string;
+  }): Observable<{ success: boolean; action: CorporateAction }> {
+    return this.http.post<{ success: boolean; action: CorporateAction }>(
+      `${this.baseUrl}/api/admin/corporate-actions`, body);
+  }
+
+  deleteCorporateAction(actionId: string): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(
+      `${this.baseUrl}/api/admin/corporate-actions/${actionId}`);
   }
 
   getPortfolio(): Observable<Holding[]> {
