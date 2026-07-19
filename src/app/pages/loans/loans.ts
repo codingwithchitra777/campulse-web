@@ -190,6 +190,7 @@ export class LoansComponent {
   // --- repayment drawer ---
   readonly viewingSchedule = signal<Loan | null>(null);
   readonly currentSchedule = signal<LoanSchedule | null>(null);
+  readonly confirmPayment = signal<{ amount: number, date: string } | null>(null);
   
   readonly mappedScheduleRows = computed(() => {
     const s = this.currentSchedule();
@@ -286,19 +287,29 @@ export class LoansComponent {
   }
 
   payRow(amount: number, date: string) {
-    if (!confirm(`Confirm payment of ${formatMoney(amount, this.viewingSchedule()?.currency || 'USD')} on ${date}?`)) return;
+    this.confirmPayment.set({ amount, date });
+  }
+
+  cancelPayment() {
+    this.confirmPayment.set(null);
+  }
+
+  executePayment() {
+    const c = this.confirmPayment();
+    if (!c) return;
     const loan = this.viewingSchedule();
     if (!loan) return;
     
     this.repaySaving.set(true);
     this.repayError.set(null);
     this.api.addRepayment(loan.loanId, {
-      amount,
-      paidDate: date,
+      amount: c.amount,
+      paidDate: c.date,
       note: 'Schedule Payment'
     }).subscribe({
       next: (res) => {
         this.repaySaving.set(false);
+        this.confirmPayment.set(null);
         this.closeSchedule();
         this.receiptNotice.set(res.receiptSent
           ? '✅ Repayment recorded — a receipt was sent to your Telegram to forward.'
@@ -308,6 +319,7 @@ export class LoansComponent {
       },
       error: (err) => {
         this.repaySaving.set(false);
+        this.confirmPayment.set(null);
         alert(err.error?.detail || 'Failed to record repayment');
       }
     });
@@ -316,6 +328,7 @@ export class LoansComponent {
   closeSchedule() {
     this.viewingSchedule.set(null);
     this.currentSchedule.set(null);
+    this.confirmPayment.set(null);
   }
 
   private reloadAll() {
