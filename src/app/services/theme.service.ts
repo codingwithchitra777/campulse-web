@@ -2,12 +2,11 @@ import { Injectable, effect, signal } from '@angular/core';
 
 const THEME_STORAGE_KEY = 'theme';
 
-export type Theme = 'dark' | 'light';
+export type Theme = 'dark' | 'light' | 'glass';
 
 /**
- * Dark/light theme state. Applied as a `light` class on <body> so the
- * `body.light ...` overrides in styles.css take effect; dark is the default
- * and needs no class. Persisted across sessions.
+ * Theme state. Applied as a class on <body> (e.g. `body.light` or `body.glass`);
+ * dark is the default and needs no class. Persisted across sessions.
  */
 @Injectable({
   providedIn: 'root'
@@ -17,9 +16,6 @@ export class ThemeService {
 
   constructor() {
     // Sync with the Telegram theme only when actually running inside Telegram.
-    // telegram-web-app.js defines window.Telegram.WebApp in regular browsers too
-    // (with colorScheme defaulting to 'light'), but initData is only populated
-    // inside the Mini App — without this gate every refresh resets to light.
     const webApp = (window as any).Telegram?.WebApp;
     if (webApp?.initData) {
       if (webApp.colorScheme) {
@@ -31,16 +27,25 @@ export class ThemeService {
     }
 
     effect(() => {
-      document.body.classList.toggle('light', this.theme() === 'light');
+      document.body.classList.remove('light', 'glass');
+      if (this.theme() !== 'dark') {
+        document.body.classList.add(this.theme());
+      }
       localStorage.setItem(THEME_STORAGE_KEY, this.theme());
     });
   }
 
   toggle() {
-    this.theme.update((t) => (t === 'dark' ? 'light' : 'dark'));
+    this.theme.update((t) => {
+      if (t === 'dark') return 'light';
+      if (t === 'light') return 'glass';
+      return 'dark';
+    });
   }
 }
 
 function restoreTheme(): Theme {
-  return localStorage.getItem(THEME_STORAGE_KEY) === 'light' ? 'light' : 'dark';
+  const t = localStorage.getItem(THEME_STORAGE_KEY);
+  if (t === 'light' || t === 'glass') return t as Theme;
+  return 'dark';
 }
