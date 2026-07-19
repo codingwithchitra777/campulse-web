@@ -81,6 +81,8 @@ export class DashboardComponent implements OnDestroy {
       const period = this.activePeriod();
       const lang = this.translateService.currentLang;
       
+      if (this.timelineResource.isLoading() || this.portfolio.isLoading()) return;
+      
       if (canvasRef && rawData) {
         this.buildChart(canvasRef.nativeElement, rawData, period);
       }

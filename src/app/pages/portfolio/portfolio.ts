@@ -144,6 +144,8 @@ export class PortfolioComponent implements OnDestroy {
       // Re-trigger chart build when language changes
       const lang = this.translateService.currentLang;
       
+      if (this.timelineResource.isLoading() || this.portfolio.isLoading()) return;
+      
       if (canvasRef && rawData) {
         this.buildPerformanceChart(canvasRef.nativeElement, rawData, period);
       }
@@ -155,6 +157,8 @@ export class PortfolioComponent implements OnDestroy {
       const activeData = this.activeHoldings();
       // Re-trigger on language change
       const lang = this.translateService.currentLang;
+      
+      if (this.portfolio.isLoading()) return;
       
       if (canvasRef && activeData) {
         this.buildAllocationChart(canvasRef.nativeElement, activeData);
