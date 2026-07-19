@@ -15,37 +15,14 @@
     </div>
   }
 
-  <!-- Create -->
-  <div class="dashboard-panel" style="margin-bottom: 20px; padding: 16px;">
-    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-      <div class="radio-group" style="display: flex; gap: 8px;">
-        <label class="radio-label"><input type="radio" name="ldir" [(ngModel)]="direction" value="lent"><span class="radio-custom">📤 {{ 'LOANS.DIR_LENT' | translate }}</span></label>
-        <label class="radio-label"><input type="radio" name="ldir" [(ngModel)]="direction" value="borrowed"><span class="radio-custom">📥 {{ 'LOANS.DIR_BORROWED' | translate }}</span></label>
-      </div>
-      <input type="text" [(ngModel)]="counterparty" [placeholder]="'LOANS.NAME_PLACEHOLDER' | translate"
-             style="min-width: 150px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
-      <input type="number" step="any" min="0" [(ngModel)]="principal" [placeholder]="'LOANS.AMOUNT_PLACEHOLDER' | translate"
-             style="min-width: 120px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
-      <select [(ngModel)]="currency" style="padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
-        <option value="USD">USD $</option>
-        <option value="KHR">KHR ៛</option>
-      </select>
-      <label class="muted" style="font-size: calc(12px * var(--font-scale, 1));">{{ 'LOANS.LOAN_DATE' | translate }}
-        <input type="date" [(ngModel)]="loanDate" [max]="today" style="padding: 7px 8px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
-      </label>
-      <label class="muted" style="font-size: calc(12px * var(--font-scale, 1));">{{ 'LOANS.DUE_DATE' | translate }}
-        <input type="date" [(ngModel)]="dueDate" style="padding: 7px 8px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
-      </label>
-      <input type="text" [(ngModel)]="note" [placeholder]="'LOANS.NOTE_PLACEHOLDER' | translate"
-             style="min-width: 140px; flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
-      <button class="btn-primary" (click)="save()" [disabled]="saving()">{{ saving() ? ('LOANS.BTN_SAVING' | translate) : '➕ ' + ('LOANS.BTN_ADD' | translate) }}</button>
-    </div>
-    @if (error(); as e) { <div class="alert error" style="margin-top: 10px;">{{ e }}</div> }
-  </div>
-
-  <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-    <label class="muted" style="font-size: calc(12px * var(--font-scale, 1)); cursor: pointer;">
-      <input type="checkbox" [ngModel]="showSettled()" (ngModelChange)="showSettled.set($event)"> {{ 'LOANS.SHOW_SETTLED' | translate }}
+  <!-- Header Actions -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <button class="btn-primary" (click)="openAdd()" style="padding: 10px 20px; font-size: calc(14px * var(--font-scale, 1)); border-radius: 8px;">
+      ➕ {{ 'LOANS.BTN_ADD' | translate }}
+    </button>
+    <label class="muted" style="font-size: calc(13px * var(--font-scale, 1)); cursor: pointer; display: flex; align-items: center; gap: 6px;">
+      <input type="checkbox" [ngModel]="showSettled()" (ngModelChange)="showSettled.set($event)" style="width: 16px; height: 16px; cursor: pointer;"> 
+      {{ 'LOANS.SHOW_SETTLED' | translate }}
     </label>
   </div>
 
@@ -68,7 +45,15 @@
             @for (l of lent(); track l.loanId) {
               <ng-container [ngTemplateOutlet]="loanRow" [ngTemplateOutletContext]="{ $implicit: l }"></ng-container>
             } @empty {
-              <tr><td class="text-center" style="padding: 24px;">{{ 'LOANS.NONE_LENT' | translate }}</td></tr>
+              <tr>
+                <td colspan="4" class="text-center" style="padding: 32px 16px;">
+                  <div style="font-size: 32px; margin-bottom: 8px; opacity: 0.5;">📤</div>
+                  <div style="color: #94a3b8; margin-bottom: 16px;">{{ 'LOANS.NONE_LENT' | translate }}</div>
+                  <button class="btn-primary" (click)="direction = 'lent'; openAdd()" style="padding: 6px 12px; font-size: 13px; border-radius: 6px;">
+                    ➕ {{ 'LOANS.BTN_ADD' | translate }}
+                  </button>
+                </td>
+              </tr>
             }
           </tbody>
         </table>
@@ -91,7 +76,15 @@
             @for (l of borrowed(); track l.loanId) {
               <ng-container [ngTemplateOutlet]="loanRow" [ngTemplateOutletContext]="{ $implicit: l }"></ng-container>
             } @empty {
-              <tr><td class="text-center" style="padding: 24px;">{{ 'LOANS.NONE_BORROWED' | translate }}</td></tr>
+              <tr>
+                <td colspan="4" class="text-center" style="padding: 32px 16px;">
+                  <div style="font-size: 32px; margin-bottom: 8px; opacity: 0.5;">📥</div>
+                  <div style="color: #94a3b8; margin-bottom: 16px;">{{ 'LOANS.NONE_BORROWED' | translate }}</div>
+                  <button class="btn-primary" (click)="direction = 'borrowed'; openAdd()" style="padding: 6px 12px; font-size: 13px; border-radius: 6px;">
+                    ➕ {{ 'LOANS.BTN_ADD' | translate }}
+                  </button>
+                </td>
+              </tr>
             }
           </tbody>
         </table>
@@ -162,5 +155,78 @@
         </form>
       </div>
     }
+  </div>
+
+  <!-- Add Loan drawer -->
+  @if (addingLoan()) {
+    <div class="drawer-backdrop" (click)="closeAdd()"></div>
+  }
+  <div class="side-drawer" [class.open]="addingLoan()">
+    <div class="drawer-header">
+      <h2 class="panel-title" style="margin: 0; font-size: calc(16px * var(--font-scale, 1));">➕ {{ 'LOANS.BTN_ADD' | translate }}</h2>
+      <button class="drawer-close-btn" (click)="closeAdd()" title="Close">✕</button>
+    </div>
+    <div class="drawer-content-scroll">
+      <form class="trade-form" (submit)="$event.preventDefault(); save()">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <div class="segmented-control" style="display: flex; background: #0f172a; padding: 4px; border-radius: 8px; border: 1px solid #334155;">
+            <label style="flex: 1; text-align: center; cursor: pointer; position: relative;">
+              <input type="radio" name="add_dir" [(ngModel)]="direction" value="lent" style="display: none;">
+              <div [style.background]="direction === 'lent' ? '#374151' : 'transparent'" [style.color]="direction === 'lent' ? '#f8fafc' : '#94a3b8'" style="padding: 8px; border-radius: 6px; font-size: calc(14px * var(--font-scale, 1)); font-weight: 500; transition: all 0.2s;">
+                📤 {{ 'LOANS.DIR_LENT' | translate }}
+              </div>
+            </label>
+            <label style="flex: 1; text-align: center; cursor: pointer; position: relative;">
+              <input type="radio" name="add_dir" [(ngModel)]="direction" value="borrowed" style="display: none;">
+              <div [style.background]="direction === 'borrowed' ? '#374151' : 'transparent'" [style.color]="direction === 'borrowed' ? '#f8fafc' : '#94a3b8'" style="padding: 8px; border-radius: 6px; font-size: calc(14px * var(--font-scale, 1)); font-weight: 500; transition: all 0.2s;">
+                📥 {{ 'LOANS.DIR_BORROWED' | translate }}
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'LOANS.NAME_PLACEHOLDER' | translate }}</label>
+          <input type="text" name="addCounterparty" [(ngModel)]="counterparty" required>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <div class="form-group" style="flex: 2; margin-bottom: 0;">
+            <label>{{ 'LOANS.AMOUNT_PLACEHOLDER' | translate }}</label>
+            <input type="number" name="addPrincipal" step="any" min="0" [(ngModel)]="principal" required>
+          </div>
+          <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <label>Currency</label>
+            <select name="addCurrency" [(ngModel)]="currency" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+              <option value="USD">USD $</option>
+              <option value="KHR">KHR ៛</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <label>{{ 'LOANS.LOAN_DATE' | translate }}</label>
+            <input type="date" name="addLoanDate" [(ngModel)]="loanDate" [max]="today" required>
+          </div>
+          <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <label>{{ 'LOANS.DUE_DATE' | translate }}</label>
+            <input type="date" name="addDueDate" [(ngModel)]="dueDate">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'LOANS.NOTE_PLACEHOLDER' | translate }}</label>
+          <input type="text" name="addNote" [(ngModel)]="note">
+        </div>
+
+        @if (error(); as e) { <div class="alert error" style="margin-bottom: 12px;">{{ e }}</div> }
+
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+          <button type="button" class="submit-btn" style="flex: 1; background: #374151; margin-top: 0;" (click)="closeAdd()">{{ 'LOANS.BTN_CANCEL' | translate }}</button>
+          <button type="submit" class="submit-btn btn-buy" style="flex: 1.5; margin-top: 0;" [disabled]="saving()">{{ saving() ? ('LOANS.BTN_SAVING' | translate) : '➕ ' + ('LOANS.BTN_ADD' | translate) }}</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

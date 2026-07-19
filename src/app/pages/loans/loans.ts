@@ -50,6 +50,7 @@ export class LoansComponent {
   readonly today = new Date().toISOString().split('T')[0];
 
   // --- create form ---
+  readonly addingLoan = signal(false);
   direction: LoanDirection = 'lent';
   counterparty = '';
   principal: number | null = null;
@@ -59,6 +60,22 @@ export class LoansComponent {
   note = '';
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
+
+  openAdd() {
+    this.addingLoan.set(true);
+    this.direction = 'lent';
+    this.counterparty = '';
+    this.principal = null;
+    this.currency = 'USD';
+    this.loanDate = this.today;
+    this.dueDate = '';
+    this.note = '';
+    this.error.set(null);
+  }
+
+  closeAdd() {
+    this.addingLoan.set(false);
+  }
 
   // --- repayment drawer ---
   readonly repayingLoan = signal<Loan | null>(null);
@@ -92,10 +109,7 @@ export class LoansComponent {
     }).subscribe({
       next: () => {
         this.saving.set(false);
-        this.counterparty = '';
-        this.principal = null;
-        this.dueDate = '';
-        this.note = '';
+        this.closeAdd();
         this.reloadAll();
       },
       error: (err) => {
