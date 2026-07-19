@@ -3887,6 +3887,25 @@ body.light .premium-upgrade-card {
   .mas-row.danger {
     color: #f87171;
   }
+  .mas-group {
+    margin-bottom: 12px;
+  }
+  .mas-group-title {
+    padding: 8px 12px;
+    font-size: calc(11px * var(--font-scale, 1));
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .mas-group-title .chevron {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .mas-group-title .chevron.collapsed {
+    transform: rotate(-90deg);
+  }
   .mas-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
