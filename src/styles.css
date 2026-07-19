@@ -2389,7 +2389,24 @@ body.light .time-btn.active {
   letter-spacing: 1px;
   font-weight: 700;
   color: #64748b;
-  margin-top: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.sidebar-group-title:hover {
+  color: #94a3b8;
+}
+
+.chevron {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chevron.collapsed {
+  transform: rotate(-90deg);
 }
 
 .sub-link {

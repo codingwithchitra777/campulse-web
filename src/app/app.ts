@@ -37,6 +37,21 @@ export class App {
   
   marketStatus = signal<{ open: boolean, text: string }>({ open: false, text: 'CSX Closed' });
 
+  // Sidebar Menu State
+  menuState = signal({
+    home: true,
+    markets: false,
+    trading: false,
+    analysis: false,
+    records: false,
+    finance: false,
+    admin: false
+  });
+
+  toggleMenu(section: keyof ReturnType<typeof this.menuState>) {
+    this.menuState.update(s => ({ ...s, [section]: !s[section] }));
+  }
+
   mobileMoreMenuOpen = false;
   // Mobile-only account sheet (the 5th bottom-nav slot). Absorbs what used to be
   // the "More" popup + the top-right profile dropdown into one surface on phones.
