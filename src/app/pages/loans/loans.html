@@ -220,6 +220,106 @@
           <input type="text" name="addNote" [(ngModel)]="note">
         </div>
 
+
+        <!-- Calculator Section -->
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <label style="font-weight: 600; color: #f8fafc; font-size: calc(14px * var(--font-scale, 1));">Amortization Schedule (Optional)</label>
+            <button type="button" class="btn-primary" (click)="toggleCalculator()" style="padding: 4px 10px; font-size: 12px; border-radius: 6px; background: transparent; border: 1px solid #3b82f6; color: #3b82f6;">
+              {{ showCalculator() ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+          
+          @if (showCalculator()) {
+            <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label>Interest Rate</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" name="calcRate" [(ngModel)]="ratePct" min="0" step="any" style="flex: 2;">
+                  <select name="calcRatePeriod" [(ngModel)]="ratePeriod" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+                    <option value="MONTH">/ mo</option>
+                    <option value="YEAR">/ yr</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label>Calculate By</label>
+                <div class="radio-group">
+                  <label class="radio-label">
+                    <input type="radio" name="calcMode" [(ngModel)]="calcMode" value="TERM">
+                    <span class="radio-custom">Term</span>
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="calcMode" [(ngModel)]="calcMode" value="PAYMENT">
+                    <span class="radio-custom">Payment</span>
+                  </label>
+                </div>
+              </div>
+
+              @if (calcMode === 'TERM') {
+                <div class="form-group" style="margin-bottom: 12px;">
+                  <label>Term (Months)</label>
+                  <input type="number" name="calcTerm" [(ngModel)]="termMonths" min="1" [max]="MAX_TERM">
+                </div>
+              } @else {
+                <div class="form-group" style="margin-bottom: 12px;">
+                  <label>Target Monthly Payment</label>
+                  <input type="number" name="calcTargetPayment" [(ngModel)]="targetPayment" min="1" step="any">
+                </div>
+              }
+
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label>Method</label>
+                <div class="radio-group">
+                  <label class="radio-label">
+                    <input type="radio" name="calcMethod" [(ngModel)]="method" value="DECLINING">
+                    <span class="radio-custom">Declining</span>
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="calcMethod" [(ngModel)]="method" value="FLAT">
+                    <span class="radio-custom">Flat</span>
+                  </label>
+                </div>
+              </div>
+
+              @if (calcError(); as err) {
+                <div class="alert error" style="margin-bottom: 12px; font-size: 12px; padding: 8px;">
+                  ❌ {{ err === 'PAYMENT_TOO_LOW' ? 'Payment too low to cover interest!' : 'Invalid inputs' }}
+                </div>
+              }
+
+              <button type="button" class="btn-primary" (click)="calculateSchedule()" style="width: 100%; padding: 10px; border-radius: 8px; justify-content: center;">
+                Calculate Schedule
+              </button>
+            </div>
+            
+            @if (schedule(); as s) {
+              <div style="margin-top: 16px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <h3 style="margin: 0; font-size: 14px; color: #f8fafc;">Schedule Generated</h3>
+                  <button type="button" (click)="exportCsv()" style="background: transparent; border: none; color: #3b82f6; cursor: pointer; font-size: 13px;">⬇ CSV</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
+                  <span class="muted">Term:</span>
+                  <span style="color: #f8fafc;">{{ termMonths }} months</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
+                  <span class="muted">Monthly:</span>
+                  <span style="color: #60a5fa;">{{ s.monthlyPayment | money:resultCurrency() }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                  <span class="muted">Total Interest:</span>
+                  <span style="color: #f59e0b;">{{ s.totalInterest | money:resultCurrency() }}</span>
+                </div>
+                <div class="quote-hint" style="margin-top: 12px; text-align: left; font-size: 11px;">
+                  Due Date has been automatically updated.
+                </div>
+              </div>
+            }
+          }
+        </div>
+
         @if (error(); as e) { <div class="alert error" style="margin-bottom: 12px;">{{ e }}</div> }
 
         <div style="display: flex; gap: 10px; margin-top: 24px;">

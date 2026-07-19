@@ -8,6 +8,8 @@ import { SessionService } from '../../services/session.service';
 import { MoneyPipe } from '../../utils/money';
 import { CurrencyCode, Loan, LoanDirection, LoanSummaryRow } from '../../models';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LoanMethod, LoanSchedule, MAX_TERM_MONTHS, RatePeriod, buildSchedule, calculateTermFromPayment } from '../../utils/loan';
+import { formatMoney } from '../../utils/money';
 
 /**
  * Personal loan ledger — money lent to / borrowed from people. Deliberately
@@ -61,6 +63,20 @@ export class LoansComponent {
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
 
+  // --- calculator extensions ---
+  readonly showCalculator = signal(false);
+  readonly MAX_TERM = MAX_TERM_MONTHS;
+  readonly termChips = [12, 24, 36, 60];
+  ratePct = 1.5;
+  ratePeriod: RatePeriod = 'MONTH';
+  termMonths = 24;
+  calcMode: 'TERM' | 'PAYMENT' = 'TERM';
+  targetPayment = 500;
+  method: LoanMethod = 'DECLINING';
+  readonly schedule = signal<LoanSchedule | null>(null);
+  readonly calcError = signal<string | null>(null);
+  readonly resultCurrency = signal<CurrencyCode>('USD');
+
   openAdd() {
     this.addingLoan.set(true);
     this.direction = 'lent';
@@ -71,10 +87,103 @@ export class LoansComponent {
     this.dueDate = '';
     this.note = '';
     this.error.set(null);
+    
+    this.showCalculator.set(false);
+    this.schedule.set(null);
+    this.calcError.set(null);
+    this.ratePct = 1.5;
+    this.termMonths = 24;
+    this.targetPayment = 500;
   }
 
   closeAdd() {
     this.addingLoan.set(false);
+  }
+
+  toggleCalculator() {
+    this.showCalculator.set(!this.showCalculator());
+  }
+
+  setTerm(months: number) {
+    this.termMonths = months;
+  }
+
+  calculateSchedule() {
+    this.calcError.set(null);
+    const amount = Number(this.principal);
+    const rate = Number(this.ratePct);
+    let term = Math.floor(Number(this.termMonths));
+
+    if (!(amount > 0) || !(rate >= 0) || !this.loanDate) {
+      this.schedule.set(null);
+      this.calcError.set('INVALID');
+      return;
+    }
+
+    if (this.calcMode === 'PAYMENT') {
+      const payment = Number(this.targetPayment);
+      if (!(payment > 0)) {
+        this.schedule.set(null);
+        this.calcError.set('INVALID');
+        return;
+      }
+      const calculatedTerm = calculateTermFromPayment(amount, rate, this.ratePeriod, this.method, payment);
+      if (calculatedTerm === null) {
+        this.schedule.set(null);
+        this.calcError.set('PAYMENT_TOO_LOW');
+        return;
+      }
+      term = Math.ceil(calculatedTerm);
+      this.termMonths = term;
+    }
+
+    if (!(term >= 1)) {
+      this.schedule.set(null);
+      this.calcError.set('INVALID');
+      return;
+    }
+    if (term > MAX_TERM_MONTHS) {
+      this.schedule.set(null);
+      this.calcError.set('TERM_TOO_LONG');
+      return;
+    }
+
+    const s = buildSchedule({
+      amount,
+      currency: this.currency,
+      ratePct: rate,
+      ratePeriod: this.ratePeriod,
+      termMonths: term,
+      method: this.method,
+      startDate: this.loanDate
+    });
+    this.schedule.set(s);
+    this.resultCurrency.set(this.currency);
+
+    if (s.rows.length > 0) {
+       this.dueDate = s.rows[s.rows.length - 1].date;
+    }
+  }
+
+  exportCsv() {
+    const s = this.schedule();
+    if (!s) return;
+    const cur = this.resultCurrency();
+    const esc = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
+    const header = ['No', 'DueDate', 'Payment', 'Principal', 'Interest', 'Balance'];
+    const lines = [
+      header.join(','),
+      ...s.rows.map((r) =>
+        [r.no, r.date, r.payment, r.principal, r.interest, r.balance].map(esc).join(',')
+      )
+    ];
+    const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `loan_schedule_${formatMoney(Number(this.principal || 0), cur).replace(/[^\d]/g, '')}_${cur}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   // --- repayment drawer ---
