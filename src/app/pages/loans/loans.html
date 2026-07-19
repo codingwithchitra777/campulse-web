@@ -112,47 +112,90 @@
       </td>
       <td style="text-align: right; padding-right: 16px; white-space: nowrap;">
         @if (l.status !== 'settled') {
-          <button class="btn-primary" (click)="openRepay(l)" style="border-radius: 4px; padding: 5px 10px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer; margin-right: 6px;">💵 {{ 'LOANS.BTN_REPAY' | translate }}</button>
+          <button class="btn-primary" (click)="openSchedule(l)" style="border-radius: 4px; padding: 5px 10px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer; margin-right: 6px;">📅 Schedule</button>
         }
         <button class="btn-danger" (click)="remove(l)" style="border-radius: 4px; padding: 5px 10px; font-size: calc(12px * var(--font-scale, 1)); cursor: pointer;">{{ 'LOANS.BTN_DELETE' | translate }}</button>
       </td>
     </tr>
   </ng-template>
 
-  <!-- Repayment drawer -->
-  @if (repayingLoan()) {
-    <div class="drawer-backdrop" (click)="closeRepay()"></div>
+  <!-- Schedule drawer -->
+  @if (viewingSchedule()) {
+    <div class="drawer-backdrop" (click)="closeSchedule()"></div>
   }
-  <div class="side-drawer" [class.open]="repayingLoan() !== null">
-    @if (repayingLoan(); as l) {
+  <div class="side-drawer" [class.open]="viewingSchedule() !== null">
+    @if (viewingSchedule(); as l) {
       <div class="drawer-header">
-        <h2 class="panel-title" style="margin: 0; font-size: calc(16px * var(--font-scale, 1));">💵 {{ 'LOANS.RECORD_REPAYMENT' | translate }}: {{ l.counterparty }}</h2>
-        <button class="drawer-close-btn" (click)="closeRepay()" title="Close">✕</button>
+        <h2 class="panel-title" style="margin: 0; font-size: calc(16px * var(--font-scale, 1));">📅 Schedule: {{ l.counterparty }}</h2>
+        <button class="drawer-close-btn" (click)="closeSchedule()" title="Close">✕</button>
       </div>
       <div class="drawer-content-scroll">
-        <p class="muted" style="font-size: calc(13px * var(--font-scale, 1)); margin-top: 0;">
-          {{ 'LOANS.OUTSTANDING' | translate }}: <strong>{{ l.outstanding | money:l.currency }}</strong> {{ 'LOANS.OF' | translate }} {{ l.principal | money:l.currency }}
-        </p>
-        <form class="trade-form" (submit)="$event.preventDefault(); saveRepayment()">
-          <div class="form-group">
-            <label for="repayAmount">{{ 'LOANS.AMOUNT_PAID' | translate }} ({{ l.currency }})</label>
-            <input type="number" id="repayAmount" name="repayAmount" step="any" min="0" [(ngModel)]="repayAmount" required>
+        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 16px;">
+          <p class="muted" style="font-size: calc(13px * var(--font-scale, 1)); margin: 0 0 8px 0;">
+            {{ 'LOANS.OUTSTANDING' | translate }}: <strong>{{ l.outstanding | money:l.currency }}</strong> {{ 'LOANS.OF' | translate }} {{ l.principal | money:l.currency }}
+          </p>
+          <form class="trade-form" (submit)="$event.preventDefault(); saveRepayment()">
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label for="repayAmount" style="font-size: 11px;">Amount ({{ l.currency }})</label>
+                <input type="number" id="repayAmount" name="repayAmount" step="any" min="0" [(ngModel)]="repayAmount" required style="padding: 6px; font-size: 13px;">
+              </div>
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label for="repayDate" style="font-size: 11px;">Date</label>
+                <input type="date" id="repayDate" name="repayDate" [(ngModel)]="repayDate" [max]="today" required style="padding: 6px; font-size: 13px;">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label for="repayNote" style="font-size: 11px;">{{ 'LOANS.NOTE' | translate }}</label>
+              <input type="text" id="repayNote" name="repayNote" [(ngModel)]="repayNote" style="padding: 6px; font-size: 13px;">
+            </div>
+            @if (repayError(); as e) { <div class="alert error" style="margin-bottom: 12px; font-size: 12px; padding: 6px;">{{ e }}</div> }
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-primary" [disabled]="repaySaving()" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">{{ repaySaving() ? ('LOANS.BTN_SAVING' | translate) : '💵 Make Payment' }}</button>
+            </div>
+          </form>
+        </div>
+
+        @if (currentSchedule(); as s) {
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <h3 style="margin: 0; font-size: 14px; color: #f8fafc;">Amortization Schedule</h3>
+              <span class="muted" style="font-size: 11px;">{{ s.totalInterest | money:l.currency }} Interest</span>
+            </div>
+            <div class="table-container">
+              <table class="data-table" style="width: 100%; font-size: 12px;">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Payment</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of s.rows; track row.no) {
+                    <tr>
+                      <td>
+                        <div>{{ row.date | date:'shortDate' }}</div>
+                        <div class="muted" style="font-size: 10px;">Bal: {{ row.balance | money:l.currency }}</div>
+                      </td>
+                      <td>
+                        <div style="color: #34d399; font-weight: 600;">{{ row.payment | money:l.currency }}</div>
+                        <div class="muted" style="font-size: 10px;">P: {{ row.principal }} / I: {{ row.interest }}</div>
+                      </td>
+                      <td style="text-align: right;">
+                        <button type="button" class="btn-primary" (click)="fillRepay(row.payment, row.date)" style="background: transparent; border: 1px solid #3b82f6; color: #3b82f6; padding: 2px 8px; font-size: 11px; border-radius: 4px;">Pay</button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="repayDate">{{ 'LOANS.PAID_DATE' | translate }}</label>
-            <input type="date" id="repayDate" name="repayDate" [(ngModel)]="repayDate" [max]="today" required>
+        } @else {
+          <div class="alert info" style="font-size: 13px;">
+            No schedule found. This loan was recorded without amortization calculation.
           </div>
-          <div class="form-group">
-            <label for="repayNote">{{ 'LOANS.NOTE' | translate }}</label>
-            <input type="text" id="repayNote" name="repayNote" [(ngModel)]="repayNote">
-          </div>
-          @if (repayError(); as e) { <div class="alert error" style="margin-bottom: 12px;">{{ e }}</div> }
-          <p class="muted" style="font-size: calc(11px * var(--font-scale, 1));">{{ 'LOANS.RECEIPT_HINT' | translate }}</p>
-          <div style="display: flex; gap: 10px;">
-            <button type="button" class="submit-btn" style="flex: 1; background: #374151; margin-top: 0;" (click)="closeRepay()">{{ 'LOANS.BTN_CANCEL' | translate }}</button>
-            <button type="submit" class="submit-btn btn-buy" style="flex: 1.5; margin-top: 0;" [disabled]="repaySaving()">{{ repaySaving() ? ('LOANS.BTN_SAVING' | translate) : ('LOANS.BTN_SAVE' | translate) }}</button>
-          </div>
-        </form>
+        }
       </div>
     }
   </div>

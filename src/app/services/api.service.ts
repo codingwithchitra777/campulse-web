@@ -233,6 +233,11 @@ export class ApiService {
     loanDate?: string;
     dueDate?: string;
     note?: string;
+    ratePct?: number;
+    ratePeriod?: string;
+    termMonths?: number;
+    method?: string;
+    fixedPayment?: number;
   }): Observable<{ success: boolean; loan: Loan }> {
     return this.http.post<{ success: boolean; loan: Loan }>(`${this.baseUrl}/api/loans`, body);
   }

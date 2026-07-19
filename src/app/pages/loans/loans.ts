@@ -188,7 +188,8 @@ export class LoansComponent {
   }
 
   // --- repayment drawer ---
-  readonly repayingLoan = signal<Loan | null>(null);
+  readonly viewingSchedule = signal<Loan | null>(null);
+  readonly currentSchedule = signal<LoanSchedule | null>(null);
   repayAmount: number | null = null;
   repayDate = this.today;
   repayNote = '';
@@ -215,7 +216,12 @@ export class LoansComponent {
       currency: this.currency,
       loanDate: this.loanDate || undefined,
       dueDate: this.dueDate || undefined,
-      note: this.note.trim() || undefined
+      note: this.note.trim() || undefined,
+      ratePct: this.schedule() ? Number(this.ratePct) : undefined,
+      ratePeriod: this.schedule() ? this.ratePeriod : undefined,
+      termMonths: this.schedule() ? Number(this.termMonths) : undefined,
+      method: this.schedule() ? this.method : undefined,
+      fixedPayment: this.schedule() && this.calcMode === 'PAYMENT' ? Number(this.targetPayment) : undefined
     }).subscribe({
       next: () => {
         this.saving.set(false);
@@ -236,20 +242,42 @@ export class LoansComponent {
     });
   }
 
-  openRepay(loan: Loan) {
-    this.repayingLoan.set(loan);
+  openSchedule(loan: Loan) {
+    this.viewingSchedule.set(loan);
     this.repayAmount = loan.outstanding > 0 ? loan.outstanding : null;
     this.repayDate = this.today;
     this.repayNote = '';
     this.repayError.set(null);
+    
+    if (loan.ratePct != null && loan.termMonths != null && loan.method && loan.ratePeriod) {
+      const s = buildSchedule({
+        amount: loan.principal,
+        currency: loan.currency,
+        ratePct: loan.ratePct,
+        ratePeriod: loan.ratePeriod,
+        termMonths: loan.termMonths,
+        method: loan.method,
+        startDate: loan.loanDate,
+        fixedMonthlyPayment: loan.fixedPayment
+      });
+      this.currentSchedule.set(s);
+    } else {
+      this.currentSchedule.set(null);
+    }
   }
 
-  closeRepay() {
-    this.repayingLoan.set(null);
+  fillRepay(amount: number, date: string) {
+    this.repayAmount = amount;
+    this.repayDate = date;
+  }
+
+  closeSchedule() {
+    this.viewingSchedule.set(null);
+    this.currentSchedule.set(null);
   }
 
   saveRepayment() {
-    const loan = this.repayingLoan();
+    const loan = this.viewingSchedule();
     if (!loan) return;
     if (!this.repayAmount || this.repayAmount <= 0) {
       this.repayError.set('Enter a positive amount');
@@ -264,7 +292,7 @@ export class LoansComponent {
     }).subscribe({
       next: (res) => {
         this.repaySaving.set(false);
-        this.closeRepay();
+        this.closeSchedule();
         this.receiptNotice.set(res.receiptSent
           ? '✅ Repayment recorded — a receipt was sent to your Telegram to forward.'
           : '✅ Repayment recorded.');

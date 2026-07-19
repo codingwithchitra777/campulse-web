@@ -465,6 +465,11 @@ export interface Loan {
   /** Σ repayments and principal − repaid (floored at 0), computed server-side. */
   repaid: number;
   outstanding: number;
+  ratePct?: number;
+  ratePeriod?: 'MONTH' | 'YEAR';
+  termMonths?: number;
+  method?: 'DECLINING' | 'FLAT';
+  fixedPayment?: number;
 }
 
 /** A single repayment against a loan. */
