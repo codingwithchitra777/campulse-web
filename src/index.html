@@ -17,7 +17,94 @@
 </head>
 
 <body>
-  <app-root></app-root>
+  <app-root>
+    <style>
+      body {
+        margin: 0;
+        background-color: #0f172a; /* default dark background */
+      }
+      .app-shell {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      .app-shell-sidebar {
+        width: 260px;
+        background-color: #0f172a;
+        border-right: 1px solid #1e293b;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .app-shell-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #0f172a;
+      }
+      .app-shell-header {
+        height: 64px;
+        border-bottom: 1px solid #1e293b;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        justify-content: flex-end;
+      }
+      .app-shell-content {
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .shell-skeleton {
+        background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+        background-size: 200% 100%;
+        animation: shell-pulse 1.5s infinite;
+        border-radius: 8px;
+      }
+      @keyframes shell-pulse {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      
+      /* Mobile responsiveness */
+      @media (max-width: 768px) {
+        .app-shell-sidebar { display: none; }
+        .app-shell-header { justify-content: space-between; }
+        .app-shell-content { padding: 16px; }
+      }
+    </style>
+    <div class="app-shell">
+      <!-- Sidebar -->
+      <div class="app-shell-sidebar">
+        <div class="shell-skeleton" style="height: 40px; width: 70%; margin-bottom: 24px; border-radius: 6px;"></div>
+        <div class="shell-skeleton" style="height: 44px; width: 100%; border-radius: 6px;"></div>
+        <div class="shell-skeleton" style="height: 44px; width: 100%; border-radius: 6px;"></div>
+        <div class="shell-skeleton" style="height: 44px; width: 100%; border-radius: 6px;"></div>
+        <div class="shell-skeleton" style="height: 44px; width: 100%; border-radius: 6px;"></div>
+      </div>
+      <!-- Main Content -->
+      <div class="app-shell-main">
+        <!-- Header -->
+        <div class="app-shell-header">
+           <div class="shell-skeleton" style="height: 36px; width: 140px; border-radius: 20px;"></div>
+        </div>
+        <!-- Content Area -->
+        <div class="app-shell-content">
+           <div class="shell-skeleton" style="height: 36px; width: 250px; margin-bottom: 16px;"></div>
+           <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+             <div class="shell-skeleton" style="height: 110px; flex: 1; min-width: 200px;"></div>
+             <div class="shell-skeleton" style="height: 110px; flex: 1; min-width: 200px;"></div>
+             <div class="shell-skeleton" style="height: 110px; flex: 1; min-width: 200px;"></div>
+           </div>
+           <div class="shell-skeleton" style="height: 350px; width: 100%; margin-top: 12px;"></div>
+        </div>
+      </div>
+    </div>
+  </app-root>
 </body>
 
 </html>
