@@ -10,7 +10,15 @@
 
   <div class="dashboard-panel" style="padding: 0;">
     @if (trades.isLoading()) {
-      <div class="panel-loader">{{ 'JOURNAL.LOADING' | translate }}</div>
+      <div style="display: flex; flex-direction: column;">
+        @for (i of [1,2,3]; track i) {
+          <div style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+            <div class="skeleton" style="height: 24px; width: 60%; margin-bottom: 12px;"></div>
+            <div class="skeleton" style="height: 16px; width: 40%; margin-bottom: 8px;"></div>
+            <div class="skeleton" style="height: 16px; width: 80%;"></div>
+          </div>
+        }
+      </div>
     } @else {
       <div style="display: flex; flex-direction: column;">
         @for (t of visible(); track t.tradeId) {

@@ -40,7 +40,24 @@
     </div>
 
     @if (trades.isLoading()) {
-      <div class="panel-loader">Loading...</div>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Seq</th><th>{{ 'DASHBOARD.COL_TICKER' | translate }}</th><th>{{ 'TRADE.ACTION' | translate }}</th><th>{{ 'TRADE.QTY' | translate }}</th><th>{{ 'TRADE.PRICE_SHARE' | translate }}</th><th>{{ 'TRADE.SUBTOTAL' | translate }}</th><th>{{ 'TRADE.COMMISSION' | translate }}</th><th>{{ 'PORTFOLIO.DRAWER.DATE' | translate }}</th><th>{{ 'HISTORY.COL_ACTIONS' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (i of [1,2,3,4,5]; track i) {
+              <tr>
+                <td colspan="9">
+                  <div class="skeleton" style="height: 32px; width: 100%;"></div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     } @else {
       <div class="table-container">
         <table class="data-table">

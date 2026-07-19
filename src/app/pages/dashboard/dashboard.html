@@ -7,59 +7,64 @@
       <h1 class="greeting">{{ 'DASHBOARD.GREETING' | translate:{name: userName()} }}</h1>
       
       <div class="portfolio-summary-cards">
-        
-        <!-- Portfolio Value -->
-        <div class="summary-card">
-          <div class="card-label">
-            <span class="label-icon">📄</span>
-            {{ 'DASHBOARD.PORTFOLIO_VALUE' | translate }}
-          </div>
-          <div class="card-value">{{ totalPortfolioValue() | number }} <span class="currency">riel</span></div>
-          <div class="card-subtitle">
-            <span class="badge profit-badge">↗ +1.2%</span>
-            <span class="subtitle-text">{{ 'DASHBOARD.VS_YESTERDAY' | translate }}</span>
-          </div>
-        </div>
-        
-        <!-- Today's Gain -->
-        <div class="summary-card">
-          <div class="card-label">
-            <span class="label-icon">📅</span>
-            {{ 'DASHBOARD.TODAYS_GAIN' | translate }}
-          </div>
-          <div class="card-value" [ngClass]="totalUnrealisedPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-            {{ totalUnrealisedPnl() >= 0 ? '+' : '' }}{{ totalUnrealisedPnl() | number }} <span class="currency">riel</span>
-          </div>
-          <div class="card-subtitle progress-subtitle">
-            <div class="progress-bar-container">
-              <div class="progress-bar-fill" style="width: 65%;"></div>
+        @if (portfolio.isLoading()) {
+          <!-- Skeleton Cards -->
+          <div class="summary-card skeleton" style="height: 110px;"></div>
+          <div class="summary-card skeleton" style="height: 110px;"></div>
+          <div class="summary-card skeleton" style="height: 110px;"></div>
+        } @else {
+          <!-- Portfolio Value -->
+          <div class="summary-card">
+            <div class="card-label">
+              <span class="label-icon">📄</span>
+              {{ 'DASHBOARD.PORTFOLIO_VALUE' | translate }}
             </div>
-            <span class="subtitle-text">{{ 'DASHBOARD.TARGET' | translate }}</span>
+            <div class="card-value">{{ totalPortfolioValue() | number }} <span class="currency">riel</span></div>
+            <div class="card-subtitle">
+              <span class="badge profit-badge">↗ +1.2%</span>
+              <span class="subtitle-text">{{ 'DASHBOARD.VS_YESTERDAY' | translate }}</span>
+            </div>
           </div>
-        </div>
+          
+          <!-- Today's Gain -->
+          <div class="summary-card">
+            <div class="card-label">
+              <span class="label-icon">📅</span>
+              {{ 'DASHBOARD.TODAYS_GAIN' | translate }}
+            </div>
+            <div class="card-value" [ngClass]="totalUnrealisedPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
+              {{ totalUnrealisedPnl() >= 0 ? '+' : '' }}{{ totalUnrealisedPnl() | number }} <span class="currency">riel</span>
+            </div>
+            <div class="card-subtitle progress-subtitle">
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: 65%;"></div>
+              </div>
+              <span class="subtitle-text">{{ 'DASHBOARD.TARGET' | translate }}</span>
+            </div>
+          </div>
 
-        <!-- Total Return -->
-        <div class="summary-card">
-          <div class="card-label">
-            <span class="label-icon">📈</span>
-            {{ 'DASHBOARD.TOTAL_RETURN' | translate }}
+          <!-- Total Return -->
+          <div class="summary-card">
+            <div class="card-label">
+              <span class="label-icon">📈</span>
+              {{ 'DASHBOARD.TOTAL_RETURN' | translate }}
+            </div>
+            <div class="card-value" [ngClass]="totalPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
+              {{ totalPnl() >= 0 ? '+' : '' }}{{ totalPnl() | number }} <span class="currency">riel</span>
+            </div>
+            <div class="card-subtitle">
+              <span class="badge profit-badge" [ngClass]="totalPnl() >= 0 ? 'profit-badge' : 'loss-badge'">
+                {{ totalPnl() >= 0 ? '↗' : '↘' }} 
+                @if (totalPortfolioValue() > 0) {
+                  {{ (totalPnl() / totalPortfolioValue()) * 100 | number:'1.1-1' }}%
+                } @else {
+                  0.0%
+                }
+              </span>
+              <span class="subtitle-text">{{ 'DASHBOARD.ALL_TIME' | translate }}</span>
+            </div>
           </div>
-          <div class="card-value" [ngClass]="totalPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-            {{ totalPnl() >= 0 ? '+' : '' }}{{ totalPnl() | number }} <span class="currency">riel</span>
-          </div>
-          <div class="card-subtitle">
-            <span class="badge profit-badge" [ngClass]="totalPnl() >= 0 ? 'profit-badge' : 'loss-badge'">
-              {{ totalPnl() >= 0 ? '↗' : '↘' }} 
-              @if (totalPortfolioValue() > 0) {
-                {{ (totalPnl() / totalPortfolioValue()) * 100 | number:'1.1-1' }}%
-              } @else {
-                0.0%
-              }
-            </span>
-            <span class="subtitle-text">{{ 'DASHBOARD.ALL_TIME' | translate }}</span>
-          </div>
-        </div>
-
+        }
       </div>
     </section>
 
@@ -81,7 +86,7 @@
           </div>
           
           @if (timelineResource.isLoading()) {
-            <div class="panel-loader">Loading...</div>
+            <div class="chart-container skeleton" style="height: 300px; margin-top: 20px;"></div>
           } @else {
             <div class="chart-container" style="height: 300px; margin-top: 20px;">
               <canvas #performanceCanvas></canvas>
@@ -103,24 +108,32 @@
             </div>
           </div>
           
-          <div class="movers-list">
-            @for (stock of sortedMarketList(); track stock.ticker) {
-              <div class="mover-item">
-                <span class="mover-ticker-col">{{ stock.ticker }}</span>
-                <div class="mover-chart-col">
-                  @if (sparklines.value()[stock.ticker]) {
-                    <app-sparkline [data]="sparklines.value()[stock.ticker]" [width]="160" [height]="50" style="max-width: 100%;"></app-sparkline>
-                  }
+          @if (marketPrices.isLoading()) {
+            <div class="movers-list">
+              @for (i of [1,2,3,4]; track i) {
+                <div class="mover-item skeleton" style="height: 60px; margin-bottom: 8px;"></div>
+              }
+            </div>
+          } @else {
+            <div class="movers-list">
+              @for (stock of sortedMarketList(); track stock.ticker) {
+                <div class="mover-item">
+                  <span class="mover-ticker-col">{{ stock.ticker }}</span>
+                  <div class="mover-chart-col">
+                    @if (sparklines.value()[stock.ticker]) {
+                      <app-sparkline [data]="sparklines.value()[stock.ticker]" [width]="160" [height]="50" style="max-width: 100%;"></app-sparkline>
+                    }
+                  </div>
+                  <div class="mover-price-col">
+                    <span class="mover-price">{{ stock.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
+                    <span class="mover-change" [ngClass]="(stock.change || 0) > 0 ? 'text-profit' : ((stock.change || 0) < 0 ? 'text-loss' : 'text-muted')">{{ formatChange(stock) }}</span>
+                  </div>
                 </div>
-                <div class="mover-price-col">
-                  <span class="mover-price">{{ stock.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
-                  <span class="mover-change" [ngClass]="(stock.change || 0) > 0 ? 'text-profit' : ((stock.change || 0) < 0 ? 'text-loss' : 'text-muted')">{{ formatChange(stock) }}</span>
-                </div>
-              </div>
-            } @empty {
-              <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
-            }
-          </div>
+              } @empty {
+                <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_DATA' | translate }}</div>
+              }
+            </div>
+          }
         </div>
 
       </div>
@@ -131,27 +144,35 @@
         <!-- Recent Trades -->
         <div class="dashboard-panel">
           <h2 class="panel-title">{{ 'DASHBOARD.RECENT_TRADES' | translate }}</h2>
-          <div class="recent-trades-list">
-            @for (t of recentTrades.value().items; track t.tradeId) {
-              <div class="trade-item">
-                <div class="trade-icon" [ngClass]="t.side === 'BUY' ? 'icon-buy' : 'icon-sell'">
-                  {{ t.side === 'BUY' ? 'B' : 'S' }}
-                </div>
-                <div class="trade-details">
-                  <div class="trade-ticker-row">
-                    <span class="trade-ticker">{{ t.ticker }}</span>
-                    <span class="trade-amount">{{ t.qty }} shares</span>
+          @if (recentTrades.isLoading()) {
+            <div class="recent-trades-list">
+              @for (i of [1,2,3]; track i) {
+                <div class="trade-item skeleton" style="height: 60px; margin-bottom: 8px;"></div>
+              }
+            </div>
+          } @else {
+            <div class="recent-trades-list">
+              @for (t of recentTrades.value().items; track t.tradeId) {
+                <div class="trade-item">
+                  <div class="trade-icon" [ngClass]="t.side === 'BUY' ? 'icon-buy' : 'icon-sell'">
+                    {{ t.side === 'BUY' ? 'B' : 'S' }}
                   </div>
-                  <div class="trade-date-row">
-                    <span class="trade-date">{{ t.orderDate | date:'mediumDate' }}</span>
-                    <span class="trade-price">{{ t.price | number }} riel</span>
+                  <div class="trade-details">
+                    <div class="trade-ticker-row">
+                      <span class="trade-ticker">{{ t.ticker }}</span>
+                      <span class="trade-amount">{{ t.qty }} shares</span>
+                    </div>
+                    <div class="trade-date-row">
+                      <span class="trade-date">{{ t.orderDate | date:'mediumDate' }}</span>
+                      <span class="trade-price">{{ t.price | number }} riel</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            } @empty {
-              <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_RECENT_TRADES' | translate }}</div>
-            }
-          </div>
+              } @empty {
+                <div class="text-center" style="color: #64748b; font-size: calc(13px * var(--font-scale, 1));">{{ 'DASHBOARD.NO_RECENT_TRADES' | translate }}</div>
+              }
+            </div>
+          }
         </div>
 
         <!-- AI Insight Card -->
