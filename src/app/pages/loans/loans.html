@@ -155,9 +155,22 @@
 
         @if (currentSchedule(); as s) {
           <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+              <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid #334155;">
+                <div class="muted" style="font-size: 11px; margin-bottom: 4px;">Total Repay Amount</div>
+                <div style="font-size: 14px; font-weight: 600; color: #f8fafc;">{{ l.principal | money:l.currency }}</div>
+              </div>
+              <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid #334155;">
+                <div class="muted" style="font-size: 11px; margin-bottom: 4px;">Total Interest</div>
+                <div style="font-size: 14px; font-weight: 600; color: #fbbf24;">{{ s.totalInterest | money:l.currency }}</div>
+              </div>
+              <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid #334155;">
+                <div class="muted" style="font-size: 11px; margin-bottom: 4px;">Total Payment</div>
+                <div style="font-size: 14px; font-weight: 600; color: #34d399;">{{ (l.principal + s.totalInterest) | money:l.currency }}</div>
+              </div>
+            </div>
+            <div style="margin-bottom: 8px;">
               <h3 style="margin: 0; font-size: 14px; color: #f8fafc;">Amortization Schedule</h3>
-              <span class="muted" style="font-size: 11px;">{{ s.totalInterest | money:l.currency }} Interest</span>
             </div>
             <div class="table-container">
               <table class="data-table" style="width: 100%; font-size: 12px; min-width: 600px;">
@@ -197,6 +210,15 @@
                     </tr>
                   }
                 </tbody>
+                <tfoot>
+                  <tr style="background: rgba(0,0,0,0.3); border-top: 1px solid #334155;">
+                    <td colspan="2" style="text-align: right; padding: 12px; font-weight: 600;">Total:</td>
+                    <td style="color: #fbbf24; font-weight: 600;">{{ s.totalInterest | money:l.currency }}</td>
+                    <td style="font-weight: 600;">{{ l.principal | money:l.currency }}</td>
+                    <td style="color: #34d399; font-weight: 600;">{{ (l.principal + s.totalInterest) | money:l.currency }}</td>
+                    <td colspan="3"></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>
