@@ -1,0 +1,56 @@
+<div class="view-container animate-fade-in">
+  <div class="history-panel">
+    <h2 class="panel-title">👥 {{ 'ADMIN.USERS_TITLE' | translate }}</h2>
+    @if (users.isLoading()) {
+      <div class="panel-loader">{{ 'ADMIN.LOADING_USERS' | translate }}</div>
+    } @else {
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>{{ 'ADMIN.COL_USER_ID' | translate }}</th>
+              <th>{{ 'ADMIN.COL_NAME' | translate }}</th>
+              <th>{{ 'ADMIN.COL_ROLE' | translate }}</th>
+              <th>{{ 'ADMIN.COL_JOINED' | translate }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of users.value().items; track u.userId) {
+              <tr>
+                <td class="font-bold">{{ u.userId }}</td>
+                <td>{{ u.userName }}</td>
+                <td>
+                  <span class="trade-side-badge" [ngClass]="u.role === 'admin' ? 'badge-buy' : 'badge-sell'">
+                    {{ u.role }}
+                  </span>
+                </td>
+                <td class="date-text">{{ u.registerDate | date:'medium' }}</td>
+                <td>
+                  @if (u.userId !== session.activeUserId()) {
+                    <button class="topbar-icon-btn" (click)="toggleRole(u)">
+                      {{ u.role === 'admin' ? ('ADMIN.BTN_DEMOTE' | translate) : ('ADMIN.BTN_PROMOTE' | translate) }}
+                    </button>
+                  } @else {
+                    <span class="text-muted">{{ 'ADMIN.YOU' | translate }}</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="text-center">{{ 'ADMIN.NO_USERS' | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pager
+        [total]="users.value().total"
+        [limit]="usersLimit()"
+        [offset]="usersOffset()"
+        (offsetChange)="usersOffset.set($event)"
+        (limitChange)="setUsersLimit($event)"
+      ></app-pager>
+    }
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<div class="view-container animate-fade-in">
+  <div class="history-panel">
+    <h2 class="panel-title">📜 {{ 'ADMIN.ALL_TRADES_TITLE' | translate }}</h2>
+    @if (trades.isLoading()) {
+      <div class="panel-loader">{{ 'ADMIN.LOADING_TRADES' | translate }}</div>
+    } @else {
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>{{ 'ADMIN.COL_USER_ID' | translate }}</th>
+              <th>{{ 'HISTORY.COL_STOCK' | translate }}</th>
+              <th>{{ 'HISTORY.COL_ACTION' | translate }}</th>
+              <th>{{ 'HISTORY.COL_QTY' | translate }}</th>
+              <th>{{ 'HISTORY.COL_PRICE' | translate }}</th>
+              <th>{{ 'HISTORY.COL_COMMISSION' | translate }}</th>
+              <th>{{ 'HISTORY.COL_DATE' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of trades.value().items; track t.tradeId) {
+              <tr>
+                <td class="font-bold">{{ t.userId }}</td>
+                <td class="font-bold">{{ t.ticker }}</td>
+                <td>
+                  <span class="trade-side-badge" [ngClass]="t.side === 'BUY' ? 'badge-buy' : 'badge-sell'">
+                    {{ t.side }}
+                  </span>
+                </td>
+                <td>{{ t.qty | number }}</td>
+                <td>{{ t.price | number }} riel</td>
+                <td class="text-muted">{{ t.commission | number }} riel</td>
+                <td class="date-text">{{ t.orderDate | date:'medium' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="text-center">No trades found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pager
+        [total]="trades.value().total"
+        [limit]="tradesLimit()"
+        [offset]="tradesOffset()"
+        (offsetChange)="tradesOffset.set($event)"
+        (limitChange)="setTradesLimit($event)"
+      ></app-pager>
+    }
+  </div>
+</div>

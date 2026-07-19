@@ -39,8 +39,30 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    loadComponent: () => import('./pages/admin/admin').then(m => m.AdminComponent),
-    canActivate: [authGuard, adminGuard]
+    canActivate: [authGuard, adminGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/admin/admin-dashboard/admin-dashboard').then(m => m.AdminDashboardComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./pages/admin/admin-users/admin-users').then(m => m.AdminUsersComponent)
+      },
+      {
+        path: 'trades',
+        loadComponent: () => import('./pages/admin/admin-trades/admin-trades').then(m => m.AdminTradesComponent)
+      },
+      {
+        path: 'corporate-actions',
+        loadComponent: () => import('./pages/admin/admin-corp-actions/admin-corp-actions').then(m => m.AdminCorpActionsComponent)
+      },
+      {
+        path: 'market-events',
+        loadComponent: () => import('./pages/admin/admin-market-events/admin-market-events').then(m => m.AdminMarketEventsComponent)
+      }
+    ]
   },
   {
     path: 'settings',
