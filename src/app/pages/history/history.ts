@@ -25,7 +25,7 @@ export class HistoryComponent {
 
   readonly offset = signal(0);
   readonly limit = signal(50);
-  readonly marketFilter = signal('');
+  readonly marketFilter = signal('CSX');
   readonly tickerFilter = signal('');
   readonly exporting = signal(false);
 

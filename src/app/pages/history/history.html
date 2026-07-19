@@ -6,10 +6,7 @@
       <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
         <!-- Market Filter (Radio Group) -->
         <div class="radio-group" style="display: flex; gap: 8px;">
-          <label class="radio-label">
-            <input type="radio" name="marketFilter" [ngModel]="marketFilter()" (ngModelChange)="setMarketFilter($event)" value="">
-            <span class="radio-custom" style="padding: 4px 10px; font-size: calc(12px * var(--font-scale, 1));">All</span>
-          </label>
+
           <label class="radio-label">
             <input type="radio" name="marketFilter" [ngModel]="marketFilter()" (ngModelChange)="setMarketFilter($event)" value="CSX">
             <span class="radio-custom" style="padding: 4px 10px; font-size: calc(12px * var(--font-scale, 1));">🇰🇭 CSX</span>
