@@ -25,15 +25,17 @@
         </div>
 
         <!-- Ticker Filter -->
-        <label class="toolbar-filter">
-          <span class="text-muted">{{ 'HISTORY.FILTER_TICKER' | translate }}</span>
-          <select [ngModel]="tickerFilter()" (ngModelChange)="setFilter($event)" name="tickerFilter">
-            <option value="">{{ 'HISTORY.ALL_TICKERS' | translate }}</option>
-            @for (t of tickers.value(); track t.ticker) {
-              <option [value]="t.ticker">{{ t.ticker }}</option>
-            }
-          </select>
-        </label>
+        @if (marketFilter() === 'CSX') {
+          <label class="toolbar-filter">
+            <span class="text-muted">{{ 'HISTORY.FILTER_TICKER' | translate }}</span>
+            <select [ngModel]="tickerFilter()" (ngModelChange)="setFilter($event)" name="tickerFilter">
+              <option value="">{{ 'HISTORY.ALL_TICKERS' | translate }}</option>
+              @for (t of tickers.value(); track t.ticker) {
+                <option [value]="t.ticker">{{ t.ticker }}</option>
+              }
+            </select>
+          </label>
+        }
       </div>
       <button class="view-btn" (click)="exportCsv()" [disabled]="exporting() || trades.value().total === 0">
         📄 {{ exporting() ? '…' : ('HISTORY.EXPORT_CSV' | translate) }}

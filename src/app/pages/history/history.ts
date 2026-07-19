@@ -73,6 +73,9 @@ export class HistoryComponent {
 
   setMarketFilter(market: string) {
     this.marketFilter.set(market);
+    if (market !== 'CSX') {
+      this.tickerFilter.set('');
+    }
     this.offset.set(0);
   }
 
