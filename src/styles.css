@@ -3820,127 +3820,116 @@ body.light .premium-upgrade-card {
     background: rgba(255, 255, 255, 0.2);
   }
 
-  .mas-header {
+  .mobile-account-sheet .mas-header-card {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 4px 4px 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    cursor: pointer;
   }
-  .mas-avatar {
+  .mas-header-card .mas-avatar {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
+    background: #3b82f6;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    color: #fff;
-    font-weight: 700;
-    font-size: calc(15px * var(--font-scale, 1));
+    font-size: 20px;
+    font-weight: 600;
+    margin-right: 16px;
+    overflow: hidden;
   }
-  .mas-avatar-guest {
-    background: #334155;
+  .mas-header-card .mas-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
-  .mas-user {
+  .mas-header-card .mas-user {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 0;
   }
-  .mas-name {
+  .mas-header-card .mas-name {
+    font-size: calc(16px * var(--font-scale, 1));
     font-weight: 600;
-    color: #f1f5f9;
-    font-size: calc(15px * var(--font-scale, 1));
+    color: #f8fafc;
   }
-  .mas-email {
-    font-size: calc(12px * var(--font-scale, 1));
+  .mas-header-card .mas-email {
+    font-size: calc(13px * var(--font-scale, 1));
     color: #94a3b8;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
-  .mas-divider {
-    height: 1px;
-    background: rgba(255, 255, 255, 0.08);
-    margin: 6px 0;
-  }
-  .mas-row {
+  .mas-header-card .mas-header-chevron {
+    color: #64748b;
     display: flex;
     align-items: center;
-    gap: 12px;
-    width: 100%;
-    padding: 14px 8px;
-    background: transparent;
-    border: none;
-    color: #e2e8f0;
-    font-family: inherit;
-    font-size: calc(15px * var(--font-scale, 1));
-    text-align: left;
-    text-decoration: none;
-    cursor: pointer;
-    border-radius: 10px;
   }
-  .mas-row:active {
-    background: rgba(255, 255, 255, 0.05);
-  }
-  .mas-row.danger {
-    color: #f87171;
-  }
+  
   .mas-group {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 12px;
   }
   .mas-group-title {
-    padding: 8px 12px;
-    font-size: calc(11px * var(--font-scale, 1));
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
+    padding: 0 4px 12px 4px;
+    font-size: calc(12px * var(--font-scale, 1));
+    font-weight: 500;
+    color: #94a3b8;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-  }
-  .mas-group-title .chevron {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .mas-group-title .chevron.collapsed {
-    transform: rotate(-90deg);
+    gap: 8px;
   }
   .mas-grid {
     display: grid;
+    gap: 8px;
+  }
+  .mas-grid.cols-3 {
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px 8px;
-    padding: 12px 0;
+  }
+  .mas-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
   }
   .mas-grid-item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 8px;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 16px;
-    padding: 16px 8px;
+    border-radius: 12px;
+    padding: 10px;
     color: #e2e8f0;
     text-decoration: none;
     cursor: pointer;
-    text-align: center;
+  }
+  .mas-grid-item.sign-out-btn {
+    justify-content: center;
+    background: transparent;
   }
   .mas-grid-item:active {
     background: rgba(255, 255, 255, 0.08);
   }
   .mas-grid-item .mas-ico {
-    font-size: calc(24px * var(--font-scale, 1));
+    font-size: calc(16px * var(--font-scale, 1));
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .mas-label {
-    font-size: calc(12px * var(--font-scale, 1));
+    font-size: calc(11px * var(--font-scale, 1));
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .mas-ico {
-    font-size: calc(18px * var(--font-scale, 1));
-    width: 24px;
-    text-align: center;
-  }
+
 }
 
 /* Light-mode surfaces (elements are hidden on desktop, so these only bite on phones). */
