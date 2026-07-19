@@ -42,14 +42,36 @@
           </div>
 
           <div class="form-group">
-            <label for="loanTerm">{{ 'LOAN.TERM' | translate }}</label>
-            <input type="number" id="loanTerm" name="termMonths" [(ngModel)]="termMonths" required min="1" [max]="MAX_TERM">
-            <div class="qty-chips">
-              @for (t of termChips; track t) {
-                <button type="button" class="qty-chip" (click)="setTerm(t)">{{ t }}</button>
-              }
+            <label>Calculate By</label>
+            <div class="radio-group" style="margin-bottom: 12px;">
+              <label class="radio-label">
+                <input type="radio" name="calcMode" [(ngModel)]="calcMode" value="TERM">
+                <span class="radio-custom">Term (Months)</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="calcMode" [(ngModel)]="calcMode" value="PAYMENT">
+                <span class="radio-custom">Monthly Repayment</span>
+              </label>
             </div>
           </div>
+
+          @if (calcMode === 'TERM') {
+            <div class="form-group">
+              <label for="loanTerm">{{ 'LOAN.TERM' | translate }}</label>
+              <input type="number" id="loanTerm" name="termMonths" [(ngModel)]="termMonths" required min="1" [max]="MAX_TERM">
+              <div class="qty-chips">
+                @for (t of termChips; track t) {
+                  <button type="button" class="qty-chip" (click)="setTerm(t)">{{ t }}</button>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="form-group">
+              <label for="targetPayment">Target Monthly Repayment</label>
+              <input type="number" id="targetPayment" name="targetPayment" [(ngModel)]="targetPayment" required min="1" step="any">
+              <div class="quote-hint" style="margin-top: 6px;">We will calculate the number of months needed to pay off the loan.</div>
+            </div>
+          }
 
           <div class="form-group">
             <label>{{ 'LOAN.METHOD' | translate }}</label>
@@ -75,7 +97,14 @@
 
           @if (error(); as err) {
             <div class="alert alert-danger animate-slide-in">
-              ❌ {{ (err === 'TERM_TOO_LONG' ? 'LOAN.ERR_TERM' : 'LOAN.ERR_INVALID') | translate }}
+              ❌
+              @if (err === 'TERM_TOO_LONG') {
+                {{ 'LOAN.ERR_TERM' | translate }}
+              } @else if (err === 'PAYMENT_TOO_LOW') {
+                The monthly payment is too low to cover the interest!
+              } @else {
+                {{ 'LOAN.ERR_INVALID' | translate }}
+              }
             </div>
           }
 

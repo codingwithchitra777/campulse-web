@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrencyCode } from '../../models';
 import { MoneyPipe, formatMoney } from '../../utils/money';
-import { LoanMethod, LoanSchedule, MAX_TERM_MONTHS, RatePeriod, buildSchedule } from '../../utils/loan';
+import { LoanMethod, LoanSchedule, MAX_TERM_MONTHS, RatePeriod, buildSchedule, calculateTermFromPayment } from '../../utils/loan';
 
 /**
  * Loan calculator (Tools). Fully client-side — no backend, works for guests.
@@ -27,6 +27,8 @@ export class LoanCalculatorComponent {
   ratePct = 1.5;
   ratePeriod: RatePeriod = 'MONTH';
   termMonths = 24;
+  calcMode: 'TERM' | 'PAYMENT' = 'TERM';
+  targetPayment = 500;
   method: LoanMethod = 'DECLINING';
   startDate = this.today;
 
@@ -48,8 +50,32 @@ export class LoanCalculatorComponent {
     this.error.set(null);
     const amount = Number(this.amount);
     const rate = Number(this.ratePct);
-    const term = Math.floor(Number(this.termMonths));
-    if (!(amount > 0) || !(rate >= 0) || !(term >= 1) || !this.startDate) {
+    let term = Math.floor(Number(this.termMonths));
+
+    if (!(amount > 0) || !(rate >= 0) || !this.startDate) {
+      this.schedule.set(null);
+      this.error.set('INVALID');
+      return;
+    }
+
+    if (this.calcMode === 'PAYMENT') {
+      const payment = Number(this.targetPayment);
+      if (!(payment > 0)) {
+        this.schedule.set(null);
+        this.error.set('INVALID');
+        return;
+      }
+      const calculatedTerm = calculateTermFromPayment(amount, rate, this.ratePeriod, this.method, payment);
+      if (calculatedTerm === null) {
+        this.schedule.set(null);
+        this.error.set('PAYMENT_TOO_LOW');
+        return;
+      }
+      term = Math.ceil(calculatedTerm);
+      this.termMonths = term;
+    }
+
+    if (!(term >= 1)) {
       this.schedule.set(null);
       this.error.set('INVALID');
       return;

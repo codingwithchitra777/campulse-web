@@ -80,6 +80,44 @@ function totalInterestFor(input: LoanInput, method: LoanMethod): number {
 }
 
 /**
+ * Calculate the required term (months) from a target monthly payment.
+ * Returns the exact decimal term or null if the payment is too low.
+ */
+export function calculateTermFromPayment(
+  amount: number,
+  ratePct: number,
+  ratePeriod: RatePeriod,
+  method: LoanMethod,
+  targetPayment: number
+): number | null {
+  const r = ratePeriod === 'MONTH' ? ratePct / 100 : ratePct / 1200;
+  
+  if (method === 'FLAT') {
+    const flatInterestPerMonth = amount * r;
+    // Payment must cover at least the monthly interest
+    if (targetPayment <= flatInterestPerMonth) {
+      return null;
+    }
+    const principalPerMonth = targetPayment - flatInterestPerMonth;
+    return amount / principalPerMonth;
+  } else {
+    // DECLINING: n = -log(1 - (P * r) / M) / log(1 + r)
+    if (r === 0) {
+      if (targetPayment <= 0) return null;
+      return amount / targetPayment;
+    }
+    
+    const monthlyInterest = amount * r;
+    if (targetPayment <= monthlyInterest) {
+      return null; // Payment too low to cover interest
+    }
+    
+    const x = 1 - (amount * r) / targetPayment;
+    return -Math.log(x) / Math.log(1 + r);
+  }
+}
+
+/**
  * Build the full repayment schedule. Rows are rounded to the currency's minor
  * unit; the final row absorbs the accumulated rounding drift so the balance
  * lands exactly on zero.
