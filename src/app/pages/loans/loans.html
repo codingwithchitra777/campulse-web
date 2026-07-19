@@ -204,15 +204,9 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-          <div class="form-group" style="flex: 1; margin-bottom: 0;">
-            <label>{{ 'LOANS.LOAN_DATE' | translate }}</label>
-            <input type="date" name="addLoanDate" [(ngModel)]="loanDate" [max]="today" required>
-          </div>
-          <div class="form-group" style="flex: 1; margin-bottom: 0;">
-            <label>{{ 'LOANS.DUE_DATE' | translate }}</label>
-            <input type="date" name="addDueDate" [(ngModel)]="dueDate">
-          </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label>{{ 'LOANS.LOAN_DATE' | translate }}</label>
+          <input type="date" name="addLoanDate" [(ngModel)]="loanDate" [max]="today" required>
         </div>
 
         <div class="form-group">
@@ -223,14 +217,11 @@
 
         <!-- Calculator Section -->
         <div style="margin-bottom: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <label style="font-weight: 600; color: #f8fafc; font-size: calc(14px * var(--font-scale, 1));">Amortization Schedule (Optional)</label>
-            <button type="button" class="btn-primary" (click)="toggleCalculator()" style="padding: 4px 10px; font-size: 12px; border-radius: 6px; background: transparent; border: 1px solid #3b82f6; color: #3b82f6;">
-              {{ showCalculator() ? 'Hide' : 'Show' }}
-            </button>
+          <div style="margin-bottom: 12px;">
+            <label style="font-weight: 600; color: #f8fafc; font-size: calc(14px * var(--font-scale, 1));">Amortization Schedule</label>
           </div>
           
-          @if (showCalculator()) {
+          <div>
             <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid #334155;">
               <div class="form-group" style="margin-bottom: 12px;">
                 <label>Interest Rate</label>
@@ -259,7 +250,14 @@
 
               @if (calcMode === 'TERM') {
                 <div class="form-group" style="margin-bottom: 12px;">
-                  <label>Term (Months)</label>
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                    <label style="margin: 0;">Term (Months)</label>
+                    <div style="display: flex; gap: 4px;">
+                      @for (t of termChips; track t) {
+                        <button type="button" (click)="setTerm(t)" [style.background]="termMonths === t ? '#3b82f6' : '#1e293b'" [style.color]="termMonths === t ? '#fff' : '#94a3b8'" style="border: none; border-radius: 4px; padding: 2px 6px; font-size: 11px; cursor: pointer;">{{ t }}</button>
+                      }
+                    </div>
+                  </div>
                   <input type="number" name="calcTerm" [(ngModel)]="termMonths" min="1" [max]="MAX_TERM">
                 </div>
               } @else {
@@ -313,11 +311,11 @@
                   <span style="color: #f59e0b;">{{ s.totalInterest | money:resultCurrency() }}</span>
                 </div>
                 <div class="quote-hint" style="margin-top: 12px; text-align: left; font-size: 11px;">
-                  Due Date has been automatically updated.
+                  Schedule saved to backend as Due Date.
                 </div>
               </div>
             }
-          }
+          </div>
         </div>
 
         @if (error(); as e) { <div class="alert error" style="margin-bottom: 12px;">{{ e }}</div> }

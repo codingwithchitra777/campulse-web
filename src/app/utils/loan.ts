@@ -24,6 +24,8 @@ export interface LoanInput {
   method: LoanMethod;
   /** First payment falls one month after this date (YYYY-MM-DD). */
   startDate: string;
+  /** Optional. If provided, overrides the mathematically calculated EMI/flat payment for the first n-1 months. */
+  fixedMonthlyPayment?: number;
 }
 
 export interface ScheduleRow {
@@ -133,8 +135,16 @@ export function buildSchedule(input: LoanInput): LoanSchedule {
   let totalInterest = 0;
 
   const flatInterest = roundMoney(P * r, currency);
-  const flatPrincipal = roundMoney(P / n, currency);
-  const emi = roundMoney(emiPayment(P, r, n), currency);
+  let flatPrincipal = roundMoney(P / n, currency);
+  let emi = roundMoney(emiPayment(P, r, n), currency);
+
+  if (input.fixedMonthlyPayment && input.fixedMonthlyPayment > 0) {
+    if (input.method === 'FLAT') {
+      flatPrincipal = roundMoney(input.fixedMonthlyPayment - flatInterest, currency);
+    } else {
+      emi = roundMoney(input.fixedMonthlyPayment, currency);
+    }
+  }
 
   for (let i = 1; i <= n; i++) {
     const last = i === n;

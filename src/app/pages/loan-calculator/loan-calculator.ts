@@ -85,17 +85,17 @@ export class LoanCalculatorComponent {
       this.error.set('TERM_TOO_LONG');
       return;
     }
-    this.schedule.set(
-      buildSchedule({
-        amount,
-        currency: this.currency,
-        ratePct: rate,
-        ratePeriod: this.ratePeriod,
-        termMonths: term,
-        method: this.method,
-        startDate: this.startDate
-      })
-    );
+    const s = buildSchedule({
+      amount,
+      currency: this.currency,
+      ratePct: rate,
+      ratePeriod: this.ratePeriod,
+      termMonths: term,
+      method: this.method,
+      startDate: this.startDate,
+      fixedMonthlyPayment: this.calcMode === 'PAYMENT' ? Number(this.targetPayment) : undefined
+    });
+    this.schedule.set(s);
     this.resultCurrency.set(this.currency);
     this.resultMethod.set(this.method);
   }

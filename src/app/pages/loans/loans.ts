@@ -155,7 +155,8 @@ export class LoansComponent {
       ratePeriod: this.ratePeriod,
       termMonths: term,
       method: this.method,
-      startDate: this.loanDate
+      startDate: this.loanDate,
+      fixedMonthlyPayment: this.calcMode === 'PAYMENT' ? Number(this.targetPayment) : undefined
     });
     this.schedule.set(s);
     this.resultCurrency.set(this.currency);
