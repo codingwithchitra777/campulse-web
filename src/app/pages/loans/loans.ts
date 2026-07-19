@@ -190,6 +190,25 @@ export class LoansComponent {
   // --- repayment drawer ---
   readonly viewingSchedule = signal<Loan | null>(null);
   readonly currentSchedule = signal<LoanSchedule | null>(null);
+  
+  readonly mappedScheduleRows = computed(() => {
+    const s = this.currentSchedule();
+    const l = this.viewingSchedule();
+    if (!s || !l) return [];
+    
+    let repaidSoFar = l.repaid;
+    return s.rows.map(r => {
+      let status: 'Paid' | 'Pending' = 'Pending';
+      if (repaidSoFar >= r.payment - 0.005) {
+        status = 'Paid';
+        repaidSoFar -= r.payment;
+      } else {
+        status = 'Pending';
+        repaidSoFar = 0;
+      }
+      return { ...r, status };
+    });
+  });
   repayAmount: number | null = null;
   repayDate = this.today;
   repayNote = '';
@@ -266,29 +285,17 @@ export class LoansComponent {
     }
   }
 
-  fillRepay(amount: number, date: string) {
-    this.repayAmount = amount;
-    this.repayDate = date;
-  }
-
-  closeSchedule() {
-    this.viewingSchedule.set(null);
-    this.currentSchedule.set(null);
-  }
-
-  saveRepayment() {
+  payRow(amount: number, date: string) {
+    if (!confirm(`Confirm payment of ${formatMoney(amount, this.viewingSchedule()?.currency || 'USD')} on ${date}?`)) return;
     const loan = this.viewingSchedule();
     if (!loan) return;
-    if (!this.repayAmount || this.repayAmount <= 0) {
-      this.repayError.set('Enter a positive amount');
-      return;
-    }
+    
     this.repaySaving.set(true);
     this.repayError.set(null);
     this.api.addRepayment(loan.loanId, {
-      amount: this.repayAmount,
-      paidDate: this.repayDate || undefined,
-      note: this.repayNote.trim() || undefined
+      amount,
+      paidDate: date,
+      note: 'Schedule Payment'
     }).subscribe({
       next: (res) => {
         this.repaySaving.set(false);
@@ -301,9 +308,14 @@ export class LoansComponent {
       },
       error: (err) => {
         this.repaySaving.set(false);
-        this.repayError.set(err.error?.detail || 'Failed to record repayment');
+        alert(err.error?.detail || 'Failed to record repayment');
       }
     });
+  }
+
+  closeSchedule() {
+    this.viewingSchedule.set(null);
+    this.currentSchedule.set(null);
   }
 
   private reloadAll() {

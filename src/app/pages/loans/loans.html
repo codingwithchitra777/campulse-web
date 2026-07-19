@@ -131,29 +131,12 @@
       </div>
       <div class="drawer-content-scroll">
         <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 16px;">
-          <p class="muted" style="font-size: calc(13px * var(--font-scale, 1)); margin: 0 0 8px 0;">
+          <p class="muted" style="font-size: calc(13px * var(--font-scale, 1)); margin: 0;">
             {{ 'LOANS.OUTSTANDING' | translate }}: <strong>{{ l.outstanding | money:l.currency }}</strong> {{ 'LOANS.OF' | translate }} {{ l.principal | money:l.currency }}
           </p>
-          <form class="trade-form" (submit)="$event.preventDefault(); saveRepayment()">
-            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-              <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label for="repayAmount" style="font-size: 11px;">Amount ({{ l.currency }})</label>
-                <input type="number" id="repayAmount" name="repayAmount" step="any" min="0" [(ngModel)]="repayAmount" required style="padding: 6px; font-size: 13px;">
-              </div>
-              <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label for="repayDate" style="font-size: 11px;">Date</label>
-                <input type="date" id="repayDate" name="repayDate" [(ngModel)]="repayDate" [max]="today" required style="padding: 6px; font-size: 13px;">
-              </div>
-            </div>
-            <div class="form-group" style="margin-bottom: 12px;">
-              <label for="repayNote" style="font-size: 11px;">{{ 'LOANS.NOTE' | translate }}</label>
-              <input type="text" id="repayNote" name="repayNote" [(ngModel)]="repayNote" style="padding: 6px; font-size: 13px;">
-            </div>
-            @if (repayError(); as e) { <div class="alert error" style="margin-bottom: 12px; font-size: 12px; padding: 6px;">{{ e }}</div> }
-            <div style="display: flex; justify-content: flex-end;">
-              <button type="submit" class="btn-primary" [disabled]="repaySaving()" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">{{ repaySaving() ? ('LOANS.BTN_SAVING' | translate) : '💵 Make Payment' }}</button>
-            </div>
-          </form>
+          @if (!currentSchedule()) {
+            <p class="muted" style="font-size: 12px; margin-top: 8px; color: #fbbf24;">No amortization schedule exists. Please delete and recreate the loan with calculator options to view the schedule.</p>
+          }
         </div>
 
         @if (currentSchedule(); as s) {
@@ -163,37 +146,45 @@
               <span class="muted" style="font-size: 11px;">{{ s.totalInterest | money:l.currency }} Interest</span>
             </div>
             <div class="table-container">
-              <table class="data-table" style="width: 100%; font-size: 12px;">
+              <table class="data-table" style="width: 100%; font-size: 12px; min-width: 600px;">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Payment</th>
+                    <th>#</th>
+                    <th>Pay Date</th>
+                    <th>Interest</th>
+                    <th>Repay Amount</th>
+                    <th>Total Payment</th>
+                    <th>Remain Balance</th>
+                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @for (row of s.rows; track row.no) {
-                    <tr>
+                  @for (row of mappedScheduleRows(); track row.no) {
+                    <tr [style.opacity]="row.status === 'Paid' ? '0.5' : '1'">
+                      <td>{{ row.no }}</td>
+                      <td>{{ row.date | date:'shortDate' }}</td>
+                      <td>{{ row.interest | money:l.currency }}</td>
+                      <td>{{ row.principal | money:l.currency }}</td>
+                      <td style="color: #34d399; font-weight: 600;">{{ row.payment | money:l.currency }}</td>
+                      <td>{{ row.balance | money:l.currency }}</td>
                       <td>
-                        <div>{{ row.date | date:'shortDate' }}</div>
-                        <div class="muted" style="font-size: 10px;">Bal: {{ row.balance | money:l.currency }}</div>
-                      </td>
-                      <td>
-                        <div style="color: #34d399; font-weight: 600;">{{ row.payment | money:l.currency }}</div>
-                        <div class="muted" style="font-size: 10px;">P: {{ row.principal }} / I: {{ row.interest }}</div>
+                        @if (row.status === 'Paid') {
+                          <span style="color: #34d399; font-weight: 600; font-size: 11px; background: rgba(52,211,153,0.12); padding: 2px 6px; border-radius: 4px;">Paid ✓</span>
+                        } @else {
+                          <span style="color: #fbbf24; font-weight: 600; font-size: 11px; background: rgba(251,191,36,0.12); padding: 2px 6px; border-radius: 4px;">Pending</span>
+                        }
                       </td>
                       <td style="text-align: right;">
-                        <button type="button" class="btn-primary" (click)="fillRepay(row.payment, row.date)" style="background: transparent; border: 1px solid #3b82f6; color: #3b82f6; padding: 2px 8px; font-size: 11px; border-radius: 4px;">Pay</button>
+                        @if (row.status === 'Pending') {
+                          <button type="button" class="btn-primary" (click)="payRow(row.payment, row.date)" [disabled]="repaySaving()" style="background: transparent; border: 1px solid #3b82f6; color: #3b82f6; padding: 2px 8px; font-size: 11px; border-radius: 4px;">Pay</button>
+                        }
                       </td>
                     </tr>
                   }
                 </tbody>
               </table>
             </div>
-          </div>
-        } @else {
-          <div class="alert info" style="font-size: 13px;">
-            No schedule found. This loan was recorded without amortization calculation.
           </div>
         }
       </div>
