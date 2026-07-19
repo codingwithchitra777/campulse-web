@@ -63,6 +63,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'market-calendar',
+    loadComponent: () => import('./pages/market-calendar/market-calendar').then(m => m.MarketCalendarComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'journal',
     loadComponent: () => import('./pages/journal/journal').then(m => m.JournalComponent),
     canActivate: [authGuard]

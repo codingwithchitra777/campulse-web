@@ -35,7 +35,8 @@ import {
   TelegramAuthPayload,
   TradePayload,
   TradeResult,
-  YearlyPnl
+  YearlyPnl,
+  MarketEvent
 } from '../models';
 import { API_BASE_URL } from '../app.constants';
 
@@ -280,6 +281,10 @@ export class ApiService {
     return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/auth/links/${aliasUserId}`);
   }
 
+  updateMarketOverviewSettings(enabled: boolean): Observable<{ success: boolean; marketOverviewEnabled: boolean }> {
+    return this.http.patch<{ success: boolean; marketOverviewEnabled: boolean }>(`${this.baseUrl}/api/settings/market-overview`, { enabled });
+  }
+
   getAllUsers(limit = 50, offset = 0): Observable<Paginated<AdminUser>> {
     return this.http.get<Paginated<AdminUser>>(`${this.baseUrl}/api/admin/users`, {
       params: { limit, offset }
@@ -298,5 +303,23 @@ export class ApiService {
 
   getAdminStats(): Observable<AdminStats> {
     return this.http.get<AdminStats>(`${this.baseUrl}/api/admin/stats`);
+  }
+
+  getMarketEvents(): Observable<{ success: boolean; items: MarketEvent[] }> {
+    return this.http.get<{ success: boolean; items: MarketEvent[] }>(`${this.baseUrl}/api/market-events`);
+  }
+
+  createMarketEvent(body: {
+    market: string;
+    eventType: 'holiday' | 'dividend';
+    eventDate: string;
+    symbol?: string | null;
+    description?: string | null;
+  }): Observable<MarketEvent> {
+    return this.http.post<MarketEvent>(`${this.baseUrl}/api/admin/market-events`, body);
+  }
+
+  deleteMarketEvent(eventId: string): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/admin/market-events/${eventId}`);
   }
 }

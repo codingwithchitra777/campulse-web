@@ -59,4 +59,22 @@ export class SettingsComponent {
       error: (err) => alert('Failed to disconnect: ' + (err.error?.detail || 'Unknown error'))
     });
   }
+
+  toggleMarketOverview() {
+    const profile = this.session.googleProfile();
+    if (!profile) return;
+    const current = profile.marketOverviewEnabled ?? true;
+    const next = !current;
+    
+    // Optimistic update
+    this.session.setProfile({ ...profile, marketOverviewEnabled: next });
+    
+    this.api.updateMarketOverviewSettings(next).subscribe({
+      error: (err) => {
+        // Revert on error
+        this.session.setProfile({ ...profile, marketOverviewEnabled: current });
+        alert('Failed to update setting: ' + (err.error?.detail || 'Unknown error'));
+      }
+    });
+  }
 }

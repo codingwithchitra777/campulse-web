@@ -46,6 +46,7 @@ export interface GoogleAuthResponse {
   userName: string;
   email: string | null;
   role: string;
+  marketOverviewEnabled?: boolean;
 }
 
 /** Profile persisted in localStorage and held in SessionService. */
@@ -57,6 +58,7 @@ export interface GoogleProfile {
   role: string;
   /** Avatar URL from the provider (Google `picture` claim / Telegram `photo_url`). */
   picture?: string | null;
+  marketOverviewEnabled?: boolean;
 }
 
 /** The Telegram Login Widget's signed user object, sent verbatim to /api/auth/telegram. */
@@ -93,6 +95,16 @@ export interface Price {
   price: number;
   change: number | null;
   change_direction: 'up' | 'down' | 'equal' | null;
+}
+
+export interface MarketEvent {
+  eventId: string;
+  market: string;
+  eventType: 'holiday' | 'dividend';
+  symbol?: string | null;
+  eventDate: string;
+  description?: string | null;
+  createdBy?: string | null;
 }
 
 /** /api/trades item. */

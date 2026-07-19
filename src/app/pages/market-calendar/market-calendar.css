@@ -1,0 +1,68 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: calc(24px * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--text-base);
+  margin-bottom: 4px;
+}
+
+.history-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: calc(14px * var(--font-scale, 1));
+}
+
+.data-table th {
+  color: #9ca3af;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: calc(12px * var(--font-scale, 1));
+  letter-spacing: 0.05em;
+}
+
+.data-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.trade-side-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.badge-buy {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.badge-sell {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.past-event td {
+  opacity: 0.5;
+}

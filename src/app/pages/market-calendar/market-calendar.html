@@ -1,0 +1,48 @@
+<div class="view-container animate-fade-in">
+  <header class="page-header">
+    <h1>📅 Market Calendar</h1>
+    <p class="muted">Track upcoming market holidays and corporate dividend events.</p>
+  </header>
+
+  <div class="history-panel">
+    @if (marketEvents.isLoading()) {
+      <div class="panel-loader">Loading events...</div>
+    } @else {
+      @if (marketEvents.value().items.length) {
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Event Date</th>
+                <th>Type</th>
+                <th>Details</th>
+                <th>Market</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (me of marketEvents.value().items; track me.eventId) {
+                <tr [class.past-event]="isPast(me.eventDate)">
+                  <td class="font-bold">{{ me.eventDate | date:'fullDate' }}</td>
+                  <td>
+                    <span class="trade-side-badge" [ngClass]="me.eventType === 'holiday' ? 'badge-sell' : 'badge-buy'">
+                      {{ me.eventType | uppercase }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (me.symbol) { <strong>{{ me.symbol }}</strong> }
+                    {{ me.description }}
+                  </td>
+                  <td class="text-muted">{{ me.market }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div style="padding: 40px; text-align: center; color: #9ca3af;">
+          <p>No upcoming market events scheduled.</p>
+        </div>
+      }
+    }
+  </div>
+</div>

@@ -21,6 +21,18 @@
       </div>
     </section>
 
+    <section class="settings-card" style="margin-bottom: 16px;">
+      <div class="card-head" style="align-items: center; cursor: pointer;" (click)="toggleMarketOverview()">
+        <div>
+          <h2>Market Overview Alerts</h2>
+          <p class="muted">Receive daily open/close updates in your connected Telegram account.</p>
+        </div>
+        <div style="font-size: calc(24px * var(--font-scale, 1));">
+          {{ session.googleProfile()?.marketOverviewEnabled !== false ? '✅' : '⬛' }}
+        </div>
+      </div>
+    </section>
+
     <section class="settings-card">
       <div class="card-head">
         <div>
