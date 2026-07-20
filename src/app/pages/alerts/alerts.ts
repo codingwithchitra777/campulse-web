@@ -33,6 +33,7 @@ export class AlertsComponent {
   market: MarketKind = 'CSX';
   symbolInput = '';
   targetPrice: number | null = null;
+  direction: 'above' | 'below' = 'above';
   readonly adding = signal(false);
   readonly error = signal<string | null>(null);
 
@@ -52,11 +53,12 @@ export class AlertsComponent {
     }
     this.adding.set(true);
     this.error.set(null);
-    this.api.createAlert({ symbol, targetPrice: this.targetPrice, market: this.market, currency: this.currency }).subscribe({
+    this.api.createAlert({ symbol, targetPrice: this.targetPrice, market: this.market, currency: this.currency, direction: this.direction }).subscribe({
       next: () => {
         this.adding.set(false);
         this.symbolInput = this.market === 'GOLD_KH' ? this.GOLD_SYMBOL : '';
         this.targetPrice = null;
+        this.direction = 'above';
         this.alerts.reload();
       },
       error: (err) => {

@@ -66,6 +66,11 @@ export class PortfolioComponent implements OnDestroy {
     return active.sort((a, b) => ((b.lastPrice || 0) * b.remainingQty) - ((a.lastPrice || 0) * a.remainingQty));
   });
 
+  readonly closedHoldings = computed(() => {
+    const closed = (this.portfolio.value() || []).filter(h => h.remainingQty <= 0);
+    return closed.sort((a, b) => b.realisedPnl - a.realisedPnl);
+  });
+
   readonly totalUnrealizedPnlPercent = computed(() => {
     const invested = this.investedCapital();
     return invested > 0 ? (this.totalUnrealizedPnl() / invested) * 100 : 0;

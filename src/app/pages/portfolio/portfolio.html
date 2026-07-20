@@ -81,38 +81,36 @@
                   </tr>
                 }
               } @else {
-                @for (h of portfolio.value(); track h.ticker) {
-                  @if (h.remainingQty > 0) {
-                    <tr (click)="selectHolding(h)" style="border-bottom: 1px solid var(--border-color); cursor: pointer;" [class.selected]="selectedHolding()?.ticker === h.ticker">
-                      <td style="padding: 16px 20px;">
-                        <div class="ticker-cell" style="display: flex; align-items: center; gap: 12px;">
-                          <div class="ticker-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; color: var(--text-muted);">
-                            {{ h.ticker.substring(0, 2) }}
-                          </div>
-                          <div class="ticker-info" style="display: flex; flex-direction: column;">
-                            <span class="font-bold" style="font-size: calc(14px * var(--font-scale, 1));">{{ h.ticker }}</span>
-                            <span class="muted" style="font-size: calc(11px * var(--font-scale, 1)); line-height: 1.2;">
-                              {{ h.ticker === 'PWSA' ? 'Phnom Penh Water' : (h.ticker === 'GTI' ? 'Grand Twins Int.' : (h.ticker === 'PPAP' ? 'Phnom Penh Port' : h.ticker)) }}
-                            </span>
-                          </div>
+                @for (h of activeHoldings(); track h.ticker) {
+                  <tr (click)="selectHolding(h)" style="border-bottom: 1px solid var(--border-color); cursor: pointer;" [class.selected]="selectedHolding()?.ticker === h.ticker">
+                    <td style="padding: 16px 20px;">
+                      <div class="ticker-cell" style="display: flex; align-items: center; gap: 12px;">
+                        <div class="ticker-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; color: var(--text-muted);">
+                          {{ h.ticker.substring(0, 2) }}
                         </div>
-                      </td>
-                      <td style="padding: 16px 20px; font-size: calc(14px * var(--font-scale, 1)); color: var(--text-muted);">{{ h.remainingQty | number }}</td>
-                      <td style="padding: 16px 20px; font-size: calc(14px * var(--font-scale, 1)); color: var(--text-muted);">{{ h.avgCostRemaining | money:h.currency }}</td>
-                      <td style="padding: 16px 20px; font-size: calc(14px * var(--font-scale, 1)); color: var(--text-muted);">{{ h.lastPrice | money:h.currency }}</td>
-                      <td style="padding: 16px 20px; text-align: right;">
-                        <div class="font-bold" [ngClass]="h.totalPnl >= 0 ? 'text-profit' : 'text-loss'" style="font-size: calc(14px * var(--font-scale, 1));">
-                          {{ h.totalPnl | money:h.currency:true }}
+                        <div class="ticker-info" style="display: flex; flex-direction: column;">
+                          <span class="font-bold" style="font-size: calc(14px * var(--font-scale, 1));">{{ h.ticker }}</span>
+                          <span class="muted" style="font-size: calc(11px * var(--font-scale, 1)); line-height: 1.2;">
+                            {{ h.ticker === 'PWSA' ? 'Phnom Penh Water' : (h.ticker === 'GTI' ? 'Grand Twins Int.' : (h.ticker === 'PPAP' ? 'Phnom Penh Port' : h.ticker)) }}
+                          </span>
                         </div>
-                        <div [ngClass]="h.totalPnlPercent >= 0 ? 'text-profit' : 'text-loss'" style="font-size: calc(11px * var(--font-scale, 1)); opacity: 0.9;">
-                          {{ h.totalPnlPercent >= 0 ? '+' : '' }}{{ h.totalPnlPercent | number:'1.2-2' }}%
-                        </div>
-                      </td>
-                      <td style="padding: 16px 20px; text-align: right;">
-                        <button class="view-btn" (click)="selectHolding(h); $event.stopPropagation()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 6px 16px; font-size: calc(12px * var(--font-scale, 1)); font-family: inherit; font-weight: 500; cursor: pointer; transition: background 0.2s;">View</button>
-                      </td>
-                    </tr>
-                  }
+                      </div>
+                    </td>
+                    <td style="padding: 16px 20px; font-size: calc(14px * var(--font-scale, 1)); color: var(--text-muted);">{{ h.remainingQty | number }}</td>
+                    <td style="padding: 16px 20px; font-size: calc(14px * var(--font-scale, 1)); color: var(--text-muted);">{{ h.avgCostRemaining | money:h.currency }}</td>
+                    <td style="padding: 16px 20px; font-size: calc(14px * var(--font-scale, 1)); color: var(--text-muted);">{{ h.lastPrice | money:h.currency }}</td>
+                    <td style="padding: 16px 20px; text-align: right;">
+                      <div class="font-bold" [ngClass]="h.totalPnl >= 0 ? 'text-profit' : 'text-loss'" style="font-size: calc(14px * var(--font-scale, 1));">
+                        {{ h.totalPnl | money:h.currency:true }}
+                      </div>
+                      <div [ngClass]="h.totalPnlPercent >= 0 ? 'text-profit' : 'text-loss'" style="font-size: calc(11px * var(--font-scale, 1)); opacity: 0.9;">
+                        {{ h.totalPnlPercent >= 0 ? '+' : '' }}{{ h.totalPnlPercent | number:'1.2-2' }}%
+                      </div>
+                    </td>
+                    <td style="padding: 16px 20px; text-align: right;">
+                      <button class="view-btn" (click)="selectHolding(h); $event.stopPropagation()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 6px 16px; font-size: calc(12px * var(--font-scale, 1)); font-family: inherit; font-weight: 500; cursor: pointer; transition: background 0.2s;">View</button>
+                    </td>
+                  </tr>
                 } @empty {
                   <tr>
                     <td colspan="6" class="text-center" style="padding: 30px;">{{ 'PORTFOLIO.NO_POSITIONS' | translate }}</td>
@@ -123,6 +121,54 @@
           </table>
         </div>
       </div>
+
+      <!-- Closed Holdings Panel -->
+      @if (!portfolio.isLoading() && closedHoldings().length > 0) {
+        <div class="dashboard-panel holdings-panel" style="margin-bottom: 24px; padding: 0;">
+          <div class="chart-header" style="padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="panel-title" style="margin-bottom: 0; font-size: calc(18px * var(--font-scale, 1));">🔒 Closed Positions (Realized P&L)</h3>
+          </div>
+          
+          <div class="table-container" style="margin-top: 16px;">
+            <table class="data-table selectable-rows modern-table" style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                  <th style="padding: 12px 20px; text-align: left; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">{{ 'DASHBOARD.COL_TICKER' | translate | uppercase }}</th>
+                  <th style="padding: 12px 20px; text-align: right; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">REALIZED P/L</th>
+                  <th style="padding: 12px 20px; text-align: right; font-size: calc(11px * var(--font-scale, 1)); letter-spacing: 0.5px; color: var(--text-muted);">{{ 'PORTFOLIO.COL_ACTIONS' | translate | uppercase }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (h of closedHoldings(); track h.ticker) {
+                  <tr (click)="selectHolding(h)" style="border-bottom: 1px solid var(--border-color); cursor: pointer;" [class.selected]="selectedHolding()?.ticker === h.ticker">
+                    <td style="padding: 16px 20px;">
+                      <div class="ticker-cell" style="display: flex; align-items: center; gap: 12px;">
+                        <div class="ticker-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; color: var(--text-muted); opacity: 0.5;">
+                          {{ h.ticker.substring(0, 2) }}
+                        </div>
+                        <div class="ticker-info" style="display: flex; flex-direction: column; opacity: 0.7;">
+                          <span class="font-bold" style="font-size: calc(14px * var(--font-scale, 1));">{{ h.ticker }}</span>
+                          <span class="muted" style="font-size: calc(11px * var(--font-scale, 1)); line-height: 1.2;">
+                            {{ h.ticker === 'PWSA' ? 'Phnom Penh Water' : (h.ticker === 'GTI' ? 'Grand Twins Int.' : (h.ticker === 'PPAP' ? 'Phnom Penh Port' : h.ticker)) }}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="padding: 16px 20px; text-align: right;">
+                      <div class="font-bold" [ngClass]="h.realisedPnl >= 0 ? 'text-profit' : 'text-loss'" style="font-size: calc(14px * var(--font-scale, 1));">
+                        {{ h.realisedPnl | money:h.currency:true }}
+                      </div>
+                    </td>
+                    <td style="padding: 16px 20px; text-align: right;">
+                      <button class="view-btn" (click)="selectHolding(h); $event.stopPropagation()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 6px 16px; font-size: calc(12px * var(--font-scale, 1)); font-family: inherit; font-weight: 500; cursor: pointer; transition: background 0.2s;">View</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
 
       <!-- Portfolio Performance Chart (Authenticated) -->
       @if (!session.isGuest()) {
