@@ -49,7 +49,10 @@ export interface LoanSchedule {
 
 /** Round to the currency's minor unit — KHR is whole, USD keeps cents. */
 function roundMoney(value: number, currency: CurrencyCode): number {
-  return currency === 'USD' ? Math.round(value * 100) / 100 : Math.round(value);
+  // Use Number.EPSILON to fix JS floating-point rounding errors (matches Excel)
+  return currency === 'USD' 
+    ? Math.round((value + Number.EPSILON) * 100) / 100 
+    : Math.round(value + Number.EPSILON);
 }
 
 function monthlyRate(input: LoanInput): number {
