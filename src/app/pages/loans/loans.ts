@@ -274,9 +274,9 @@ export class LoansComponent {
         amount: loan.principal,
         currency: loan.currency,
         ratePct: loan.ratePct,
-        ratePeriod: loan.ratePeriod,
+        ratePeriod: loan.ratePeriod as RatePeriod,
         termMonths: loan.termMonths,
-        method: loan.method,
+        method: loan.method as LoanMethod,
         startDate: loan.loanDate,
         fixedMonthlyPayment: loan.fixedPayment
       });

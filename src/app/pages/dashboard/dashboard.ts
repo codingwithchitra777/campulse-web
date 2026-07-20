@@ -51,8 +51,7 @@ export class DashboardComponent implements OnDestroy {
   });
 
   readonly exchangeRate = rxResource({
-    stream: () => this.api.getLatestExchangeRate('USD', 'KHR'),
-    defaultValue: null as ExchangeRate | null
+    stream: () => this.api.getLatestExchangeRate('USD', 'KHR')
   });
 
   marketFilter = signal<'ALL' | 'CSX' | 'GOLD_KH' | 'US'>('ALL');
@@ -486,9 +485,10 @@ export class DashboardComponent implements OnDestroy {
 
   private convertToTarget(amount: number, fromCurrency: string, toCurrency: string): number {
     if (fromCurrency === toCurrency || !amount) return amount;
-    const rate = this.exchangeRate.value();
-    if (!rate) return amount; 
+    const rateWrapper = this.exchangeRate.value();
+    if (!rateWrapper?.rate) return amount; 
     
+    const rate = rateWrapper.rate;
     if (fromCurrency === 'USD' && toCurrency === 'KHR') {
       return amount * rate.bidRate; 
     }
