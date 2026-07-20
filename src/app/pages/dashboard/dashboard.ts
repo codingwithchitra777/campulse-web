@@ -161,16 +161,16 @@ export class DashboardComponent implements OnDestroy {
       equity.push(activeEquity);
     });
 
-    const activePositions = this.portfolio.value();
+    const activePositions = this.filteredPortfolio();
     if (activePositions && activePositions.length > 0) {
       let livePrincipal = 0;
       let liveEquity = 0;
 
       activePositions.forEach((h) => {
         if (h.avgCostRemaining && h.remainingQty) {
-          const cost = h.avgCostRemaining * h.remainingQty;
+          const cost = this.convertToTarget(h.avgCostRemaining * h.remainingQty, h.currency, this.baseCurrency());
           livePrincipal += cost;
-          liveEquity += (h.lastPrice ?? h.avgCostRemaining) * h.remainingQty;
+          liveEquity += this.convertToTarget((h.lastPrice ?? h.avgCostRemaining) * h.remainingQty, h.currency, this.baseCurrency());
         }
       });
 
@@ -409,8 +409,8 @@ export class DashboardComponent implements OnDestroy {
 
   readonly recentTrades = rxResource({
     params: () => this.userId(),
-    stream: () => this.api.getTrades(undefined, 3, 0),
-    defaultValue: { items: [], total: 0, limit: 3, offset: 0 } as Paginated<Trade>
+    stream: () => this.api.getTrades(undefined, 5, 0),
+    defaultValue: { items: [], total: 0, limit: 5, offset: 0 } as Paginated<Trade>
   });
 
   readonly marketPrices = rxResource({
@@ -439,18 +439,12 @@ export class DashboardComponent implements OnDestroy {
   readonly sortedMarketList = computed(() => {
     const prices = this.marketPrices.value() || [];
     
+    // For Market Movers, sort by % change descending, slice top 5
     return [...prices].sort((a, b) => {
-      const sort = this.marketSort();
-      const desc = this.marketSortDesc() ? -1 : 1;
-      
-      if (sort === 'symbol') {
-        return a.ticker.localeCompare(b.ticker) * desc;
-      } else {
-        const changeA = a.change && a.price ? (a.change / (a.price - a.change)) : 0;
-        const changeB = b.change && b.price ? (b.change / (b.price - b.change)) : 0;
-        return (changeA - changeB) * desc;
-      }
-    });
+      const changeA = a.change && a.price ? (a.change / (a.price - a.change)) : 0;
+      const changeB = b.change && b.price ? (b.change / (b.price - b.change)) : 0;
+      return changeB - changeA;
+    }).slice(0, 5);
   });
 
   setMarketSort(field: 'symbol' | 'change') {

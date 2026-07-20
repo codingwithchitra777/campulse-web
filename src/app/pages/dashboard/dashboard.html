@@ -121,23 +121,15 @@
           }
         </div>
 
-        <!-- Market Overview -->
+        <!-- Market Movers -->
         <div class="dashboard-panel">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-            <h2 class="panel-title" style="margin-bottom: 0;">{{ 'DASHBOARD.MARKET_OVERVIEW' | translate }}</h2>
-            <div class="sort-controls" style="display: flex; gap: 12px; font-size: 0.9em;">
-              <button (click)="setMarketSort('symbol')" [style.color]="marketSort() === 'symbol' ? 'var(--primary-color)' : 'var(--text-color)'" style="background: transparent; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px;">
-                Symbol @if (marketSort() === 'symbol') { <span style="font-size: 0.8em;">{{ marketSortDesc() ? '▼' : '▲' }}</span> }
-              </button>
-              <button (click)="setMarketSort('change')" [style.color]="marketSort() === 'change' ? 'var(--primary-color)' : 'var(--text-color)'" style="background: transparent; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; padding: 4px;">
-                Change @if (marketSort() === 'change') { <span style="font-size: 0.8em;">{{ marketSortDesc() ? '▼' : '▲' }}</span> }
-              </button>
-            </div>
+            <h2 class="panel-title" style="margin-bottom: 0;">Market Movers <span style="font-size: 0.8em; color: var(--text-muted); font-weight: normal;">(Top 5 Gainers)</span></h2>
           </div>
           
           @if (marketPrices.isLoading()) {
             <div class="movers-list">
-              @for (i of [1,2,3,4]; track i) {
+              @for (i of [1,2,3,4,5]; track i) {
                 <div class="mover-item skeleton" style="height: 60px; margin-bottom: 8px;"></div>
               }
             </div>
@@ -173,7 +165,7 @@
           <h2 class="panel-title">{{ 'DASHBOARD.RECENT_TRADES' | translate }}</h2>
           @if (recentTrades.isLoading()) {
             <div class="recent-trades-list">
-              @for (i of [1,2,3]; track i) {
+              @for (i of [1,2,3,4,5]; track i) {
                 <div class="trade-item skeleton" style="height: 60px; margin-bottom: 8px;"></div>
               }
             </div>
