@@ -415,7 +415,7 @@ export class DashboardComponent implements OnDestroy {
   });
 
   readonly marketTickers = computed(() => {
-    return this.marketPrices.value().map(p => p.ticker);
+    return (this.marketPrices.value() || []).map(p => p.ticker);
   });
 
   readonly sparklines = rxResource({
@@ -480,7 +480,7 @@ export class DashboardComponent implements OnDestroy {
 
   readonly filteredPortfolio = computed(() => {
     const filter = this.marketFilter();
-    return this.portfolio.value().filter(h => filter === 'ALL' || h.market === filter);
+    return (this.portfolio.value() || []).filter(h => filter === 'ALL' || h.market === filter);
   });
 
   private convertToTarget(amount: number, fromCurrency: string, toCurrency: string): number {
