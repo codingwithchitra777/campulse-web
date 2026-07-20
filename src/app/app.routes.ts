@@ -61,6 +61,10 @@ export const routes: Routes = [
       {
         path: 'market-events',
         loadComponent: () => import('./pages/admin/admin-market-events/admin-market-events').then(m => m.AdminMarketEventsComponent)
+      },
+      {
+        path: 'exchange-rates',
+        loadComponent: () => import('./pages/admin/admin-exchange-rates/admin-exchange-rates').then(m => m.AdminExchangeRatesComponent)
       }
     ]
   },

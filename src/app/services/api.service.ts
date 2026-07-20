@@ -8,6 +8,7 @@ import {
   CoachInsight,
   CoachRefreshResponse,
   CorporateAction,
+  ExchangeRate,
   GoogleAuthResponse,
   Holding,
   Loan,
@@ -326,5 +327,21 @@ export class ApiService {
 
   deleteMarketEvent(eventId: string): Observable<{ success: boolean }> {
     return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/admin/market-events/${eventId}`);
+  }
+
+  getExchangeRatesHistory(baseCurrency: string, targetCurrency: string, limit = 100): Observable<{ items: ExchangeRate[] }> {
+    return this.http.get<{ items: ExchangeRate[] }>(`${this.baseUrl}/api/market/exchange-rates/history`, {
+      params: { baseCurrency, targetCurrency, limit }
+    });
+  }
+
+  getLatestExchangeRate(baseCurrency: string, targetCurrency: string): Observable<{ rate: ExchangeRate }> {
+    return this.http.get<{ rate: ExchangeRate }>(`${this.baseUrl}/api/market/exchange-rates/latest`, {
+      params: { baseCurrency, targetCurrency }
+    });
+  }
+
+  addExchangeRate(rate: { baseCurrency: string; targetCurrency: string; bidRate: number; askRate: number; effectiveDate: string }): Observable<{ success: boolean; rate: ExchangeRate }> {
+    return this.http.post<{ success: boolean; rate: ExchangeRate }>(`${this.baseUrl}/api/admin/exchange-rates`, rate);
   }
 }

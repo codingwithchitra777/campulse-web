@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
-import { Holding, Price, TopOrder, TopTicker, Trade, Paginated } from '../../models';
+import { Holding, Price, TopOrder, TopTicker, Trade, Paginated, ExchangeRate } from '../../models';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
 import { Chart } from 'chart.js/auto';
@@ -49,6 +49,14 @@ export class DashboardComponent implements OnDestroy {
     stream: () => this.api.getPortfolio(),
     defaultValue: [] as Holding[]
   });
+
+  readonly exchangeRate = rxResource({
+    stream: () => this.api.getLatestExchangeRate('USD', 'KHR'),
+    defaultValue: null as ExchangeRate | null
+  });
+
+  marketFilter = signal<'ALL' | 'CSX' | 'GOLD_KH' | 'US'>('ALL');
+  baseCurrency = signal<'KHR' | 'USD'>('KHR');
 
   readonly topTickers = rxResource({
     params: () => this.userId(),
@@ -471,12 +479,31 @@ export class DashboardComponent implements OnDestroy {
     return prevClose > 0 ? (change / prevClose) * 100 : 0;
   }
 
+  readonly filteredPortfolio = computed(() => {
+    const filter = this.marketFilter();
+    return this.portfolio.value().filter(h => filter === 'ALL' || h.market === filter);
+  });
+
+  private convertToTarget(amount: number, fromCurrency: string, toCurrency: string): number {
+    if (fromCurrency === toCurrency || !amount) return amount;
+    const rate = this.exchangeRate.value();
+    if (!rate) return amount; 
+    
+    if (fromCurrency === 'USD' && toCurrency === 'KHR') {
+      return amount * rate.bidRate; 
+    }
+    if (fromCurrency === 'KHR' && toCurrency === 'USD') {
+      return amount / rate.askRate;
+    }
+    return amount;
+  }
+
   readonly totalRealisedPnl = computed(() =>
-    this.portfolio.value().reduce((sum, h) => sum + (h.realisedPnl || 0), 0)
+    this.filteredPortfolio().reduce((sum, h) => sum + this.convertToTarget(h.realisedPnl || 0, h.currency, this.baseCurrency()), 0)
   );
 
   readonly totalUnrealisedPnl = computed(() =>
-    this.portfolio.value().reduce((sum, h) => sum + (h.unrealisedPnl || 0), 0)
+    this.filteredPortfolio().reduce((sum, h) => sum + this.convertToTarget(h.unrealisedPnl || 0, h.currency, this.baseCurrency()), 0)
   );
 
   readonly totalPnl = computed(() => this.totalRealisedPnl() + this.totalUnrealisedPnl());
@@ -484,9 +511,9 @@ export class DashboardComponent implements OnDestroy {
   // Provide a safe portfolio value by summing up current holdings value
   readonly totalPortfolioValue = computed(() => {
     // Basic mock logic: base value + unrealized PNL
-    const baseValue = this.portfolio.value().reduce((sum, h) => {
+    const baseValue = this.filteredPortfolio().reduce((sum, h) => {
       const cost = h.avgCostRemaining || 0;
-      return sum + (cost * h.remainingQty);
+      return sum + this.convertToTarget(cost * h.remainingQty, h.currency, this.baseCurrency());
     }, 0);
     return baseValue + this.totalUnrealisedPnl();
   });

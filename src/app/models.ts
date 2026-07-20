@@ -466,11 +466,23 @@ export interface Loan {
   repaid: number;
   outstanding: number;
   ratePct?: number;
-  ratePeriod?: 'MONTH' | 'YEAR';
+  ratePeriod?: string;
   termMonths?: number;
-  method?: 'DECLINING' | 'FLAT';
+  method?: string;
   fixedPayment?: number;
 }
+
+export interface ExchangeRate {
+  id?: string;
+  baseCurrency: string;
+  targetCurrency: string;
+  bidRate: number;
+  askRate: number;
+  effectiveDate: string;
+  createdBy?: string;
+  createdAt?: string;
+}
+
 
 /** A single repayment against a loan. */
 export interface LoanRepayment {

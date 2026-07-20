@@ -4,9 +4,33 @@
     
     <!-- Hero Section -->
     <section class="dashboard-hero">
-      <h1 class="greeting">{{ 'DASHBOARD.GREETING' | translate:{name: userName()} }}</h1>
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+        <h1 class="greeting">{{ 'DASHBOARD.GREETING' | translate:{name: userName()} }}</h1>
+        
+        <!-- Market Filter & Currency Toggle -->
+        <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; background: #1e293b; border-radius: 8px; padding: 4px;">
+            <button [class.active]="marketFilter() === 'ALL'" (click)="marketFilter.set('ALL')" style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; color: #9ca3af; cursor: pointer; font-size: 13px; transition: 0.2s;" [style.background]="marketFilter() === 'ALL' ? '#334155' : 'transparent'" [style.color]="marketFilter() === 'ALL' ? '#f8fafc' : '#9ca3af'">All Markets</button>
+            <button [class.active]="marketFilter() === 'CSX'" (click)="marketFilter.set('CSX')" style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; color: #9ca3af; cursor: pointer; font-size: 13px; transition: 0.2s;" [style.background]="marketFilter() === 'CSX' ? '#334155' : 'transparent'" [style.color]="marketFilter() === 'CSX' ? '#f8fafc' : '#9ca3af'">CSX</button>
+            <button [class.active]="marketFilter() === 'GOLD_KH'" (click)="marketFilter.set('GOLD_KH')" style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; color: #9ca3af; cursor: pointer; font-size: 13px; transition: 0.2s;" [style.background]="marketFilter() === 'GOLD_KH' ? '#334155' : 'transparent'" [style.color]="marketFilter() === 'GOLD_KH' ? '#f8fafc' : '#9ca3af'">Gold</button>
+            <button [class.active]="marketFilter() === 'US'" (click)="marketFilter.set('US')" style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; color: #9ca3af; cursor: pointer; font-size: 13px; transition: 0.2s;" [style.background]="marketFilter() === 'US' ? '#334155' : 'transparent'" [style.color]="marketFilter() === 'US' ? '#f8fafc' : '#9ca3af'">USA</button>
+          </div>
+          
+          <div style="display: flex; align-items: center; gap: 8px;">
+            @if (exchangeRate.value(); as er) {
+              <div class="rate-badge" style="font-size: 11px; color: #9ca3af; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px;" title="Bid: {{ er.bidRate | number:'1.0-4' }} | Ask: {{ er.askRate | number:'1.0-4' }}">
+                1 USD = {{ er.bidRate | number:'1.0-0' }} ៛
+              </div>
+            }
+            <div style="background: #1e293b; border-radius: 20px; padding: 4px; display: flex;">
+              <button [class.active]="baseCurrency() === 'KHR'" (click)="baseCurrency.set('KHR')" style="background: transparent; border: none; padding: 4px 12px; border-radius: 16px; color: #f8fafc; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s;" [style.background]="baseCurrency() === 'KHR' ? '#3b82f6' : 'transparent'">KHR</button>
+              <button [class.active]="baseCurrency() === 'USD'" (click)="baseCurrency.set('USD')" style="background: transparent; border: none; padding: 4px 12px; border-radius: 16px; color: #f8fafc; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s;" [style.background]="baseCurrency() === 'USD' ? '#3b82f6' : 'transparent'">USD</button>
+            </div>
+          </div>
+        </div>
+      </div>
       
-      <div class="portfolio-summary-cards">
+      <div class="portfolio-summary-cards" style="margin-top: 24px;">
         @if (portfolio.isLoading()) {
           <!-- Skeleton Cards -->
           <div class="summary-card skeleton" style="height: 110px;"></div>
@@ -19,7 +43,7 @@
               <span class="label-icon">📄</span>
               {{ 'DASHBOARD.PORTFOLIO_VALUE' | translate }}
             </div>
-            <div class="card-value">{{ totalPortfolioValue() | number }} <span class="currency">riel</span></div>
+            <div class="card-value">{{ totalPortfolioValue() | number:'1.0-2' }} <span class="currency">{{ baseCurrency() === 'KHR' ? '៛' : '$' }}</span></div>
             <div class="card-subtitle">
               <span class="badge profit-badge">↗ +1.2%</span>
               <span class="subtitle-text">{{ 'DASHBOARD.VS_YESTERDAY' | translate }}</span>
@@ -33,7 +57,7 @@
               {{ 'DASHBOARD.TODAYS_GAIN' | translate }}
             </div>
             <div class="card-value" [ngClass]="totalUnrealisedPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-              {{ totalUnrealisedPnl() >= 0 ? '+' : '' }}{{ totalUnrealisedPnl() | number }} <span class="currency">riel</span>
+              {{ totalUnrealisedPnl() >= 0 ? '+' : '' }}{{ totalUnrealisedPnl() | number:'1.0-2' }} <span class="currency">{{ baseCurrency() === 'KHR' ? '៛' : '$' }}</span>
             </div>
             <div class="card-subtitle progress-subtitle">
               <div class="progress-bar-container">
@@ -50,7 +74,7 @@
               {{ 'DASHBOARD.TOTAL_RETURN' | translate }}
             </div>
             <div class="card-value" [ngClass]="totalPnl() >= 0 ? 'text-profit-bright' : 'text-loss-bright'">
-              {{ totalPnl() >= 0 ? '+' : '' }}{{ totalPnl() | number }} <span class="currency">riel</span>
+              {{ totalPnl() >= 0 ? '+' : '' }}{{ totalPnl() | number:'1.0-2' }} <span class="currency">{{ baseCurrency() === 'KHR' ? '៛' : '$' }}</span>
             </div>
             <div class="card-subtitle">
               <span class="badge profit-badge" [ngClass]="totalPnl() >= 0 ? 'profit-badge' : 'loss-badge'">
