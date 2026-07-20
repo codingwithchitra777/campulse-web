@@ -216,6 +216,12 @@ export class ApiService {
     });
   }
 
+  getExchangeRateHistory(baseCurrency = 'USD', targetCurrency = 'KHR', limit = 30): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/api/market/exchange-rates/history`, {
+      params: { baseCurrency, targetCurrency, limit }
+    });
+  }
+
   // --- Personal loan ledger (money lent / borrowed) ---
 
   getLoans(direction?: LoanDirection, status?: LoanStatus): Observable<{ items: Loan[]; deliverable: boolean }> {

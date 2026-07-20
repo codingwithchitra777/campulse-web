@@ -54,6 +54,10 @@ export class DashboardComponent implements OnDestroy {
     stream: () => this.api.getLatestExchangeRate('USD', 'KHR')
   });
 
+  readonly exchangeRateHistory = rxResource({
+    stream: () => this.api.getExchangeRateHistory('USD', 'KHR', 30)
+  });
+
   marketFilter = signal<'ALL' | 'CSX' | 'GOLD_KH' | 'US'>('ALL');
   baseCurrency = signal<'KHR' | 'USD'>('KHR');
 
@@ -71,6 +75,7 @@ export class DashboardComponent implements OnDestroy {
 
   // --- Chart Implementation ---
   readonly performanceCanvas = viewChild<ElementRef<HTMLCanvasElement>>('performanceCanvas');
+  readonly exchangeCanvas = viewChild<ElementRef<HTMLCanvasElement>>('exchangeCanvas');
 
   readonly timelineResource = rxResource({
     params: () => ({ user: this.userId(), market: this.marketFilter(), currency: this.baseCurrency() }),
@@ -96,6 +101,14 @@ export class DashboardComponent implements OnDestroy {
       
       if (canvasRef && rawData) {
         this.buildChart(canvasRef.nativeElement, rawData, period);
+      }
+    });
+
+    effect(() => {
+      const canvasRef = this.exchangeCanvas();
+      const historyRes = this.exchangeRateHistory.value();
+      if (!this.exchangeRateHistory.isLoading() && canvasRef && historyRes?.items) {
+        this.buildExchangeChart(canvasRef.nativeElement, historyRes.items);
       }
     });
   }
@@ -188,8 +201,8 @@ export class DashboardComponent implements OnDestroy {
 
     // --- Mock Data Fallback ---
     // If the timeline is completely empty (new account), provide some beautiful mock data
-    // so the dashboard chart doesn't look broken.
-    if (dates.length === 0) {
+    // so the dashboard chart doesn't look broken, ONLY IF we are not filtering.
+    if (dates.length === 0 && this.marketFilter() === 'ALL') {
       const mockDates: string[] = [];
       const mockInvested: number[] = [];
       const mockEquity: number[] = [];
@@ -264,6 +277,8 @@ export class DashboardComponent implements OnDestroy {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    
+    const currencySym = this.baseCurrency() === 'KHR' ? '៛' : '$';
 
     const equityGradient = ctx.createLinearGradient(0, 0, 0, 320);
     equityGradient.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
@@ -287,7 +302,7 @@ export class DashboardComponent implements OnDestroy {
             backgroundColor: equityGradient,
             fill: true,
             tension: 0.3,
-            pointRadius: 0,
+            pointRadius: dates.length === 1 ? 4 : 0,
             pointHoverRadius: 6,
             pointHoverBackgroundColor: '#10b981',
             pointHoverBorderColor: '#ffffff',
@@ -302,7 +317,7 @@ export class DashboardComponent implements OnDestroy {
             backgroundColor: 'transparent',
             fill: false,
             tension: 0.1,
-            pointRadius: 0,
+            pointRadius: dates.length === 1 ? 4 : 0,
             pointHoverRadius: 4,
             pointHoverBackgroundColor: '#3b82f6',
           }
@@ -346,7 +361,7 @@ export class DashboardComponent implements OnDestroy {
                   label += ': ';
                 }
                 if (context.parsed.y !== null) {
-                  label += new Intl.NumberFormat().format(context.parsed.y) + ' ៛';
+                  label += new Intl.NumberFormat().format(context.parsed.y) + ' ' + currencySym;
                 }
                 return label;
               },
@@ -358,7 +373,7 @@ export class DashboardComponent implements OnDestroy {
                 const pnlPercent = principalVal > 0 ? ((netPnl / principalVal) * 100).toFixed(1) : '0.0';
                 const sign = netPnl >= 0 ? '+' : '';
                 const titleStr = this.translate('DASHBOARD.CHART_NET_PNL', 'Net P/L');
-                return `${titleStr}: ${sign}${new Intl.NumberFormat().format(netPnl)} ៛ (${sign}${pnlPercent}%)`;
+                return `${titleStr}: ${sign}${new Intl.NumberFormat().format(netPnl)} ${currencySym} (${sign}${pnlPercent}%)`;
               }
             },
             footerFont: { family: "'Outfit', 'Kantumruy Pro', sans-serif", weight: 'bold' },
@@ -396,12 +411,79 @@ export class DashboardComponent implements OnDestroy {
               callback: (value) => {
                 const valNum = Number(value);
                 if (valNum >= 1000000) {
-                  return (valNum / 1000000).toFixed(1) + 'M ៛';
+                  return (valNum / 1000000).toFixed(1) + 'M ' + currencySym;
                 }
-                return new Intl.NumberFormat().format(valNum) + ' ៛';
+                return new Intl.NumberFormat().format(valNum) + ' ' + currencySym;
               }
             }
           }
+        }
+      }
+    });
+  }
+
+  private exchangeChartInstance: any = null;
+
+  private buildExchangeChart(canvas: HTMLCanvasElement, rawHistory: any[]) {
+    if (this.exchangeChartInstance) {
+      this.exchangeChartInstance.destroy();
+      this.exchangeChartInstance = null;
+    }
+
+    if (!rawHistory || rawHistory.length === 0) return;
+    
+    // Sort oldest to newest
+    const sorted = [...rawHistory].sort((a, b) => new Date(a.effectiveDate).getTime() - new Date(b.effectiveDate).getTime());
+
+    const dates = sorted.map(i => new Date(i.effectiveDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+    const bidRates = sorted.map(i => i.bidRate);
+    const askRates = sorted.map(i => i.askRate);
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    this.exchangeChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: 'Ask Rate (Buy USD)',
+            data: askRates,
+            borderColor: '#ef4444',
+            borderWidth: 2,
+            backgroundColor: 'transparent',
+            tension: 0.1,
+            pointRadius: dates.length === 1 ? 4 : 0,
+            pointHoverRadius: 4,
+          },
+          {
+            label: 'Bid Rate (Sell USD)',
+            data: bidRates,
+            borderColor: '#3b82f6',
+            borderWidth: 2,
+            backgroundColor: 'transparent',
+            tension: 0.1,
+            pointRadius: dates.length === 1 ? 4 : 0,
+            pointHoverRadius: 4,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'top', labels: { color: '#f3f4f6', font: { family: "'Outfit', 'Kantumruy Pro', sans-serif", size: 11 } } },
+          tooltip: {
+            backgroundColor: '#111827', titleColor: '#f3f4f6', bodyColor: '#9ca3af', borderColor: '#1e293b', borderWidth: 1,
+            titleFont: { family: "'Outfit', 'Kantumruy Pro', sans-serif", weight: 'bold' },
+            bodyFont: { family: "'Outfit', 'Kantumruy Pro', sans-serif" }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { family: "'Outfit', 'Kantumruy Pro', sans-serif" }, maxTicksLimit: 5 } },
+          y: { grid: { color: '#1e293b' }, ticks: { color: '#9ca3af', font: { family: "'Outfit', 'Kantumruy Pro', sans-serif" } } }
         }
       }
     });

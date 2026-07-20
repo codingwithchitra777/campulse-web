@@ -115,8 +115,27 @@
           @if (timelineResource.isLoading()) {
             <div class="chart-container skeleton" style="height: 300px; margin-top: 20px;"></div>
           } @else {
-            <div class="chart-container" style="height: 300px; margin-top: 20px;">
+            <div class="chart-container" style="height: 300px; margin-top: 20px; position: relative;">
+              @if (timelineResource.value()?.dates?.length === 0 && marketFilter() !== 'ALL') {
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                  No data available for this market
+                </div>
+              }
               <canvas #performanceCanvas></canvas>
+            </div>
+          }
+        </div>
+
+        <!-- Exchange Rate History -->
+        <div class="dashboard-panel chart-panel">
+          <div class="chart-header">
+            <h2 class="panel-title" style="margin-bottom: 0;">💱 Exchange Rate Trend (USD to KHR)</h2>
+          </div>
+          @if (exchangeRateHistory.isLoading()) {
+            <div class="chart-container skeleton" style="height: 250px; margin-top: 20px;"></div>
+          } @else {
+            <div class="chart-container" style="height: 250px; margin-top: 20px;">
+              <canvas #exchangeCanvas></canvas>
             </div>
           }
         </div>
