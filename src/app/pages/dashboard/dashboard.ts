@@ -73,8 +73,12 @@ export class DashboardComponent implements OnDestroy {
   readonly performanceCanvas = viewChild<ElementRef<HTMLCanvasElement>>('performanceCanvas');
 
   readonly timelineResource = rxResource({
-    params: () => this.session.activeUserId(),
-    stream: () => this.api.getChartsTimeline(),
+    params: () => ({ user: this.userId(), market: this.marketFilter(), currency: this.baseCurrency() }),
+    stream: ({ params }) => {
+      if (!params.user) return of(null);
+      const marketParam = params.market === 'ALL' ? undefined : params.market;
+      return this.api.getChartsTimeline(marketParam, params.currency);
+    },
     defaultValue: null as any
   });
 

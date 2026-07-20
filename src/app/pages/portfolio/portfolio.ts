@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal, effect, viewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { map, of } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SessionService } from '../../services/session.service';
 import { Holding, HoldingView, PositionSell, YearlyPnl } from '../../models';
@@ -48,26 +48,54 @@ export class PortfolioComponent implements OnDestroy {
   // Layout state
   readonly activeTab = signal<'holdings' | 'performance'>('holdings');
 
+  // Filters
+  marketFilter = signal<'ALL' | 'CSX' | 'GOLD_KH' | 'US'>('ALL');
+  baseCurrency = signal<'KHR' | 'USD'>('KHR');
+
+  readonly exchangeRate = rxResource({
+    stream: () => this.api.getLatestExchangeRate('USD', 'KHR')
+  });
+
+  readonly filteredPortfolio = computed(() => {
+    const filter = this.marketFilter();
+    return (this.portfolio.value() || []).filter(h => filter === 'ALL' || h.market === filter);
+  });
+
+  private convertToTarget(amount: number, fromCurrency: string, toCurrency: string): number {
+    if (fromCurrency === toCurrency || !amount) return amount;
+    const rateWrapper = this.exchangeRate.value();
+    if (!rateWrapper?.rate) return amount; 
+    
+    const rate = rateWrapper.rate;
+    if (fromCurrency === 'USD' && toCurrency === 'KHR') {
+      return amount * rate.bidRate; 
+    }
+    if (fromCurrency === 'KHR' && toCurrency === 'USD') {
+      return amount / rate.askRate;
+    }
+    return amount;
+  }
+
   // Computed Portfolio Metrics
   readonly totalValue = computed(() => {
-    return this.portfolio.value()?.reduce((sum, h) => sum + ((h.lastPrice || 0) * h.remainingQty), 0) || 0;
+    return this.filteredPortfolio().reduce((sum, h) => sum + this.convertToTarget((h.lastPrice || 0) * h.remainingQty, h.currency, this.baseCurrency()), 0) || 0;
   });
 
   readonly investedCapital = computed(() => {
-    return this.portfolio.value()?.reduce((sum, h) => sum + ((h.avgCostRemaining || 0) * h.remainingQty), 0) || 0;
+    return this.filteredPortfolio().reduce((sum, h) => sum + this.convertToTarget((h.avgCostRemaining || 0) * h.remainingQty, h.currency, this.baseCurrency()), 0) || 0;
   });
 
   readonly totalUnrealizedPnl = computed(() => {
-    return this.portfolio.value()?.reduce((sum, h) => sum + h.unrealisedPnl, 0) || 0;
+    return this.filteredPortfolio().reduce((sum, h) => sum + this.convertToTarget(h.unrealisedPnl, h.currency, this.baseCurrency()), 0) || 0;
   });
 
   readonly activeHoldings = computed(() => {
-    const active = (this.portfolio.value() || []).filter(h => h.remainingQty > 0);
+    const active = this.filteredPortfolio().filter(h => h.remainingQty > 0);
     return active.sort((a, b) => ((b.lastPrice || 0) * b.remainingQty) - ((a.lastPrice || 0) * a.remainingQty));
   });
 
   readonly closedHoldings = computed(() => {
-    const closed = (this.portfolio.value() || []).filter(h => h.remainingQty <= 0);
+    const closed = this.filteredPortfolio().filter(h => h.remainingQty <= 0);
     return closed.sort((a, b) => b.realisedPnl - a.realisedPnl);
   });
 
@@ -77,16 +105,15 @@ export class PortfolioComponent implements OnDestroy {
   });
 
   readonly totalRealizedPnl = computed(() => {
-    return this.portfolio.value()?.reduce((sum, h) => sum + h.realisedPnl, 0) || 0;
+    return this.filteredPortfolio().reduce((sum, h) => sum + this.convertToTarget(h.realisedPnl, h.currency, this.baseCurrency()), 0) || 0;
   });
 
   /**
-   * Per-currency roll-up. We never blend currencies into one number (no FX),
-   * so the summary cards show a set of totals — one per currency held (KHR / USD).
+   * Per-currency roll-up based on the filtered portfolio.
    */
   readonly currencySummaries = computed<CurrencySummary[]>(() => {
     const groups = new Map<string, CurrencySummary>();
-    for (const h of this.portfolio.value() || []) {
+    for (const h of this.filteredPortfolio()) {
       if (h.remainingQty <= 0 && h.realisedPnl === 0) continue;
       const cur = h.currency || 'KHR';
       const g = groups.get(cur) || { currency: cur, value: 0, invested: 0, unrealised: 0, realised: 0, unrealisedPct: 0 };
@@ -111,8 +138,12 @@ export class PortfolioComponent implements OnDestroy {
 
   // Timeline chart resource
   readonly timelineResource = rxResource({
-    params: () => this.session.activeUserId(),
-    stream: () => this.api.getChartsTimeline(),
+    params: () => ({ user: this.session.activeUserId(), market: this.marketFilter(), currency: this.baseCurrency() }),
+    stream: ({ params }) => {
+      if (!params.user) return of(null);
+      const marketParam = params.market === 'ALL' ? undefined : params.market;
+      return this.api.getChartsTimeline(marketParam, params.currency);
+    },
     defaultValue: null as any
   });
 
@@ -270,18 +301,18 @@ export class PortfolioComponent implements OnDestroy {
       equity.push(activeEquity);
     });
 
-    const activePositions = this.portfolio.value();
-    if (activePositions && activePositions.length > 0) {
-      let livePrincipal = 0;
-      let liveEquity = 0;
+      const activePositions = this.filteredPortfolio();
+      if (activePositions && activePositions.length > 0) {
+        let livePrincipal = 0;
+        let liveEquity = 0;
 
-      activePositions.forEach((h) => {
-        if (h.avgCostRemaining && h.remainingQty) {
-          const cost = h.avgCostRemaining * h.remainingQty;
-          livePrincipal += cost;
-          liveEquity += (h.lastPrice ?? h.avgCostRemaining) * h.remainingQty;
-        }
-      });
+        activePositions.forEach((h) => {
+          if (h.avgCostRemaining && h.remainingQty) {
+            const cost = this.convertToTarget(h.avgCostRemaining * h.remainingQty, h.currency, this.baseCurrency());
+            livePrincipal += cost;
+            liveEquity += this.convertToTarget((h.lastPrice ?? h.avgCostRemaining) * h.remainingQty, h.currency, this.baseCurrency());
+          }
+        });
 
       const todayStr = new Date().toISOString().split('T')[0];
       

@@ -19,7 +19,10 @@
           <div style="display: flex; align-items: center; gap: 8px;">
             @if (exchangeRate.value()?.rate; as er) {
               <div class="rate-badge" style="font-size: 11px; color: #9ca3af; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px;" title="Bid: {{ er.bidRate | number:'1.0-4' }} | Ask: {{ er.askRate | number:'1.0-4' }}">
-                1 USD = {{ er.bidRate | number:'1.0-0' }} ៛
+                1 USD = 
+                <span [style.color]="baseCurrency() === 'KHR' ? '#3b82f6' : 'inherit'" [style.fontWeight]="baseCurrency() === 'KHR' ? 'bold' : 'normal'">Bid {{ er.bidRate | number:'1.0-0' }} ៛</span>
+                | 
+                <span [style.color]="baseCurrency() === 'USD' ? '#3b82f6' : 'inherit'" [style.fontWeight]="baseCurrency() === 'USD' ? 'bold' : 'normal'">Ask {{ er.askRate | number:'1.0-0' }} ៛</span>
               </div>
             }
             <div style="background: #1e293b; border-radius: 20px; padding: 4px; display: flex;">

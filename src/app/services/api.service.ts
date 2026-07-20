@@ -210,8 +210,10 @@ export class ApiService {
     return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/alerts/${alertId}`);
   }
 
-  getChartsTimeline(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/api/charts/timeline`);
+  getChartsTimeline(market?: string, targetCurrency?: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/api/charts/timeline`, {
+      params: { ...(market ? { market } : {}), ...(targetCurrency ? { targetCurrency } : {}) }
+    });
   }
 
   // --- Personal loan ledger (money lent / borrowed) ---

@@ -8,6 +8,30 @@
           <h2 class="panel-title" style="margin-bottom: 8px; font-size: calc(28px * var(--font-scale, 1));">{{ 'PORTFOLIO.TITLE' | translate }}</h2>
           <p class="muted" style="margin: 0; font-size: calc(14px * var(--font-scale, 1));">Manage your holdings and track performance across the Cambodian market.</p>
         </div>
+        <!-- Market Filter & Currency Toggle -->
+        <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; background: #1e293b; border-radius: 8px; padding: 4px;">
+            <button [class.active]="marketFilter() === 'ALL'" (click)="marketFilter.set('ALL')" style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; color: #9ca3af; cursor: pointer; font-size: 13px; transition: 0.2s;" [style.background]="marketFilter() === 'ALL' ? '#334155' : 'transparent'" [style.color]="marketFilter() === 'ALL' ? '#f8fafc' : '#9ca3af'">All Markets</button>
+            <button [class.active]="marketFilter() === 'CSX'" (click)="marketFilter.set('CSX')" style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; color: #9ca3af; cursor: pointer; font-size: 13px; transition: 0.2s;" [style.background]="marketFilter() === 'CSX' ? '#334155' : 'transparent'" [style.color]="marketFilter() === 'CSX' ? '#f8fafc' : '#9ca3af'">CSX</button>
+            <button [class.active]="marketFilter() === 'GOLD_KH'" (click)="marketFilter.set('GOLD_KH')" style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; color: #9ca3af; cursor: pointer; font-size: 13px; transition: 0.2s;" [style.background]="marketFilter() === 'GOLD_KH' ? '#334155' : 'transparent'" [style.color]="marketFilter() === 'GOLD_KH' ? '#f8fafc' : '#9ca3af'">Gold</button>
+            <button [class.active]="marketFilter() === 'US'" (click)="marketFilter.set('US')" style="background: transparent; border: none; padding: 6px 12px; border-radius: 6px; color: #9ca3af; cursor: pointer; font-size: 13px; transition: 0.2s;" [style.background]="marketFilter() === 'US' ? '#334155' : 'transparent'" [style.color]="marketFilter() === 'US' ? '#f8fafc' : '#9ca3af'">USA</button>
+          </div>
+          
+          <div style="display: flex; align-items: center; gap: 8px;">
+            @if (exchangeRate.value()?.rate; as er) {
+              <div class="rate-badge" style="font-size: 11px; color: #9ca3af; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px;" title="Bid: {{ er.bidRate | number:'1.0-4' }} | Ask: {{ er.askRate | number:'1.0-4' }}">
+                1 USD = 
+                <span [style.color]="baseCurrency() === 'KHR' ? '#3b82f6' : 'inherit'" [style.fontWeight]="baseCurrency() === 'KHR' ? 'bold' : 'normal'">Bid {{ er.bidRate | number:'1.0-0' }} ៛</span>
+                | 
+                <span [style.color]="baseCurrency() === 'USD' ? '#3b82f6' : 'inherit'" [style.fontWeight]="baseCurrency() === 'USD' ? 'bold' : 'normal'">Ask {{ er.askRate | number:'1.0-0' }} ៛</span>
+              </div>
+            }
+            <div style="background: #1e293b; border-radius: 20px; padding: 4px; display: flex;">
+              <button [class.active]="baseCurrency() === 'KHR'" (click)="baseCurrency.set('KHR')" style="background: transparent; border: none; padding: 4px 12px; border-radius: 16px; color: #f8fafc; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s;" [style.background]="baseCurrency() === 'KHR' ? '#3b82f6' : 'transparent'">KHR</button>
+              <button [class.active]="baseCurrency() === 'USD'" (click)="baseCurrency.set('USD')" style="background: transparent; border: none; padding: 4px 12px; border-radius: 16px; color: #f8fafc; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s;" [style.background]="baseCurrency() === 'USD' ? '#3b82f6' : 'transparent'">USD</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       @if (portfolio.isLoading()) {
