@@ -31,6 +31,8 @@ export interface ManualPrice {
   market: string;
   symbol: string;
   price: number;
+  bidPrice?: number;
+  askPrice?: number;
   currency: string;
   change: number;
   updatedBy: string | null;

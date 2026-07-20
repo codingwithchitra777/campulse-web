@@ -122,7 +122,7 @@ export class ApiService {
     return this.http.get<{ items: ManualPrice[] }>(`${this.baseUrl}/api/admin/manual-prices`);
   }
 
-  setManualPrice(body: { price: number; market?: string; symbol?: string; currency?: string; change?: number }) {
+  setManualPrice(body: { price: number; bidPrice?: number; askPrice?: number; market?: string; symbol?: string; currency?: string; change?: number }) {
     return this.http.put<any>(`${this.baseUrl}/api/admin/manual-price`, body);
   }
 
@@ -351,5 +351,11 @@ export class ApiService {
 
   addExchangeRate(rate: { baseCurrency: string; targetCurrency: string; bidRate: number; askRate: number; effectiveDate: string }): Observable<{ success: boolean; rate: ExchangeRate }> {
     return this.http.post<{ success: boolean; rate: ExchangeRate }>(`${this.baseUrl}/api/admin/exchange-rates`, rate);
+  }
+
+  getMarketPriceHistory(symbol: string, days = 30): Observable<{ items: any[] }> {
+    return this.http.get<{ items: any[] }>(`${this.baseUrl}/api/market/price-history/${symbol}`, {
+      params: { days }
+    });
   }
 }

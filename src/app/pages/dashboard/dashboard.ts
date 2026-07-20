@@ -58,6 +58,10 @@ export class DashboardComponent implements OnDestroy {
     stream: () => this.api.getExchangeRateHistory('USD', 'KHR', 30)
   });
 
+  readonly goldPriceHistory = rxResource({
+    stream: () => this.api.getMarketPriceHistory('XAU-KH', 30)
+  });
+
   marketFilter = signal<'ALL' | 'CSX' | 'GOLD_KH' | 'US'>('ALL');
   baseCurrency = signal<'KHR' | 'USD'>('KHR');
 
@@ -76,6 +80,7 @@ export class DashboardComponent implements OnDestroy {
   // --- Chart Implementation ---
   readonly performanceCanvas = viewChild<ElementRef<HTMLCanvasElement>>('performanceCanvas');
   readonly exchangeCanvas = viewChild<ElementRef<HTMLCanvasElement>>('exchangeCanvas');
+  readonly goldCanvas = viewChild<ElementRef<HTMLCanvasElement>>('goldCanvas');
 
   readonly timelineResource = rxResource({
     params: () => ({ user: this.userId(), market: this.marketFilter(), currency: this.baseCurrency() }),
@@ -109,6 +114,14 @@ export class DashboardComponent implements OnDestroy {
       const historyRes = this.exchangeRateHistory.value();
       if (!this.exchangeRateHistory.isLoading() && canvasRef && historyRes?.items) {
         this.buildExchangeChart(canvasRef.nativeElement, historyRes.items);
+      }
+    });
+
+    effect(() => {
+      const canvasRef = this.goldCanvas();
+      const historyRes = this.goldPriceHistory.value();
+      if (!this.goldPriceHistory.isLoading() && canvasRef && historyRes?.items) {
+        this.buildGoldChart(canvasRef.nativeElement, historyRes.items);
       }
     });
   }
@@ -207,8 +220,10 @@ export class DashboardComponent implements OnDestroy {
       const mockInvested: number[] = [];
       const mockEquity: number[] = [];
       const now = new Date();
-      let currentInvested = 5000000;
-      let currentEquity = 5000000;
+      const isUsd = this.baseCurrency() === 'USD';
+      let currentInvested = isUsd ? 1250 : 5000000;
+      let currentEquity = isUsd ? 1250 : 5000000;
+      const depositAmount = isUsd ? 250 : 1000000;
       
       for (let i = 180; i >= 0; i--) {
         const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
@@ -216,16 +231,16 @@ export class DashboardComponent implements OnDestroy {
         
         // Add periodic deposits
         if (i > 0 && i % 30 === 0) {
-          currentInvested += 1000000;
+          currentInvested += depositAmount;
         }
         
         // Add random market movement (trending upwards)
-        const dailyMove = (Math.random() - 0.45) * 150000;
+        const dailyMove = (Math.random() - 0.45) * (isUsd ? 37.5 : 150000);
         currentEquity += dailyMove;
         
         // Ensure equity broadly tracks invested as a baseline
         if (currentEquity < currentInvested * 0.9) currentEquity = currentInvested * 0.9;
-        if (i % 30 === 0) currentEquity += 1000000; // Match the deposit
+        if (i % 30 === 0) currentEquity += depositAmount; // Match the deposit
         
         mockInvested.push(currentInvested);
         mockEquity.push(currentEquity);
@@ -489,6 +504,73 @@ export class DashboardComponent implements OnDestroy {
     });
   }
 
+  private goldChartInstance: any = null;
+
+  private buildGoldChart(canvas: HTMLCanvasElement, rawHistory: any[]) {
+    if (this.goldChartInstance) {
+      this.goldChartInstance.destroy();
+      this.goldChartInstance = null;
+    }
+
+    if (!rawHistory || rawHistory.length === 0) return;
+    
+    // Sort oldest to newest
+    const sorted = [...rawHistory].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    const dates = sorted.map(i => new Date(i.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+    const bidRates = sorted.map(i => i.bidPrice ?? i.price);
+    const askRates = sorted.map(i => i.askPrice ?? i.price);
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    this.goldChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: 'Ask Price (Buy)',
+            data: askRates,
+            borderColor: '#f59e0b',
+            borderWidth: 2,
+            backgroundColor: 'transparent',
+            tension: 0.1,
+            pointRadius: dates.length === 1 ? 4 : 0,
+            pointHoverRadius: 4,
+          },
+          {
+            label: 'Bid Price (Sell)',
+            data: bidRates,
+            borderColor: '#3b82f6',
+            borderWidth: 2,
+            backgroundColor: 'transparent',
+            tension: 0.1,
+            pointRadius: dates.length === 1 ? 4 : 0,
+            pointHoverRadius: 4,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'top', labels: { color: '#f3f4f6', font: { family: "'Outfit', 'Kantumruy Pro', sans-serif", size: 11 } } },
+          tooltip: {
+            backgroundColor: '#111827', titleColor: '#f3f4f6', bodyColor: '#9ca3af', borderColor: '#1e293b', borderWidth: 1,
+            titleFont: { family: "'Outfit', 'Kantumruy Pro', sans-serif", weight: 'bold' },
+            bodyFont: { family: "'Outfit', 'Kantumruy Pro', sans-serif" }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { family: "'Outfit', 'Kantumruy Pro', sans-serif" }, maxTicksLimit: 5 } },
+          y: { grid: { color: '#1e293b' }, ticks: { color: '#9ca3af', font: { family: "'Outfit', 'Kantumruy Pro', sans-serif" } } }
+        }
+      }
+    });
+  }
+
   readonly recentTrades = rxResource({
     params: () => this.userId(),
     stream: () => this.api.getTrades(undefined, 5, 0),
@@ -556,6 +638,14 @@ export class DashboardComponent implements OnDestroy {
     if (change === 0 || p.change_direction === 'equal') return 0;
     const prevClose = p.change_direction === 'up' ? p.price - change : p.price + change;
     return prevClose > 0 ? (change / prevClose) * 100 : 0;
+  }
+
+  getCurrencyForTicker(ticker: string): string {
+    if (!ticker) return '';
+    if (ticker === 'XAU-KH') return '$';
+    const khmerTickers = ['PWSA', 'GTI', 'PPAP', 'PPSP', 'PAS', 'ABC', 'PEPC', 'CGSM', 'MJQE'];
+    if (khmerTickers.includes(ticker)) return '៛';
+    return '$'; // Assume US stock
   }
 
   readonly filteredPortfolio = computed(() => {

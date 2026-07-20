@@ -140,6 +140,20 @@
           }
         </div>
 
+        <!-- Gold Price History -->
+        <div class="dashboard-panel chart-panel">
+          <div class="chart-header">
+            <h2 class="panel-title" style="margin-bottom: 0;">🪙 Gold Price Trend (Bid/Ask)</h2>
+          </div>
+          @if (goldPriceHistory.isLoading()) {
+            <div class="chart-container skeleton" style="height: 250px; margin-top: 20px;"></div>
+          } @else {
+            <div class="chart-container" style="height: 250px; margin-top: 20px;">
+              <canvas #goldCanvas></canvas>
+            </div>
+          }
+        </div>
+
         <!-- Market Movers -->
         <div class="dashboard-panel">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
@@ -163,7 +177,7 @@
                     }
                   </div>
                   <div class="mover-price-col">
-                    <span class="mover-price">{{ stock.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">riel</span></span>
+                    <span class="mover-price">{{ stock.price | number }} <span style="font-size: 0.8em; color: var(--text-color); opacity: 0.7;">{{ getCurrencyForTicker(stock.ticker) }}</span></span>
                     <span class="mover-change" [ngClass]="(stock.change || 0) > 0 ? 'text-profit' : ((stock.change || 0) < 0 ? 'text-loss' : 'text-muted')">{{ formatChange(stock) }}</span>
                   </div>
                 </div>
@@ -202,7 +216,7 @@
                     </div>
                     <div class="trade-date-row">
                       <span class="trade-date">{{ t.orderDate | date:'mediumDate' }}</span>
-                      <span class="trade-price">{{ t.price | number }} riel</span>
+                      <span class="trade-price">{{ t.price | number }} {{ getCurrencyForTicker(t.ticker) }}</span>
                     </div>
                   </div>
                 </div>

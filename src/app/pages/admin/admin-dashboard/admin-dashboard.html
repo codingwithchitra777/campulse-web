@@ -23,7 +23,11 @@
     </p>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
       <input type="number" step="any" min="0" [(ngModel)]="goldPrice" [placeholder]="'ADMIN.GOLD_PRICE_PLACEHOLDER' | translate"
-             style="max-width: 200px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+             style="max-width: 150px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+      <input type="number" step="any" min="0" [(ngModel)]="goldBidPrice" placeholder="Bid (Sell at)"
+             style="max-width: 150px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
+      <input type="number" step="any" min="0" [(ngModel)]="goldAskPrice" placeholder="Ask (Buy at)"
+             style="max-width: 150px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
       <button class="btn-primary" (click)="saveGoldPrice()" [disabled]="goldSaving()">
         {{ goldSaving() ? ('ADMIN.BTN_SAVING' | translate) : ('ADMIN.BTN_SAVE_PRICE' | translate) }}
       </button>
@@ -33,7 +37,12 @@
       <div style="margin-top: 12px; font-size: calc(13px * var(--font-scale, 1)); color: #cbd5e1;">
         @for (mp of manualPrices.value().items; track mp.symbol) {
           <div>Current <strong>{{ mp.symbol }}</strong>: <strong>{{ mp.price | money:mp.currency }}</strong>
-            <span style="color: #64748b;">{{ 'ADMIN.CURRENT_UPDATED' | translate:{date: (mp.updatedAt | date:'short')} }}</span>
+            @if (mp.bidPrice || mp.askPrice) {
+            <span style="margin-left: 8px; font-size: 0.9em; color: #94a3b8;">
+              (Bid: {{ (mp.bidPrice || 0) | money:mp.currency }} | Ask: {{ (mp.askPrice || 0) | money:mp.currency }})
+            </span>
+            }
+            <span style="color: #64748b; margin-left: 8px;">{{ 'ADMIN.CURRENT_UPDATED' | translate:{date: (mp.updatedAt | date:'short')} }}</span>
           </div>
         }
       </div>

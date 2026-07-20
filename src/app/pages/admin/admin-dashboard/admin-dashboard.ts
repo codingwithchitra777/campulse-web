@@ -31,6 +31,8 @@ export class AdminDashboardComponent {
     defaultValue: { items: [] as ManualPrice[] }
   });
   goldPrice: number | null = null;
+  goldBidPrice: number | null = null;
+  goldAskPrice: number | null = null;
   readonly goldSaving = signal(false);
   readonly goldMsg = signal<string | null>(null);
 
@@ -41,7 +43,14 @@ export class AdminDashboardComponent {
     }
     this.goldSaving.set(true);
     this.goldMsg.set(null);
-    this.api.setManualPrice({ price: this.goldPrice, market: 'GOLD_KH', symbol: 'XAU-KH', currency: 'USD' }).subscribe({
+    this.api.setManualPrice({ 
+      price: this.goldPrice, 
+      bidPrice: this.goldBidPrice || undefined,
+      askPrice: this.goldAskPrice || undefined,
+      market: 'GOLD_KH', 
+      symbol: 'XAU-KH', 
+      currency: 'USD' 
+    }).subscribe({
       next: () => {
         this.goldSaving.set(false);
         this.goldMsg.set('Saved ✓');
