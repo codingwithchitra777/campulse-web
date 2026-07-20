@@ -122,6 +122,15 @@
         </div>
       </div>
 
+      <div style="padding: 10px; background: rgba(255,0,0,0.2); color: white; margin-bottom: 10px;">
+        DEBUG INFO: 
+        isLoading: {{ portfolio.isLoading() | json }}
+        closedHoldings.length: {{ closedHoldings().length }}
+        portfolio.value.length: {{ portfolio.value()?.length }}
+        <br>
+        Closed Items: {{ closedHoldings() | json }}
+      </div>
+
       <!-- Closed Holdings Panel -->
       @if (!portfolio.isLoading() && closedHoldings().length > 0) {
         <div class="dashboard-panel holdings-panel" style="margin-bottom: 24px; padding: 0;">
