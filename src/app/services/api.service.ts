@@ -148,8 +148,10 @@ export class ApiService {
       `${this.baseUrl}/api/admin/corporate-actions/${actionId}`);
   }
 
-  getPortfolio(): Observable<Holding[]> {
-    return this.http.get<Holding[]>(`${this.baseUrl}/api/portfolio`);
+  getPortfolio(valuationMode: string = 'BID'): Observable<Holding[]> {
+    return this.http.get<Holding[]>(`${this.baseUrl}/api/portfolio`, {
+      params: { valuationMode }
+    });
   }
 
   getTopOrders(): Observable<TopOrder[]> {
@@ -210,9 +212,9 @@ export class ApiService {
     return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/alerts/${alertId}`);
   }
 
-  getChartsTimeline(market?: string, targetCurrency?: string): Observable<any> {
+  getChartsTimeline(market?: string, targetCurrency?: string, valuationMode: string = 'BID'): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/api/charts/timeline`, {
-      params: { ...(market ? { market } : {}), ...(targetCurrency ? { targetCurrency } : {}) }
+      params: { ...(market ? { market } : {}), ...(targetCurrency ? { targetCurrency } : {}), valuationMode }
     });
   }
 

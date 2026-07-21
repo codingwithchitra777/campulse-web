@@ -31,6 +31,14 @@
               <button [class.active]="baseCurrency() === 'USD'" (click)="baseCurrency.set('USD')" style="background: transparent; border: none; padding: 4px 12px; border-radius: 16px; color: #f8fafc; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s;" [style.background]="baseCurrency() === 'USD' ? '#3b82f6' : 'transparent'">USD</button>
             </div>
           </div>
+          
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 12px; color: #9ca3af; font-weight: 600;">Valuation:</span>
+            <div style="background: #1e293b; border-radius: 20px; padding: 4px; display: flex;">
+              <button [class.active]="valuationMode() === 'BID'" (click)="valuationMode.set('BID')" style="background: transparent; border: none; padding: 4px 12px; border-radius: 16px; color: #f8fafc; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s;" [style.background]="valuationMode() === 'BID' ? '#10b981' : 'transparent'">Bid</button>
+              <button [class.active]="valuationMode() === 'ASK'" (click)="valuationMode.set('ASK')" style="background: transparent; border: none; padding: 4px 12px; border-radius: 16px; color: #f8fafc; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s;" [style.background]="valuationMode() === 'ASK' ? '#10b981' : 'transparent'">Ask</button>
+            </div>
+          </div>
         </div>
       </div>
 

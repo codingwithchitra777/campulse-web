@@ -38,8 +38,8 @@ export class PortfolioComponent implements OnDestroy {
   readonly allocationCanvas = viewChild<ElementRef<HTMLCanvasElement>>('allocationCanvas');
 
   readonly portfolio = rxResource({
-    params: () => this.session.activeUserId(),
-    stream: () => this.api.getPortfolio().pipe(map((holdings) => holdings.map(toHoldingView))),
+    params: () => ({ user: this.session.activeUserId(), mode: this.valuationMode() }),
+    stream: ({ params }) => this.api.getPortfolio(params.mode).pipe(map((holdings) => holdings.map(toHoldingView))),
     defaultValue: [] as HoldingView[]
   });
 
@@ -51,6 +51,7 @@ export class PortfolioComponent implements OnDestroy {
   // Filters
   marketFilter = signal<'ALL' | 'CSX' | 'GOLD_KH' | 'US'>('ALL');
   baseCurrency = signal<'KHR' | 'USD'>('KHR');
+  valuationMode = signal<'BID' | 'ASK'>('BID');
 
   readonly exchangeRate = rxResource({
     stream: () => this.api.getLatestExchangeRate('USD', 'KHR')
@@ -138,11 +139,11 @@ export class PortfolioComponent implements OnDestroy {
 
   // Timeline chart resource
   readonly timelineResource = rxResource({
-    params: () => ({ user: this.session.activeUserId(), market: this.marketFilter(), currency: this.baseCurrency() }),
+    params: () => ({ user: this.session.activeUserId(), market: this.marketFilter(), currency: this.baseCurrency(), mode: this.valuationMode() }),
     stream: ({ params }) => {
       if (!params.user) return of(null);
       const marketParam = params.market === 'ALL' ? undefined : params.market;
-      return this.api.getChartsTimeline(marketParam, params.currency);
+      return this.api.getChartsTimeline(marketParam, params.currency, params.mode);
     },
     defaultValue: null as any
   });
@@ -371,6 +372,8 @@ export class PortfolioComponent implements OnDestroy {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const currencySym = this.baseCurrency() === 'KHR' ? '៛' : '$';
+
     const equityGradient = ctx.createLinearGradient(0, 0, 0, 320);
     equityGradient.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
     equityGradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
@@ -452,7 +455,7 @@ export class PortfolioComponent implements OnDestroy {
                   label += ': ';
                 }
                 if (context.parsed.y !== null) {
-                  label += new Intl.NumberFormat().format(context.parsed.y) + ' ៛';
+                  label += new Intl.NumberFormat().format(context.parsed.y) + ' ' + currencySym;
                 }
                 return label;
               },
@@ -464,7 +467,7 @@ export class PortfolioComponent implements OnDestroy {
                 const pnlPercent = principalVal > 0 ? ((netPnl / principalVal) * 100).toFixed(1) : '0.0';
                 const sign = netPnl >= 0 ? '+' : '';
                 const titleStr = this.translate('DASHBOARD.CHART_NET_PNL', 'Net P/L');
-                return `${titleStr}: ${sign}${new Intl.NumberFormat().format(netPnl)} ៛ (${sign}${pnlPercent}%)`;
+                return `${titleStr}: ${sign}${new Intl.NumberFormat().format(netPnl)} ${currencySym} (${sign}${pnlPercent}%)`;
               }
             },
             footerFont: { family: "'Outfit', 'Kantumruy Pro', sans-serif", weight: 'bold' },
@@ -502,9 +505,9 @@ export class PortfolioComponent implements OnDestroy {
               callback: (value) => {
                 const valNum = Number(value);
                 if (valNum >= 1000000) {
-                  return (valNum / 1000000).toFixed(1) + 'M ៛';
+                  return (valNum / 1000000).toFixed(1) + 'M ' + currencySym;
                 }
-                return new Intl.NumberFormat().format(valNum) + ' ៛';
+                return new Intl.NumberFormat().format(valNum) + ' ' + currencySym;
               }
             }
           }
@@ -561,7 +564,8 @@ export class PortfolioComponent implements OnDestroy {
                 const value = context.raw as number;
                 const total = context.dataset.data.reduce((a: any, b: any) => a + b, 0);
                 const percentage = ((value / total) * 100).toFixed(2) + '%';
-                return ` ៛ ${value.toLocaleString()} (${percentage})`;
+                const currencySym = this.baseCurrency() === 'KHR' ? '៛' : '$';
+                return ` ${currencySym} ${value.toLocaleString()} (${percentage})`;
               }
             }
           }

@@ -212,42 +212,6 @@ export class DashboardComponent implements OnDestroy {
       }
     }
 
-    // --- Mock Data Fallback ---
-    // If the timeline is completely empty (new account), provide some beautiful mock data
-    // so the dashboard chart doesn't look broken, ONLY IF we are not filtering.
-    if (dates.length === 0 && this.marketFilter() === 'ALL') {
-      const mockDates: string[] = [];
-      const mockInvested: number[] = [];
-      const mockEquity: number[] = [];
-      const now = new Date();
-      const isUsd = this.baseCurrency() === 'USD';
-      let currentInvested = isUsd ? 1250 : 5000000;
-      let currentEquity = isUsd ? 1250 : 5000000;
-      const depositAmount = isUsd ? 250 : 1000000;
-      
-      for (let i = 180; i >= 0; i--) {
-        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-        mockDates.push(d.toISOString().split('T')[0]);
-        
-        // Add periodic deposits
-        if (i > 0 && i % 30 === 0) {
-          currentInvested += depositAmount;
-        }
-        
-        // Add random market movement (trending upwards)
-        const dailyMove = (Math.random() - 0.45) * (isUsd ? 37.5 : 150000);
-        currentEquity += dailyMove;
-        
-        // Ensure equity broadly tracks invested as a baseline
-        if (currentEquity < currentInvested * 0.9) currentEquity = currentInvested * 0.9;
-        if (i % 30 === 0) currentEquity += depositAmount; // Match the deposit
-        
-        mockInvested.push(currentInvested);
-        mockEquity.push(currentEquity);
-      }
-      return { dates: mockDates, invested: mockInvested, equity: mockEquity };
-    }
-
     return { dates, invested, equity };
   }
 
