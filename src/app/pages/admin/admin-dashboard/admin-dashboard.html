@@ -22,8 +22,6 @@
     <p style="color: #9ca3af; font-size: calc(13px * var(--font-scale, 1)); margin-bottom: 12px;" [innerHTML]="'ADMIN.GOLD_BOARD_DESC' | translate">
     </p>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-      <input type="number" step="any" min="0" [(ngModel)]="goldPrice" [placeholder]="'ADMIN.GOLD_PRICE_PLACEHOLDER' | translate"
-             style="max-width: 150px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
       <input type="number" step="any" min="0" [(ngModel)]="goldBidPrice" placeholder="Bid (Sell at)"
              style="max-width: 150px; padding: 8px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;">
       <input type="number" step="any" min="0" [(ngModel)]="goldAskPrice" placeholder="Ask (Buy at)"

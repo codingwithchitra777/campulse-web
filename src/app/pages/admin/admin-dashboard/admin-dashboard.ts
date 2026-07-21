@@ -30,23 +30,25 @@ export class AdminDashboardComponent {
     stream: () => this.api.getManualPrices(),
     defaultValue: { items: [] as ManualPrice[] }
   });
-  goldPrice: number | null = null;
   goldBidPrice: number | null = null;
   goldAskPrice: number | null = null;
   readonly goldSaving = signal(false);
   readonly goldMsg = signal<string | null>(null);
 
   saveGoldPrice() {
-    if (!this.goldPrice || this.goldPrice <= 0) {
-      this.goldMsg.set('Enter a positive price');
+    if (!this.goldBidPrice || !this.goldAskPrice || this.goldBidPrice <= 0 || this.goldAskPrice <= 0) {
+      this.goldMsg.set('Enter positive Bid and Ask prices');
       return;
     }
+    // Calculate nominal price as the mid price between bid and ask
+    const nominalPrice = (this.goldBidPrice + this.goldAskPrice) / 2;
+
     this.goldSaving.set(true);
     this.goldMsg.set(null);
     this.api.setManualPrice({ 
-      price: this.goldPrice, 
-      bidPrice: this.goldBidPrice || undefined,
-      askPrice: this.goldAskPrice || undefined,
+      price: nominalPrice, 
+      bidPrice: this.goldBidPrice,
+      askPrice: this.goldAskPrice,
       market: 'GOLD_KH', 
       symbol: 'XAU-KH', 
       currency: 'USD' 
