@@ -1,0 +1,66 @@
+<div class="view-container animate-fade-in">
+  <section class="history-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+      <h2 class="panel-title" style="margin: 0;">🥇 Gold Price (XAU-KH)</h2>
+      <button class="btn-primary" (click)="openDrawer()">+ Add Gold Price</button>
+    </div>
+    <p style="color: #9ca3af; font-size: calc(13px * var(--font-scale, 1)); margin-bottom: 12px;">
+      Historical local gold prices (USD per <em>chi</em>) with bid &amp; ask. The latest entry drives the gold board and values gold holdings.
+    </p>
+
+    @if (history.value().items.length) {
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr><th>Effective Date</th><th>Bid (Buy)</th><th>Ask (Sell)</th><th>Mid</th><th>Spread</th></tr>
+          </thead>
+          <tbody>
+            @for (g of history.value().items; track g.date) {
+              <tr>
+                <td class="font-bold">{{ g.date | date: 'mediumDate' }}</td>
+                <td class="text-profit">{{ g.bidPrice | number: '1.2-2' }}</td>
+                <td class="text-loss">{{ g.askPrice | number: '1.2-2' }}</td>
+                <td>{{ g.price | number: '1.2-2' }}</td>
+                <td style="color: #64748b;">{{ g.askPrice - g.bidPrice | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (history.isLoading()) {
+      <p style="color: #64748b;">Loading…</p>
+    } @else {
+      <p style="color: #64748b;">No gold prices yet. Click “+ Add Gold Price”.</p>
+    }
+  </section>
+
+  @if (drawerOpen()) {
+    <div class="drawer-backdrop" (click)="closeDrawer()"></div>
+  }
+  <div class="side-drawer" [class.open]="drawerOpen()">
+    <div class="drawer-header">
+      <h3 style="margin: 0; font-size: calc(18px * var(--font-scale, 1));">Add Gold Price</h3>
+      <button class="drawer-close-btn" (click)="closeDrawer()" title="Close">✕</button>
+    </div>
+    <div class="drawer-content-scroll" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #9ca3af;">Effective Date
+        <input type="date" [(ngModel)]="form.effectiveDate"
+               style="padding: 10px 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;" />
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #9ca3af;">Bid Price — Buy (USD)
+        <input type="number" step="0.01" min="0" [(ngModel)]="form.bidPrice" placeholder="e.g. 495.00"
+               style="padding: 10px 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;" />
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #9ca3af;">Ask Price — Sell (USD)
+        <input type="number" step="0.01" min="0" [(ngModel)]="form.askPrice" placeholder="e.g. 500.00"
+               style="padding: 10px 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc;" />
+      </label>
+      <button class="btn-primary" (click)="save()" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : 'Save Gold Price' }}
+      </button>
+      @if (msg(); as m) {
+        <span style="font-size: calc(13px * var(--font-scale, 1)); color: #9ca3af;">{{ m }}</span>
+      }
+    </div>
+  </div>
+</div>

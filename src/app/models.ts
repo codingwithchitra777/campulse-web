@@ -485,6 +485,15 @@ export interface ExchangeRate {
   createdAt?: string;
 }
 
+/** A dated gold (XAU-KH) price point with bid & ask, from price_history. */
+export interface GoldPrice {
+  ticker?: string;
+  date: string;
+  price: number;
+  bidPrice: number;
+  askPrice: number;
+}
+
 
 /** A single repayment against a loan. */
 export interface LoanRepayment {

@@ -9,6 +9,7 @@ import {
   CoachRefreshResponse,
   CorporateAction,
   ExchangeRate,
+  GoldPrice,
   GoogleAuthResponse,
   Holding,
   Loan,
@@ -353,6 +354,14 @@ export class ApiService {
 
   addExchangeRate(rate: { baseCurrency: string; targetCurrency: string; bidRate: number; askRate: number; effectiveDate: string }): Observable<{ success: boolean; rate: ExchangeRate }> {
     return this.http.post<{ success: boolean; rate: ExchangeRate }>(`${this.baseUrl}/api/admin/exchange-rates`, rate);
+  }
+
+  getGoldHistory(): Observable<{ items: GoldPrice[] }> {
+    return this.http.get<{ items: GoldPrice[] }>(`${this.baseUrl}/api/admin/gold-history`);
+  }
+
+  addGoldPrice(body: { bidPrice: number; askPrice: number; effectiveDate: string }): Observable<{ success: boolean; item: GoldPrice }> {
+    return this.http.post<{ success: boolean; item: GoldPrice }>(`${this.baseUrl}/api/admin/gold-history`, body);
   }
 
   getMarketPriceHistory(symbol: string, days = 30): Observable<{ items: any[] }> {

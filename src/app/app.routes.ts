@@ -65,6 +65,10 @@ export const routes: Routes = [
       {
         path: 'exchange-rates',
         loadComponent: () => import('./pages/admin/admin-exchange-rates/admin-exchange-rates').then(m => m.AdminExchangeRatesComponent)
+      },
+      {
+        path: 'gold',
+        loadComponent: () => import('./pages/admin/admin-gold/admin-gold').then(m => m.AdminGoldComponent)
       }
     ]
   },

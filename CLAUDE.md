@@ -89,3 +89,6 @@ Styling is essentially one global stylesheet, `src/styles.css` (~3600 lines) —
 ### TypeScript strictness
 
 `tsconfig.json` enables full strict mode plus `strictTemplates`, `noImplicitReturns`, and `noPropertyAccessFromIndexSignature` — template type errors fail the build.
+
+## Response style
+- Keep chat replies short (1–3 lines) to save tokens. Do the work; skip long recaps/option surveys.
