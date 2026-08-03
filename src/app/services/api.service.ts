@@ -11,6 +11,8 @@ import {
   ExchangeRate,
   GoldPrice,
   GoogleAuthResponse,
+  GridPlan,
+  GridPlanResponse,
   Holding,
   Loan,
   LoanDirection,
@@ -97,6 +99,20 @@ export class ApiService {
 
   updateJournal(tradeId: string, body: { note?: string; tags?: string }): Observable<Trade> {
     return this.http.patch<Trade>(`${this.baseUrl}/api/trades/${tradeId}/journal`, body);
+  }
+
+  // --- Grid trading plan (per-user active ladder, persisted server-side) ---
+
+  getGrid(): Observable<GridPlanResponse> {
+    return this.http.get<GridPlanResponse>(`${this.baseUrl}/api/grid`);
+  }
+
+  saveGrid(plan: GridPlan): Observable<GridPlanResponse> {
+    return this.http.put<GridPlanResponse>(`${this.baseUrl}/api/grid`, plan);
+  }
+
+  deleteGrid(): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/grid`);
   }
 
   getPosition(symbol: string, market?: string): Observable<Position> {

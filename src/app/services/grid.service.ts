@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { catchError, of } from 'rxjs';
+import { ApiService } from './api.service';
 import { CurrencyCode, GridFill, GridPlan, GridRung, GridSpacing, MarketKind, TradeSide } from '../models';
 
 /**
@@ -13,6 +15,8 @@ import { CurrencyCode, GridFill, GridPlan, GridRung, GridSpacing, MarketKind, Tr
  */
 @Injectable({ providedIn: 'root' })
 export class GridService {
+  private readonly api = inject(ApiService);
+
   /** The active grid plan for the current user (null = none registered). */
   readonly plan = signal<GridPlan | null>(null);
 
@@ -22,30 +26,59 @@ export class GridService {
     return `campulse_grid_${userId}`;
   }
 
-  /** Load (or clear) the active plan for a user — call on user switch. */
+  private isGuest(userId: string): boolean {
+    return !userId || userId === 'guest';
+  }
+
+  /**
+   * Load the active plan for a user. The backend is the source of truth for
+   * signed-in users (so the grid follows them across devices); localStorage is
+   * the offline/guest fallback and instant cache. On user switch, call this.
+   */
   loadFor(userId: string): void {
     this.currentUserId = userId;
+    // Instant paint from cache first.
+    this.plan.set(this.readCache(userId));
+
+    if (this.isGuest(userId)) return;
+    // Then reconcile with the server (best-effort; keeps the cache if it fails).
+    this.api
+      .getGrid()
+      .pipe(catchError(() => of(null)))
+      .subscribe((remote) => {
+        if (this.currentUserId !== userId) return; // user changed mid-flight
+        if (remote) {
+          this.plan.set(remote.plan ?? null);
+          this.writeCache(userId, remote.plan ?? null);
+        }
+      });
+  }
+
+  private readCache(userId: string): GridPlan | null {
     const raw = localStorage.getItem(this.storageKey(userId));
-    if (!raw) {
-      this.plan.set(null);
-      return;
-    }
+    if (!raw) return null;
     try {
-      this.plan.set(JSON.parse(raw) as GridPlan);
+      return JSON.parse(raw) as GridPlan;
     } catch {
       localStorage.removeItem(this.storageKey(userId));
-      this.plan.set(null);
+      return null;
     }
+  }
+
+  private writeCache(userId: string, plan: GridPlan | null): void {
+    if (!userId) return;
+    if (plan) localStorage.setItem(this.storageKey(userId), JSON.stringify(plan));
+    else localStorage.removeItem(this.storageKey(userId));
   }
 
   private persist(): void {
     const p = this.plan();
     if (!this.currentUserId) return;
-    if (p) {
-      localStorage.setItem(this.storageKey(this.currentUserId), JSON.stringify(p));
-    } else {
-      localStorage.removeItem(this.storageKey(this.currentUserId));
-    }
+    this.writeCache(this.currentUserId, p);
+    if (this.isGuest(this.currentUserId)) return;
+    // Mirror to the backend (fire-and-forget; localStorage already has it).
+    const req = p ? this.api.saveGrid(p) : this.api.deleteGrid();
+    req.pipe(catchError(() => of(null))).subscribe();
   }
 
   /** Compute the ladder prices for a range (arithmetic = even step, geometric = even %). */
@@ -132,26 +165,27 @@ export class GridService {
    * sell it books the backend-reported realised P/L and re-arms a buy one step
    * down. Returns nothing — mutates + persists the plan signal.
    */
-  applyFill(rungId: number, realisedPnl: number): void {
+  applyFill(rungId: number, realisedPnl: number, actualPrice?: number): void {
     const plan = this.plan();
     if (!plan) return;
     const rung = plan.rungs.find((r) => r.id === rungId);
     if (!rung) return;
 
     const side: TradeSide = rung.side;
-    const filledPrice = rung.price; // capture before re-arming to a new level
+    const gridPrice = rung.price; // the rung's grid line — re-arm relative to this
+    const filledPrice = actualPrice ?? gridPrice; // what actually executed (may differ)
     rung.fills += 1;
 
     if (side === 'BUY') {
       plan.openLots += 1;
       rung.side = 'SELL';
-      rung.price = this.roundPrice(Math.min(filledPrice + plan.step, plan.upper), plan.currency);
+      rung.price = this.roundPrice(Math.min(gridPrice + plan.step, plan.upper), plan.currency);
     } else {
       plan.realised += realisedPnl;
       plan.cycles += 1;
       plan.openLots = Math.max(0, plan.openLots - 1);
       rung.side = 'BUY';
-      rung.price = this.roundPrice(Math.max(filledPrice - plan.step, plan.lower), plan.currency);
+      rung.price = this.roundPrice(Math.max(gridPrice - plan.step, plan.lower), plan.currency);
     }
 
     const fill: GridFill = {

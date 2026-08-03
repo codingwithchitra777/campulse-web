@@ -70,7 +70,13 @@
     "ARMED_TITLE": "Armed rungs — tap to record",
     "TAP_CTA": "tap to record",
     "BUY_ARMED": "Buy armed",
-    "SELL_ARMED": "Sell armed"
+    "SELL_ARMED": "Sell armed",
+    "RECORD_FILL": "Record fill",
+    "FILL_DIALOG_SUB": "Confirm the price your broker actually filled at — adjust it if there was slippage.",
+    "FILL_PRICE": "Fill price",
+    "FILL_OFF_RUNG": "Off the rung price of",
+    "CONFIRM_FILL": "Record trade",
+    "RECORDING": "Recording…"
   },
   "LOANS": {
     "TITLE": "Loans",

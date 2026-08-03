@@ -258,6 +258,14 @@ export interface GridPlan {
   openLots: number;
   /** ISO datetime the plan was registered. */
   createdAt: string;
+  /** ISO datetime of the last recorded fill or edit (server-stamped). */
+  updatedAt?: string;
+}
+
+/** GET/PUT /api/grid response — the user's active plan (null = none registered). */
+export interface GridPlanResponse {
+  success: boolean;
+  plan: GridPlan | null;
 }
 
 /** /api/portfolio item. */

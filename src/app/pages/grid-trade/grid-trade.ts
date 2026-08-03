@@ -68,6 +68,9 @@ export class GridTradeComponent implements OnInit {
   readonly recordError = signal<string | null>(null);
   readonly toast = signal<string | null>(null);
 
+  // ---- fill confirm dialog (broker fills aren't always exactly at the rung price) ----
+  readonly pendingFill = signal<{ rung: GridRung; side: TradeSide; price: number } | null>(null);
+
   readonly plan = this.grid.plan;
 
   get currency(): CurrencyCode {
@@ -286,28 +289,58 @@ export class GridTradeComponent implements OnInit {
     this.mode.set('active');
   }
 
-  // ---- record a fill (one recorded trade per tap) ----
+  // ---- tap a rung → open the confirm dialog (price prefilled, editable) ----
   recordFill(rung: GridRung) {
+    if (this.recording()) return;
+    this.recordError.set(null);
+    this.pendingFill.set({ rung, side: rung.side, price: rung.price });
+  }
+
+  cancelFill() {
+    this.pendingFill.set(null);
+  }
+
+  /** Set the confirm-dialog price to a percentage nudge off the rung price (slippage helper). */
+  nudgeFillPrice(delta: number) {
+    const pf = this.pendingFill();
+    if (!pf) return;
+    const next = this.grid.roundPrice(pf.price + delta, this.currencyOf());
+    this.pendingFill.set({ ...pf, price: Math.max(0, next) });
+  }
+
+  private currencyOf(): CurrencyCode {
+    return this.plan()?.currency ?? this.currency;
+  }
+
+  // ---- confirm the fill: one recorded trade at the (possibly edited) price ----
+  confirmFill() {
     const p = this.plan();
-    if (!p || this.recording()) return;
+    const pf = this.pendingFill();
+    if (!p || !pf || this.recording()) return;
+    if (pf.price <= 0) {
+      this.recordError.set('Fill price must be greater than zero.');
+      return;
+    }
     this.recordError.set(null);
     this.recording.set(true);
 
     const payload: TradePayload = {
       ticker: p.ticker,
-      side: rung.side,
-      price: rung.price,
+      side: pf.side,
+      price: pf.price,
       qty: p.qty,
       market: p.market,
       currency: p.currency
     };
 
-    const side = rung.side;
-    const price = rung.price;
+    const side = pf.side;
+    const price = pf.price;
     this.api.confirmTrade(payload).subscribe({
       next: (res) => {
-        this.grid.applyFill(rung.id, res.realisedPnl ?? 0);
+        // Log the actual filled price; the rung still re-arms on its grid line.
+        this.grid.applyFill(pf.rung.id, res.realisedPnl ?? 0, price);
         this.recording.set(false);
+        this.pendingFill.set(null);
         const label = side === 'BUY' ? 'Buy' : 'Sell';
         const pnlNote =
           side === 'SELL' ? ` · P/L ${res.realisedPnl >= 0 ? '+' : ''}${res.realisedPnl}` : '';

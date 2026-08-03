@@ -280,6 +280,56 @@
           </div>
         </aside>
       </div>
+
+      <!-- Fill confirm dialog (editable price — broker fills drift off the rung) -->
+      @if (pendingFill(); as pf) {
+        <div class="grid-modal-overlay" (click)="cancelFill()">
+          <div class="grid-modal" (click)="$event.stopPropagation()">
+            <h3 class="grid-modal-title">
+              <span class="side-pill" [class.buy]="pf.side === 'BUY'" [class.sell]="pf.side === 'SELL'">
+                {{ pf.side === 'BUY' ? '▲ Buy' : '▼ Sell' }}
+              </span>
+              {{ 'GRID.RECORD_FILL' | translate }} — {{ p.ticker }}
+            </h3>
+            <p class="grid-modal-sub">{{ 'GRID.FILL_DIALOG_SUB' | translate }}</p>
+
+            <div class="grid-modal-row">
+              <span>{{ 'GRID.COL_QTY' | translate }}</span>
+              <strong>{{ p.qty }} {{ qtyUnit }}</strong>
+            </div>
+
+            <div class="form-group grid-modal-price">
+              <label>{{ 'GRID.FILL_PRICE' | translate }}</label>
+              <div class="grid-price-input">
+                <button type="button" (click)="nudgeFillPrice(-p.step)" [attr.aria-label]="'Lower price'">−</button>
+                <input type="number" [ngModel]="pf.price" (ngModelChange)="pendingFill.set({ rung: pf.rung, side: pf.side, price: +$event })" step="any" min="0">
+                <button type="button" (click)="nudgeFillPrice(p.step)" [attr.aria-label]="'Raise price'">+</button>
+              </div>
+              @if (pf.price !== pf.rung.price) {
+                <div class="grid-hint">{{ 'GRID.FILL_OFF_RUNG' | translate }} {{ pf.rung.price | money:p.currency }}</div>
+              }
+            </div>
+
+            <div class="grid-modal-row total">
+              <span>{{ 'TRADE.EST_TOTAL' | translate }}</span>
+              <strong>{{ (pf.price * p.qty) | money:p.currency }}</strong>
+            </div>
+
+            @if (recordError(); as err) {
+              <div class="alert alert-danger" style="margin-top:12px;">❌ {{ err }}</div>
+            }
+
+            <div class="grid-modal-actions">
+              <button type="button" class="grid-ghost-btn" (click)="cancelFill()">{{ 'TRADE.BTN_CANCEL' | translate }}</button>
+              <button type="button" class="submit-btn grid-modal-confirm"
+                      [class.btn-buy]="pf.side === 'BUY'" [class.btn-sell]="pf.side === 'SELL'"
+                      [disabled]="recording()" (click)="confirmFill()">
+                {{ recording() ? ('GRID.RECORDING' | translate) : ('GRID.CONFIRM_FILL' | translate) }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     }
   }
 </div>
