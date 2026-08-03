@@ -1,0 +1,285 @@
+<div class="view-container animate-fade-in grid-view">
+
+  <!-- Header -->
+  <div class="grid-header">
+    <div class="grid-header-title">
+      <h2 class="panel-title">🪜 {{ 'GRID.TITLE' | translate }}</h2>
+      <p class="grid-subtitle">{{ 'GRID.SUBTITLE' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Mode switch -->
+  <div class="grid-mode-switch">
+    <button type="button" [class.on]="mode() === 'plan'" (click)="goPlan()">
+      ① {{ 'GRID.MODE_PLAN' | translate }}
+    </button>
+    <button type="button" [class.on]="mode() === 'active'" [disabled]="!plan()" (click)="goActive()">
+      ② {{ 'GRID.MODE_ACTIVE' | translate }}
+    </button>
+  </div>
+
+  <!-- Toast -->
+  @if (toast(); as msg) {
+    <div class="grid-toast animate-slide-in">✅ {{ msg }}</div>
+  }
+
+  <!-- ============================ PLAN MODE ============================ -->
+  @if (mode() === 'plan') {
+    <div class="grid-layout">
+      <!-- Setup card -->
+      <div class="form-card grid-card">
+        <h3 class="grid-card-title">{{ 'GRID.SETUP_TITLE' | translate }}</h3>
+        <p class="grid-card-sub">{{ 'GRID.SETUP_SUB' | translate }}</p>
+
+        @if (formError(); as err) {
+          <div class="alert alert-danger animate-slide-in">❌ {{ err }}</div>
+        }
+
+        <!-- Market -->
+        <div class="form-group">
+          <label>{{ 'TRADE.MARKET' | translate }}</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="gmarket" [(ngModel)]="market" value="US" (ngModelChange)="onMarketChange()">
+              <span class="radio-custom">🇺🇸 US · $</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="gmarket" [(ngModel)]="market" value="CSX" (ngModelChange)="onMarketChange()">
+              <span class="radio-custom">🇰🇭 CSX · ៛</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="gmarket" [(ngModel)]="market" value="GOLD_KH" (ngModelChange)="onMarketChange()">
+              <span class="radio-custom">🥇 Gold · $/chi</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Symbol -->
+        <div class="form-group">
+          <label>{{ 'TRADE.SELECT_STOCK' | translate }}</label>
+
+          @if (market === 'CSX') {
+            @if (loadingTickers()) {
+              <div class="grid-muted">Loading…</div>
+            } @else {
+              <select name="gticker" [(ngModel)]="ticker" (change)="onCsxTickerChange()">
+                @for (t of tickersList(); track t.ticker) {
+                  <option [value]="t.ticker">{{ t.ticker }} (CSX: {{ t.price | number }} riel)</option>
+                }
+                @empty {
+                  <option value="">No tickers available</option>
+                }
+              </select>
+            }
+          }
+
+          @if (market === 'US') {
+            <input type="text" name="gsym" [(ngModel)]="ticker" (ngModelChange)="searchSymbols($event)"
+                   placeholder="Search e.g. AAPL, MSFT" autocomplete="off">
+            @if (searchingSymbols()) { <div class="grid-muted">Searching…</div> }
+            @if (usResults().length) {
+              <div class="grid-symbol-results">
+                @for (r of usResults(); track r.symbol) {
+                  <button type="button" class="grid-symbol-row" (click)="pickSymbol(r.symbol)">
+                    <strong>{{ r.symbol }}</strong> <span>{{ r.description }}</span>
+                  </button>
+                }
+              </div>
+            }
+          }
+
+          @if (market === 'GOLD_KH') {
+            <div class="grid-muted">{{ GOLD_SYMBOL }} — priced per chi</div>
+          }
+        </div>
+
+        <!-- Quote strip -->
+        @if (quoteInfo; as q) {
+          <div class="grid-quote-strip">
+            <span class="sym">{{ ticker }}</span>
+            <span class="px">{{ q.price | money:currency }}</span>
+            @if (q.change !== null) {
+              <span class="chg" [class.up]="q.change >= 0" [class.down]="q.change < 0">
+                {{ q.change >= 0 ? '+' : '' }}{{ q.change | number:'1.2-2' }}%
+              </span>
+            }
+            <span class="spacer"></span>
+            <span class="grid-live"><span class="blip"></span> live</span>
+          </div>
+        }
+
+        <!-- Range -->
+        <div class="grid-two-col">
+          <div class="form-group">
+            <label>{{ 'GRID.LOWER' | translate }}</label>
+            <input type="number" name="glo" [(ngModel)]="lower" (ngModelChange)="onInputChange()" step="any">
+          </div>
+          <div class="form-group">
+            <label>{{ 'GRID.UPPER' | translate }}</label>
+            <input type="number" name="ghi" [(ngModel)]="upper" (ngModelChange)="onInputChange()" step="any">
+          </div>
+        </div>
+
+        <!-- Levels -->
+        <div class="form-group">
+          <label>{{ 'GRID.LEVELS' | translate }} <span class="grid-hint-inline">— {{ 'GRID.LEVELS_HINT' | translate }}</span></label>
+          <div class="grid-range-row">
+            <input type="range" name="glvl" min="3" max="15" [(ngModel)]="levels" (ngModelChange)="onInputChange()">
+            <span class="grid-range-val">{{ levels }}</span>
+          </div>
+        </div>
+
+        <!-- Qty + spacing -->
+        <div class="grid-two-col">
+          <div class="form-group">
+            <label>{{ 'GRID.QTY' | translate }}</label>
+            <input type="number" name="gqty" [(ngModel)]="qty" (ngModelChange)="onInputChange()" min="1" step="1">
+            <div class="grid-hint">{{ qtyUnit }} {{ 'GRID.QTY_HINT' | translate }}</div>
+          </div>
+          <div class="form-group">
+            <label>{{ 'GRID.SPACING' | translate }}</label>
+            <div class="grid-seg">
+              <button type="button" [class.on]="spacing === 'arith'" (click)="spacing = 'arith'; onInputChange()">{{ 'GRID.SPACING_ARITH' | translate }}</button>
+              <button type="button" [class.on]="spacing === 'geo'" (click)="spacing = 'geo'; onInputChange()">{{ 'GRID.SPACING_GEO' | translate }}</button>
+            </div>
+            <div class="grid-hint">{{ 'GRID.SPACING_HINT' | translate }}</div>
+          </div>
+        </div>
+
+        <button type="button" class="submit-btn grid-primary-btn" (click)="registerGrid()">
+          {{ 'GRID.REGISTER' | translate }} →
+        </button>
+      </div>
+
+      <!-- Preview / ladder rail -->
+      <aside class="form-card grid-card grid-rail">
+        <h3 class="grid-rail-title">{{ 'GRID.PREVIEW_TITLE' | translate }}</h3>
+
+        <div class="grid-stat-grid">
+          <div class="grid-stat"><small>{{ 'GRID.BUYS' | translate }}</small><b class="text-profit">{{ previewBuyCount() }}</b></div>
+          <div class="grid-stat"><small>{{ 'GRID.SELLS' | translate }}</small><b class="text-loss">{{ previewSellCount() }}</b></div>
+          <div class="grid-stat"><small>{{ 'GRID.STEP' | translate }}</small><b>{{ previewStep().abs | money:currency }} · {{ previewStep().pct | number:'1.1-1' }}%</b></div>
+          <div class="grid-stat"><small>{{ 'GRID.CAPITAL' | translate }}</small><b>{{ previewCapital() | money:currency }}</b></div>
+          <div class="grid-stat"><small>{{ 'GRID.PER_GRID' | translate }}</small><b class="text-profit">{{ previewPerGrid() | money:currency }}</b></div>
+          <div class="grid-stat"><small>{{ 'GRID.CYCLE_PROFIT' | translate }}</small><b class="text-profit">{{ previewCycleProfit() | money:currency }}</b></div>
+        </div>
+
+        <div class="grid-ladder-preview">
+          @for (o of previewOrders(); track o.seq) {
+            <div class="grid-lad-row" [class.buy]="o.side === 'BUY'" [class.sell]="o.side === 'SELL'">
+              <span class="price">{{ o.price | money:currency }}</span>
+              <span class="side-pill" [class.buy]="o.side === 'BUY'" [class.sell]="o.side === 'SELL'">
+                {{ o.side === 'BUY' ? '▲ Buy' : '▼ Sell' }}
+              </span>
+              <span class="val">{{ o.qty }}× · {{ o.value | money:currency }}</span>
+            </div>
+          } @empty {
+            <div class="grid-muted grid-center">{{ 'GRID.PREVIEW_EMPTY' | translate }}</div>
+          }
+        </div>
+        <div class="grid-legend">
+          <span><span class="sw buy"></span> {{ 'GRID.BUY_RUNG' | translate }}</span>
+          <span><span class="sw sell"></span> {{ 'GRID.SELL_RUNG' | translate }}</span>
+        </div>
+      </aside>
+    </div>
+  }
+
+  <!-- ============================ ACTIVE MODE ============================ -->
+  @if (mode() === 'active') {
+    @if (plan(); as p) {
+      <!-- Head -->
+      <div class="form-card grid-card grid-active-head">
+        <div class="gah-top">
+          <div class="gah-id">
+            <span class="gah-sym">{{ p.ticker }}</span>
+            <span class="gah-tag">{{ p.market }} · {{ p.rungs.length }} {{ 'GRID.RUNGS_ARMED' | translate }}</span>
+          </div>
+          <span class="spacer"></span>
+          <div class="grid-chips">
+            <div class="grid-chip"><small>{{ 'GRID.REALIZED' | translate }}</small>
+              <b [class.text-profit]="p.realised > 0" [class.text-loss]="p.realised < 0">{{ p.realised | money:p.currency:true }}</b>
+            </div>
+            <div class="grid-chip"><small>{{ 'GRID.CYCLES' | translate }}</small><b>{{ p.cycles }}</b></div>
+            <div class="grid-chip"><small>{{ 'GRID.OPEN_LOTS' | translate }}</small><b>{{ p.openLots }}</b></div>
+          </div>
+        </div>
+        <div class="gah-instr">
+          <span>{{ 'GRID.TAP_INSTRUCTION' | translate }}</span>
+          <span class="spacer"></span>
+          <button type="button" class="grid-ghost-btn" (click)="resetGrid()">↺ {{ 'GRID.RESET' | translate }}</button>
+          <button type="button" class="grid-ghost-btn danger" (click)="discardGrid()">🗑 {{ 'GRID.DISCARD' | translate }}</button>
+        </div>
+        @if (recordError(); as err) {
+          <div class="alert alert-danger animate-slide-in" style="margin-top:12px;">❌ {{ err }}</div>
+        }
+      </div>
+
+      <div class="grid-layout">
+        <!-- Fills log -->
+        <div class="form-card grid-card">
+          <h3 class="grid-card-title">{{ 'GRID.LOG_TITLE' | translate }}</h3>
+          <p class="grid-card-sub">{{ 'GRID.LOG_SUB' | translate }}</p>
+          <div class="table-container">
+            <table class="grid-log-table">
+              <thead>
+                <tr>
+                  <th>{{ 'GRID.COL_TIME' | translate }}</th>
+                  <th>{{ 'GRID.COL_SIDE' | translate }}</th>
+                  <th>{{ 'GRID.COL_PRICE' | translate }}</th>
+                  <th>{{ 'GRID.COL_QTY' | translate }}</th>
+                  <th>{{ 'GRID.COL_REALIZED' | translate }}</th>
+                  <th>{{ 'GRID.COL_RUNNING' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (f of p.log; track trackFill($index, f)) {
+                  <tr>
+                    <td class="grid-muted">{{ f.at | date:'shortTime' }}</td>
+                    <td>
+                      <span class="side-pill" [class.buy]="f.side === 'BUY'" [class.sell]="f.side === 'SELL'">
+                        {{ f.side === 'BUY' ? '▲ Buy' : '▼ Sell' }}
+                      </span>
+                    </td>
+                    <td>{{ f.price | money:p.currency }}</td>
+                    <td>{{ f.qty }}</td>
+                    <td>
+                      @if (f.side === 'SELL') {
+                        <span [class.text-profit]="f.pnl >= 0" [class.text-loss]="f.pnl < 0">{{ f.pnl | money:p.currency:true }}</span>
+                      } @else { <span class="grid-muted">—</span> }
+                    </td>
+                    <td>{{ f.running | money:p.currency }}</td>
+                  </tr>
+                }
+                @empty {
+                  <tr><td colspan="6" class="grid-center grid-muted" style="padding:26px 10px;">{{ 'GRID.LOG_EMPTY' | translate }}</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Armed rungs -->
+        <aside class="form-card grid-card grid-rail">
+          <h3 class="grid-rail-title">{{ 'GRID.ARMED_TITLE' | translate }}</h3>
+          <p class="grid-rail-meta">{{ p.rungs.length }} {{ 'GRID.RUNGS_ARMED' | translate }} · {{ 'GRID.STEP' | translate }} {{ p.step | money:p.currency }}</p>
+          <div class="grid-taprail">
+            @for (r of activeRungs(); track trackRung($index, r)) {
+              <button type="button" class="grid-taprow" [class.arm-buy]="r.side === 'BUY'" [class.arm-sell]="r.side === 'SELL'"
+                      [disabled]="recording()" (click)="recordFill(r)"
+                      [title]="'Record ' + r.side + ' fill at ' + (r.price | money:p.currency)">
+                <span class="price">{{ r.price | money:p.currency }}</span>
+                <span class="cta-wrap"><span class="state"></span><span class="cta">{{ r.side === 'BUY' ? '▲ Buy' : '▼ Sell' }} · {{ 'GRID.TAP_CTA' | translate }}</span></span>
+                <span class="badge">{{ r.fills ? '✓' + r.fills : '' }}</span>
+              </button>
+            }
+          </div>
+          <div class="grid-legend">
+            <span><span class="sw ring-buy"></span> {{ 'GRID.BUY_ARMED' | translate }}</span>
+            <span><span class="sw ring-sell"></span> {{ 'GRID.SELL_ARMED' | translate }}</span>
+          </div>
+        </aside>
+      </div>
+    }
+  }
+</div>

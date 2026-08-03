@@ -200,6 +200,66 @@ export interface TradeInitResult {
   existingQty: number;
 }
 
+// ---------------------------------------------------------------------------
+// Grid trading (client-side only)
+//
+// Campulse records data — it does not execute orders. A grid plan is a ladder
+// of resting orders the user placed at their real broker; when one fills there,
+// they tap the rung here to record the trade (one confirmTrade call per fill).
+// The whole plan lives in localStorage (per user), keyed by GridService — there
+// is no backend grid table. Each recorded fill IS a real Trade in the journal.
+// ---------------------------------------------------------------------------
+
+export type GridSpacing = 'arith' | 'geo';
+
+/** A single price rung — one resting order that flips side each time it fills. */
+export interface GridRung {
+  id: number;
+  price: number;
+  /** Currently armed side; a filled BUY re-arms as SELL one step up, and vice versa. */
+  side: TradeSide;
+  /** How many times this rung has been recorded as filled. */
+  fills: number;
+}
+
+/** One recorded fill in the grid's running log. */
+export interface GridFill {
+  id: string;
+  side: TradeSide;
+  price: number;
+  qty: number;
+  /** Realised P/L booked by this fill (0 for buys); comes from the backend for sells. */
+  pnl: number;
+  /** Running realised total after this fill. */
+  running: number;
+  /** ISO datetime the fill was recorded. */
+  at: string;
+}
+
+/** A full grid plan + its live fill state, persisted per user. */
+export interface GridPlan {
+  ticker: string;
+  market: MarketKind;
+  currency: CurrencyCode;
+  lower: number;
+  upper: number;
+  levels: number;
+  qty: number;
+  spacing: GridSpacing;
+  /** Price distance between adjacent rungs (absolute, from the first gap). */
+  step: number;
+  rungs: GridRung[];
+  log: GridFill[];
+  /** Accumulated realised P/L across all recorded sells. */
+  realised: number;
+  /** Completed round-trips (buy → paired sell). */
+  cycles: number;
+  /** Net open grid lots held (buy fills − sell fills, floored at 0). */
+  openLots: number;
+  /** ISO datetime the plan was registered. */
+  createdAt: string;
+}
+
 /** /api/portfolio item. */
 export interface Holding {
   ticker: string;

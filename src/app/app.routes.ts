@@ -38,6 +38,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'grid-trade',
+    loadComponent: () => import('./pages/grid-trade/grid-trade').then(m => m.GridTradeComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, adminGuard],
     children: [
