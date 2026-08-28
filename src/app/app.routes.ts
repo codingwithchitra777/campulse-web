@@ -43,6 +43,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'top-lots',
+    loadComponent: () => import('./pages/top-lots/top-lots').then(m => m.TopLotsComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, adminGuard],
     children: [
