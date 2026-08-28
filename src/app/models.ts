@@ -268,6 +268,47 @@ export interface GridPlanResponse {
   plan: GridPlan | null;
 }
 
+// --- Top Lots (most profitable lots, paginated) ---
+
+/** An open buy lot ranked by current unrealized P/L (GET /api/lots/open). */
+export interface OpenLot {
+  buyTradeId: string;
+  seq: number;
+  ticker: string;
+  market: MarketKind;
+  currency: CurrencyCode;
+  buyPrice: number;
+  qtyOpen: number;
+  /** null when the lot's market has no live quote. */
+  currentPrice: number | null;
+  costBasis: number;
+  marketValue: number | null;
+  unrealisedPnl: number | null;
+  unrealisedPnlPercent: number | null;
+  orderDate: string | null;
+}
+
+/** A closed buy lot ranked by realized P/L (GET /api/lots/closed). */
+export interface ClosedLot {
+  buyTradeId: string;
+  seq: number | null;
+  ticker: string;
+  market: MarketKind;
+  currency: CurrencyCode;
+  buyPrice: number;
+  qtySold: number;
+  avgSellPrice: number;
+  realisedPnl: number;
+  lastSellDate: string | null;
+}
+
+/** Paginated response for the Top Lots endpoints. */
+export interface LotsPage<T> {
+  items: T[];
+  total: number;
+  hasMore: boolean;
+}
+
 /** /api/portfolio item. */
 export interface Holding {
   ticker: string;

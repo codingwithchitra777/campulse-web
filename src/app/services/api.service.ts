@@ -13,6 +13,9 @@ import {
   GoogleAuthResponse,
   GridPlan,
   GridPlanResponse,
+  OpenLot,
+  ClosedLot,
+  LotsPage,
   Holding,
   Loan,
   LoanDirection,
@@ -113,6 +116,20 @@ export class ApiService {
 
   deleteGrid(): Observable<{ success: boolean }> {
     return this.http.delete<{ success: boolean }>(`${this.baseUrl}/api/grid`);
+  }
+
+  // --- Top Lots (most profitable lots, paginated) ---
+
+  getOpenLots(limit = 10, offset = 0): Observable<LotsPage<OpenLot>> {
+    return this.http.get<LotsPage<OpenLot>>(`${this.baseUrl}/api/lots/open`, {
+      params: { limit, offset }
+    });
+  }
+
+  getClosedLots(limit = 10, offset = 0): Observable<LotsPage<ClosedLot>> {
+    return this.http.get<LotsPage<ClosedLot>>(`${this.baseUrl}/api/lots/closed`, {
+      params: { limit, offset }
+    });
   }
 
   getPosition(symbol: string, market?: string): Observable<Position> {

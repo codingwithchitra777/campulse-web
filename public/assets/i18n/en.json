@@ -5,6 +5,7 @@
     "TRADES": "Trades",
     "RECORD_TRADE": "Record Trade",
     "GRID_TRADE": "Grid Trade",
+    "TOP_LOTS": "Top Lots",
     "HISTORY": "History",
     "ANALYTICS": "Analytics",
     "AI_COACH": "AI Coach",
@@ -22,6 +23,21 @@
     "ADMIN": "Admin",
     "LOAN_CALC": "Loan Calculator",
     "LOANS": "Loans"
+  },
+  "LOTS": {
+    "TITLE": "Top Lots",
+    "SUBTITLE": "Your most profitable lots. Open ranks current holdings by paper gain; Closed ranks completed trades by realized profit.",
+    "TAB_OPEN": "Open (unrealized)",
+    "TAB_CLOSED": "Closed (realized)",
+    "NOW": "Now",
+    "VALUE": "Value",
+    "NO_QUOTE": "No live price for this market",
+    "CLOSED_ON": "Closed",
+    "REALIZED": "realized",
+    "EMPTY_OPEN": "No open lots yet — record a buy to start tracking holdings.",
+    "EMPTY_CLOSED": "No closed lots yet — sell some shares to book realized profit.",
+    "LOADING": "Loading…",
+    "END": "That's all your lots."
   },
   "GRID": {
     "TITLE": "Grid Trade",

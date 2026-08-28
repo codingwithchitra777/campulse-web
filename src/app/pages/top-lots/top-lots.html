@@ -1,0 +1,104 @@
+<div class="view-container animate-fade-in grid-view">
+  <div class="grid-header">
+    <div class="grid-header-title">
+      <h2 class="panel-title">🏆 {{ 'LOTS.TITLE' | translate }}</h2>
+      <p class="grid-subtitle">{{ 'LOTS.SUBTITLE' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="grid-mode-switch">
+    <button type="button" [class.on]="isOpen" (click)="setTab('open')">
+      📈 {{ 'LOTS.TAB_OPEN' | translate }}
+      @if (openTotal()) { <span class="lots-count">{{ openTotal() }}</span> }
+    </button>
+    <button type="button" [class.on]="!isOpen" (click)="setTab('closed')">
+      ✅ {{ 'LOTS.TAB_CLOSED' | translate }}
+      @if (closedTotal()) { <span class="lots-count">{{ closedTotal() }}</span> }
+    </button>
+  </div>
+
+  @if (error(); as err) {
+    <div class="alert alert-danger animate-slide-in">❌ {{ err }}</div>
+  }
+
+  <!-- OPEN tab: ranked by unrealized P/L -->
+  @if (isOpen) {
+    <div class="lots-list">
+      @for (lot of openItems(); track trackLot($index, lot); let i = $index) {
+        <div class="lot-row">
+          <span class="lot-rank">{{ i + 1 }}</span>
+          <div class="lot-main">
+            <div class="lot-top">
+              <span class="lot-ticker">{{ lot.ticker }}</span>
+              <span class="lot-badge">{{ lot.market }}</span>
+              <span class="lot-sub">#{{ lot.seq }} · {{ lot.qtyOpen | number }} @ {{ lot.buyPrice | money:lot.currency }}</span>
+            </div>
+            <div class="lot-meta">
+              @if (lot.currentPrice !== null) {
+                {{ 'LOTS.NOW' | translate }} {{ lot.currentPrice | money:lot.currency }}
+                · {{ 'LOTS.VALUE' | translate }} {{ lot.marketValue | money:lot.currency }}
+              } @else {
+                <span class="lot-noquote">{{ 'LOTS.NO_QUOTE' | translate }}</span>
+              }
+            </div>
+          </div>
+          <div class="lot-pnl">
+            @if (lot.unrealisedPnl !== null) {
+              <span class="lot-pnl-val" [class.text-profit]="lot.unrealisedPnl >= 0" [class.text-loss]="lot.unrealisedPnl < 0">
+                {{ lot.unrealisedPnl | money:lot.currency:true }}
+              </span>
+              <span class="lot-pnl-pct" [class.text-profit]="(lot.unrealisedPnlPercent || 0) >= 0" [class.text-loss]="(lot.unrealisedPnlPercent || 0) < 0">
+                {{ (lot.unrealisedPnlPercent || 0) >= 0 ? '+' : '' }}{{ lot.unrealisedPnlPercent | number:'1.1-1' }}%
+              </span>
+            } @else {
+              <span class="lot-pnl-val grid-muted">—</span>
+            }
+          </div>
+        </div>
+      } @empty {
+        @if (!activeLoading) {
+          <div class="lots-empty">{{ 'LOTS.EMPTY_OPEN' | translate }}</div>
+        }
+      }
+    </div>
+  } @else {
+    <!-- CLOSED tab: ranked by realized P/L -->
+    <div class="lots-list">
+      @for (lot of closedItems(); track trackLot($index, lot); let i = $index) {
+        <div class="lot-row">
+          <span class="lot-rank">{{ i + 1 }}</span>
+          <div class="lot-main">
+            <div class="lot-top">
+              <span class="lot-ticker">{{ lot.ticker }}</span>
+              <span class="lot-badge">{{ lot.market }}</span>
+              <span class="lot-sub">{{ lot.qtySold | number }} @ {{ lot.buyPrice | money:lot.currency }} → {{ lot.avgSellPrice | money:lot.currency }}</span>
+            </div>
+            <div class="lot-meta">
+              @if (lot.lastSellDate) { {{ 'LOTS.CLOSED_ON' | translate }} {{ lot.lastSellDate | date:'mediumDate' }} }
+            </div>
+          </div>
+          <div class="lot-pnl">
+            <span class="lot-pnl-val" [class.text-profit]="lot.realisedPnl >= 0" [class.text-loss]="lot.realisedPnl < 0">
+              {{ lot.realisedPnl | money:lot.currency:true }}
+            </span>
+            <span class="lot-pnl-pct grid-muted">{{ 'LOTS.REALIZED' | translate }}</span>
+          </div>
+        </div>
+      } @empty {
+        @if (!activeLoading) {
+          <div class="lots-empty">{{ 'LOTS.EMPTY_CLOSED' | translate }}</div>
+        }
+      }
+    </div>
+  }
+
+  <!-- Loading + infinite-scroll sentinel -->
+  @if (activeLoading) {
+    <div class="lots-loading">{{ 'LOTS.LOADING' | translate }}</div>
+  }
+  <div #sentinel class="lots-sentinel" aria-hidden="true"></div>
+  @if (!activeHasMore && ((isOpen && openItems().length) || (!isOpen && closedItems().length))) {
+    <div class="lots-end grid-muted">{{ 'LOTS.END' | translate }}</div>
+  }
+</div>

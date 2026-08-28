@@ -4860,3 +4860,89 @@ body.light .grid-modal,
 body.light .grid-price-input input,
 body.light .grid-price-input button { background: #f4f6fb; }
 body.light .grid-modal { background: #ffffff; }
+
+/* ============================================================
+   Top Lots (pages/top-lots) — ranked most-profitable lots
+   ============================================================ */
+.lots-count {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: calc(11px * var(--font-scale, 1));
+  font-family: ui-monospace, Menlo, monospace;
+  vertical-align: middle;
+}
+.lots-list { display: flex; flex-direction: column; gap: 8px; }
+.lot-row {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  background: #0d121e;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 13px 15px;
+}
+.lot-rank {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: #151b2c;
+  border: 1px solid #1e293b;
+  color: #9ca3af;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+}
+.lot-row:nth-child(1) .lot-rank { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1a1205; border-color: transparent; }
+.lot-row:nth-child(2) .lot-rank { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: #0f172a; border-color: transparent; }
+.lot-row:nth-child(3) .lot-rank { background: linear-gradient(135deg, #d6a06a, #b07d4b); color: #1a1205; border-color: transparent; }
+.lot-main { min-width: 0; }
+.lot-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lot-ticker { font-weight: 700; font-size: calc(15px * var(--font-scale, 1)); color: #f0f6fc; }
+.lot-badge {
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+.lot-sub { font-size: calc(12px * var(--font-scale, 1)); color: #9ca3af; font-family: ui-monospace, Menlo, monospace; }
+.lot-meta { font-size: calc(11.5px * var(--font-scale, 1)); color: #5f6c82; margin-top: 4px; font-family: ui-monospace, Menlo, monospace; }
+.lot-noquote { color: #f59e0b; }
+.lot-pnl { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+.lot-pnl-val {
+  font-family: ui-monospace, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 700;
+}
+.lot-pnl-pct {
+  font-family: ui-monospace, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: calc(11.5px * var(--font-scale, 1));
+}
+.lots-empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 40px 20px;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+.lots-loading { text-align: center; color: #9ca3af; padding: 16px; font-size: calc(12.5px * var(--font-scale, 1)); }
+.lots-end { text-align: center; padding: 14px; font-size: calc(12px * var(--font-scale, 1)); }
+.lots-sentinel { height: 1px; }
+
+/* light mode */
+body.light .lot-row { background: #ffffff; border-color: #d9e0ec; }
+body.light .lot-rank { background: #f4f6fb; border-color: #d9e0ec; color: #566072; }
+body.light .lot-ticker { color: #10203b; }
+body.light .lot-sub { color: #566072; }
+body.light .lot-meta { color: #8a94a6; }
+body.light .lots-count { background: rgba(0, 0, 0, 0.06); }
